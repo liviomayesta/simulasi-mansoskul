@@ -204,6 +204,9 @@ textarea.star-input{height:90px;resize:vertical;font-size:13.5px;line-height:1.6
     </div>
   </div>
   <button class="btn btn-primary" style="width:100%;padding:14px" onclick="doSetup()">Mulai Asesmen →</button>
+  <div style="text-align:center;margin-top:1.25rem">
+    <a href="admin_dashboard.html" style="font-size:12px;color:#bbb;text-decoration:none;display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;transition:all .2s" onmouseover="this.style.background='#eef2fb';this.style.color='#1F3A8C'" onmouseout="this.style.background='transparent';this.style.color='#bbb'">🔐 Masuk sebagai Admin</a>
+  </div>
 </div>
 </div>
 
@@ -229,8 +232,9 @@ textarea.star-input{height:90px;resize:vertical;font-size:13.5px;line-height:1.6
       <div style="font-size:12px;color:#888;margin-top:.5rem">⏱ 90 menit</div>
     </div>
   </div>
-  <div style="margin-top:1.5rem;text-align:center">
+  <div style="margin-top:1.5rem;text-align:center;display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
     <button class="btn btn-outline btn-sm" onclick="showResults()">Lihat Hasil Lengkap</button>
+    <button class="btn btn-outline btn-sm" onclick="goToSetup()" style="color:#888;border-color:#ddd">✏️ Edit Data Saya</button>
   </div>
 </div>
 </div>
@@ -646,6 +650,17 @@ function doSetup(){
 
   renderDashboard();
   goTo('dashboard');
+}
+
+function goToSetup(){
+  // Pre-fill form with current data
+  if(S.peserta){
+    document.getElementById('f-nama').value = S.peserta.nama || '';
+    document.getElementById('f-nip').value  = S.peserta.nip  || '';
+    document.getElementById('f-unit').value = S.peserta.unit || '';
+    document.getElementById('f-jenjang').value = S.peserta.jenjang || 'Administrator';
+  }
+  goTo('setup');
 }
 
 // Auto-init Firebase when page loads
