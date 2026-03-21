@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin – Simulasi Asesmen Mansoskul</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#0f1523;color:#e8ecf8;min-height:100vh}
+
+/* ── LOGIN ── */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0f1523 0%,#1a2540 100%)}
+.login-box{background:#1c2640;border:1px solid #2e3d66;border-radius:16px;padding:2.5rem;width:360px;text-align:center}
+.login-logo{font-size:40px;margin-bottom:1rem}
+.login-title{font-size:20px;font-weight:700;color:#7fa8ff;margin-bottom:.3rem}
+.login-sub{font-size:13px;color:#7a88aa;margin-bottom:2rem}
+.login-box input{width:100%;padding:11px 14px;background:#0f1523;border:1px solid #2e3d66;border-radius:8px;color:#e8ecf8;font-size:14px;outline:none;margin-bottom:1rem;font-family:inherit}
+.login-box input:focus{border-color:#4b6fcc}
+.login-box input::placeholder{color:#4a5470}
+.btn-login{width:100%;padding:12px;background:#1F3A8C;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.btn-login:hover{background:#2a4eb5}
+.login-err{color:#e06c6c;font-size:12px;margin-top:.75rem;display:none}
+
+/* ── MAIN LAYOUT ── */
+#admin-app{display:none;min-height:100vh}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:#141c30;border-right:1px solid #1e2d4d;padding:1.5rem 1rem;z-index:100}
+.sidebar-logo{display:flex;align-items:center;gap:10px;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid #1e2d4d}
+.sidebar-logo-icon{font-size:24px}
+.sidebar-logo-text{font-size:13px;font-weight:700;color:#7fa8ff;line-height:1.3}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:500;color:#7a88aa;cursor:pointer;transition:all .15s;margin-bottom:3px}
+.nav-item:hover{background:#1e2d4d;color:#e8ecf8}
+.nav-item.active{background:#1F3A8C;color:#fff}
+.nav-item .nav-icon{font-size:16px;width:20px;text-align:center}
+.nav-section{font-size:10px;font-weight:700;color:#3a4a6a;letter-spacing:.1em;text-transform:uppercase;padding:1rem 12px .4rem}
+.sidebar-bottom{position:absolute;bottom:1.5rem;left:1rem;right:1rem}
+.btn-logout{width:100%;padding:9px;background:transparent;border:1px solid #2e3d66;border-radius:8px;color:#7a88aa;font-size:13px;cursor:pointer;transition:all .15s}
+.btn-logout:hover{border-color:#e06c6c;color:#e06c6c}
+
+.main{margin-left:220px;min-height:100vh;padding:0}
+.topbar{background:#141c30;border-bottom:1px solid #1e2d4d;padding:.85rem 1.75rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50}
+.topbar-title{font-size:15px;font-weight:600;color:#e8ecf8}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.fb-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:#4caf7d;background:rgba(76,175,125,.12);padding:4px 10px;border-radius:20px;border:1px solid rgba(76,175,125,.25)}
+.fb-dot{width:7px;height:7px;border-radius:50%;background:#4caf7d;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.last-refresh{font-size:12px;color:#4a5470}
+
+.page{display:none;padding:1.75rem}
+.page.active{display:block}
+
+/* ── STATS CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem}
+.stat-card{background:#1c2640;border:1px solid #2e3d66;border-radius:12px;padding:1.25rem}
+.stat-label{font-size:12px;color:#7a88aa;margin-bottom:.4rem;font-weight:500}
+.stat-num{font-size:28px;font-weight:700;line-height:1}
+.stat-sub{font-size:11px;color:#4a5470;margin-top:.3rem}
+.stat-blue{color:#7fa8ff}.stat-green{color:#4caf7d}.stat-amber{color:#f0a04b}.stat-red{color:#e06c6c}
+
+/* ── FILTERS ── */
+.filters-bar{background:#1c2640;border:1px solid #2e3d66;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+.filter-group{display:flex;align-items:center;gap:8px}
+.filter-label{font-size:12px;color:#7a88aa;white-space:nowrap}
+.filter-input{padding:7px 12px;background:#0f1523;border:1px solid #2e3d66;border-radius:8px;color:#e8ecf8;font-size:13px;outline:none;font-family:inherit}
+.filter-input:focus{border-color:#4b6fcc}
+.filter-input option{background:#1c2640}
+.filter-search{flex:1;min-width:200px}
+.btn-refresh{padding:7px 14px;background:#1F3A8C;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;white-space:nowrap}
+.btn-refresh:hover{background:#2a4eb5}
+.btn-export{padding:7px 14px;background:transparent;border:1px solid #2e3d66;color:#7a88aa;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-export:hover{border-color:#4caf7d;color:#4caf7d}
+
+/* ── TABLE ── */
+.table-wrap{background:#1c2640;border:1px solid #2e3d66;border-radius:12px;overflow:hidden}
+.table-header{padding:.85rem 1.25rem;border-bottom:1px solid #1e2d4d;display:flex;justify-content:space-between;align-items:center}
+.table-title{font-size:14px;font-weight:600;color:#e8ecf8}
+.record-count{font-size:12px;color:#4a5470}
+table{width:100%;border-collapse:collapse}
+thead th{padding:.75rem 1rem;text-align:left;font-size:11px;font-weight:700;color:#4a5470;text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid #1e2d4d;white-space:nowrap;background:#141c30}
+tbody tr{border-bottom:1px solid #1e2d4d;transition:background .1s;cursor:pointer}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#1e2d4d}
+td{padding:.75rem 1rem;font-size:13px;color:#c8d0e8}
+.td-name{font-weight:600;color:#e8ecf8}
+.td-nip{font-size:12px;color:#7a88aa;font-family:monospace}
+.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.pill-green{background:rgba(76,175,125,.15);color:#4caf7d;border:1px solid rgba(76,175,125,.3)}
+.pill-blue{background:rgba(127,168,255,.12);color:#7fa8ff;border:1px solid rgba(127,168,255,.25)}
+.pill-amber{background:rgba(240,160,75,.12);color:#f0a04b;border:1px solid rgba(240,160,75,.25)}
+.pill-gray{background:rgba(122,136,170,.1);color:#7a88aa;border:1px solid rgba(122,136,170,.2)}
+.pill-red{background:rgba(224,108,108,.12);color:#e06c6c;border:1px solid rgba(224,108,108,.25)}
+.score-bar-wrap{display:flex;align-items:center;gap:8px}
+.score-bar{height:6px;border-radius:3px;background:#1e2d4d;width:80px;overflow:hidden}
+.score-bar-fill{height:6px;border-radius:3px;transition:width .6s}
+.td-btn{padding:4px 10px;background:transparent;border:1px solid #2e3d66;border-radius:6px;color:#7fa8ff;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.td-btn:hover{border-color:#7fa8ff;background:rgba(127,168,255,.1)}
+.empty-state{text-align:center;padding:3rem;color:#4a5470}
+.empty-icon{font-size:40px;margin-bottom:.75rem}
+.loading-row td{text-align:center;color:#4a5470;padding:2rem}
+
+/* ── MODAL / DETAIL PANEL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:200;display:none;align-items:flex-start;justify-content:flex-end}
+.overlay.open{display:flex}
+.detail-panel{background:#141c30;width:680px;max-width:95vw;height:100vh;overflow-y:auto;border-left:1px solid #2e3d66;padding:0}
+.detail-header{background:#1c2640;padding:1.25rem 1.5rem;border-bottom:1px solid #1e2d4d;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.detail-header-left{display:flex;align-items:center;gap:12px}
+.detail-avatar{width:44px;height:44px;border-radius:50%;background:#1F3A8C;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#7fa8ff;flex-shrink:0}
+.detail-name{font-size:15px;font-weight:700;color:#e8ecf8}
+.detail-meta{font-size:12px;color:#7a88aa;margin-top:2px}
+.btn-close{width:32px;height:32px;border-radius:50%;background:#1e2d4d;border:1px solid #2e3d66;color:#7a88aa;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:all .15s}
+.btn-close:hover{border-color:#e06c6c;color:#e06c6c}
+.detail-body{padding:1.5rem}
+.detail-section{margin-bottom:1.75rem}
+.detail-section-title{font-size:13px;font-weight:700;color:#7fa8ff;text-transform:uppercase;letter-spacing:.07em;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.detail-section-title::after{content:'';flex:1;height:1px;background:#1e2d4d}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
+.info-item{background:#1c2640;border-radius:8px;padding:.75rem 1rem}
+.info-item-label{font-size:11px;color:#4a5470;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem}
+.info-item-val{font-size:13px;color:#e8ecf8;font-weight:500}
+
+/* SJT detail */
+.sjt-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.25rem}
+.sjt-mini-card{background:#1c2640;border-radius:8px;padding:.75rem;text-align:center}
+.sjt-mini-num{font-size:22px;font-weight:700}
+.sjt-mini-label{font-size:11px;color:#4a5470;margin-top:2px}
+.comp-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.comp-name{font-size:12px;color:#c8d0e8;min-width:185px}
+.comp-bar-outer{flex:1;background:#0f1523;border-radius:4px;height:8px;overflow:hidden}
+.comp-bar-inner{height:8px;border-radius:4px;transition:width 1s ease}
+.comp-frac{font-size:11px;color:#7a88aa;min-width:36px;text-align:right}
+
+/* PE detail */
+.pe-card{background:#1c2640;border:1px solid #2e3d66;border-radius:10px;margin-bottom:.75rem;overflow:hidden}
+.pe-card-header{padding:.75rem 1rem;background:#141c30;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none}
+.pe-card-num{width:24px;height:24px;border-radius:50%;background:#1F3A8C;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#7fa8ff;flex-shrink:0}
+.pe-card-komp{font-size:13px;font-weight:600;color:#7fa8ff}
+.pe-card-chevron{margin-left:auto;font-size:14px;color:#4a5470;transition:transform .2s}
+.pe-card-chevron.open{transform:rotate(180deg)}
+.pe-card-body{padding:1rem;display:none}
+.pe-card-body.open{display:block}
+.pe-card-q{font-size:12.5px;color:#7a88aa;line-height:1.6;margin-bottom:.75rem;padding:.75rem;background:#0f1523;border-radius:8px;border-left:3px solid #2e3d66}
+.star-block{margin-bottom:.75rem}
+.star-block-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem}
+.star-s-l{color:#7fa8ff}.star-k-l{color:#f0a04b}.star-p-l{color:#4caf7d}.star-h-l{color:#e06c6c}
+.star-block-text{font-size:13px;color:#c8d0e8;line-height:1.65;white-space:pre-wrap;background:#0f1523;padding:.75rem;border-radius:8px;min-height:40px}
+.star-block-empty{font-size:12px;color:#3a4a6a;font-style:italic}
+
+/* ── KOMPETENSI PAGE ── */
+.komp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.komp-card{background:#1c2640;border:1px solid #2e3d66;border-radius:12px;padding:1.25rem}
+.komp-name{font-size:14px;font-weight:700;color:#7fa8ff;margin-bottom:.75rem}
+.komp-stat-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+.komp-stat-label{font-size:12px;color:#7a88aa}
+.komp-stat-val{font-size:13px;font-weight:600;color:#e8ecf8}
+.komp-bar-outer{background:#0f1523;border-radius:4px;height:6px;margin-top:.5rem}
+.komp-bar-inner{height:6px;border-radius:4px;background:#1F3A8C}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}.main{margin-left:0}
+  .stats-grid{grid-template-columns:1fr 1fr}.komp-grid{grid-template-columns:1fr 1fr}
+  .detail-panel{width:100vw}
+}
+@media(max-width:600px){
+  .stats-grid{grid-template-columns:1fr}
+  .info-grid,.sjt-summary-grid{grid-template-columns:1fr}
+}
+
+/* ── MISC ── */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #2e3d66;border-top-color:#7fa8ff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1c2640;border:1px solid #2e3d66;border-radius:10px;padding:.85rem 1.25rem;font-size:13px;color:#e8ecf8;z-index:500;display:none;box-shadow:0 4px 24px rgba(0,0,0,.4)}
+.toast.show{display:block}
+
+/* ── CUSTOM MODAL ── */
+.modal-backdrop{position:fixed;inset:0;background:rgba(6,10,20,.75);backdrop-filter:blur(6px);z-index:600;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-backdrop.open{opacity:1;pointer-events:all}
+.modal-box{background:#1c2640;border:1px solid #2e3d66;border-radius:16px;padding:2rem;width:420px;max-width:92vw;transform:translateY(16px) scale(.97);transition:transform .2s;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.modal-backdrop.open .modal-box{transform:translateY(0) scale(1)}
+.modal-icon{font-size:36px;text-align:center;margin-bottom:.75rem}
+.modal-title{font-size:17px;font-weight:700;color:#e8ecf8;text-align:center;margin-bottom:.4rem}
+.modal-body{font-size:13px;color:#7a88aa;text-align:center;line-height:1.65;margin-bottom:.25rem}
+.modal-name-highlight{font-weight:700;color:#7fa8ff}
+.modal-warn{font-size:12px;color:#e06c6c;text-align:center;margin-top:.35rem;margin-bottom:1.25rem}
+.modal-actions{display:flex;gap:.75rem;margin-top:1.5rem}
+.modal-btn{flex:1;padding:11px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s}
+.modal-btn-cancel{background:#1e2d4d;color:#7a88aa;border:1px solid #2e3d66}.modal-btn-cancel:hover{background:#253557;color:#e8ecf8}
+.modal-btn-danger{background:rgba(224,108,108,.15);color:#e06c6c;border:1px solid rgba(224,108,108,.3)}.modal-btn-danger:hover{background:#e06c6c;color:#fff}
+.modal-btn-primary{background:#1F3A8C;color:#fff}.modal-btn-primary:hover{background:#2a4eb5}
+.modal-btn-success{background:rgba(76,175,125,.15);color:#4caf7d;border:1px solid rgba(76,175,125,.3)}.modal-btn-success:hover{background:#0F6E56;color:#fff}
+.modal-input{width:100%;padding:9px 12px;background:#0f1523;border:1px solid #2e3d66;border-radius:8px;color:#e8ecf8;font-size:13px;outline:none;margin-top:.75rem;font-family:inherit}
+.modal-input:focus{border-color:#4b6fcc}
+
+/* ── JPM ANALYSIS ── */
+.btn-jpm{width:100%;padding:11px;background:linear-gradient(135deg,#1F3A8C,#2a6fff);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.03em;margin-top:.5rem}
+.btn-jpm:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(42,111,255,.35)}
+.btn-jpm:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.jpm-loading{text-align:center;padding:2rem;color:#7a88aa}
+.jpm-loading .spinner{width:28px;height:28px;border-width:3px;margin-bottom:.75rem}
+.jpm-loading-step{font-size:12px;color:#4a5470;margin-top:.5rem}
+
+/* Match score ring */
+.jpm-hero{display:flex;align-items:center;gap:1.5rem;background:#1c2640;border-radius:12px;padding:1.25rem;margin-bottom:1.25rem}
+.jpm-ring-wrap{flex-shrink:0}
+.jpm-hero-right{flex:1}
+.jpm-match-label{font-size:12px;color:#7a88aa;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem}
+.jpm-match-grade{font-size:22px;font-weight:700;margin-bottom:.25rem}
+.jpm-match-desc{font-size:12px;color:#7a88aa;line-height:1.55}
+.jpm-grade-excellent{color:#4caf7d}
+.jpm-grade-good{color:#7fa8ff}
+.jpm-grade-fair{color:#f0a04b}
+.jpm-grade-poor{color:#e06c6c}
+
+/* Competency gap table */
+.jpm-table{width:100%;border-collapse:collapse;margin-bottom:1.25rem}
+.jpm-table th{font-size:10px;font-weight:700;color:#4a5470;text-transform:uppercase;letter-spacing:.07em;padding:.6rem .75rem;border-bottom:1px solid #1e2d4d;text-align:left;background:#141c30}
+.jpm-table td{padding:.6rem .75rem;border-bottom:1px solid #141c30;font-size:12.5px;vertical-align:middle}
+.jpm-table tr:last-child td{border-bottom:none}
+.jpm-table tr:hover td{background:rgba(255,255,255,.02)}
+.level-dots{display:flex;gap:4px}
+.level-dot{width:18px;height:18px;border-radius:50%;border:1.5px solid #2e3d66;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#3a4a6a}
+.level-dot.filled-req{border-color:#2e3d66;background:#1e2d4d;color:#4a5470}
+.level-dot.filled-person{border-color:#7fa8ff;background:#1F3A8C;color:#fff}
+.level-dot.gap-positive{border-color:#4caf7d;background:rgba(76,175,125,.2);color:#4caf7d}
+.level-dot.gap-negative{border-color:#e06c6c;background:rgba(224,108,108,.15);color:#e06c6c}
+.gap-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.gap-match{background:rgba(76,175,125,.15);color:#4caf7d;border:1px solid rgba(76,175,125,.3)}
+.gap-above{background:rgba(127,168,255,.12);color:#7fa8ff;border:1px solid rgba(127,168,255,.3)}
+.gap-below1{background:rgba(240,160,75,.12);color:#f0a04b;border:1px solid rgba(240,160,75,.3)}
+.gap-below2{background:rgba(224,108,108,.12);color:#e06c6c;border:1px solid rgba(224,108,108,.3)}
+
+/* Accordion per competency detail */
+.jpm-komp-accord{background:#1c2640;border:1px solid #2e3d66;border-radius:10px;margin-bottom:.6rem;overflow:hidden}
+.jpm-komp-header{display:flex;align-items:center;gap:10px;padding:.75rem 1rem;cursor:pointer;transition:background .15s}
+.jpm-komp-header:hover{background:#1e2d4d}
+.jpm-komp-num{width:22px;height:22px;border-radius:50%;background:#1F3A8C;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#7fa8ff;flex-shrink:0}
+.jpm-komp-name{font-size:13px;font-weight:600;color:#e8ecf8;flex:1}
+.jpm-komp-score{font-size:12px;font-weight:700;margin-right:.5rem}
+.jpm-komp-chev{font-size:12px;color:#4a5470;transition:transform .2s;flex-shrink:0}
+.jpm-komp-chev.open{transform:rotate(180deg)}
+.jpm-komp-body{display:none;padding:.75rem 1rem 1rem;border-top:1px solid #1e2d4d}
+.jpm-komp-body.open{display:block}
+.jpm-evidence-box{background:#0f1523;border-radius:8px;padding:.75rem;font-size:12.5px;color:#c8d0e8;line-height:1.65;margin-bottom:.75rem}
+.jpm-sublabel{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.4rem}
+.jpm-sub-green{color:#4caf7d}.jpm-sub-amber{color:#f0a04b}.jpm-sub-blue{color:#7fa8ff}
+.jpm-tag-list{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.75rem}
+.jpm-tag{font-size:11px;padding:3px 8px;border-radius:6px;background:#1e2d4d;color:#c8d0e8}
+
+/* Rekomendasi section */
+.jpm-reko-box{background:#1c2640;border:1px solid #2e3d66;border-radius:10px;padding:1rem;margin-bottom:.75rem}
+.jpm-reko-title{font-size:12px;font-weight:700;color:#f0a04b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.6rem}
+.jpm-reko-item{display:flex;gap:8px;font-size:12.5px;color:#c8d0e8;line-height:1.6;margin-bottom:.4rem}
+.jpm-reko-bullet{flex-shrink:0;width:5px;height:5px;border-radius:50%;background:#f0a04b;margin-top:7px}
+
+/* Summary radar (SVG) */
+.jpm-radar-wrap{background:#1c2640;border-radius:12px;padding:1rem;margin-bottom:1.25rem;text-align:center}
+.jpm-section-label{font-size:12px;font-weight:700;color:#7a88aa;text-transform:uppercase;letter-spacing:.07em;margin-bottom:.75rem}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ LOGIN ══════════════════ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🔐</div>
+    <div class="login-title">Admin Dashboard</div>
+    <div class="login-sub">Simulasi Asesmen Mansoskul – BPS<br>Masukkan password untuk melanjutkan</div>
+    <input type="text" id="l-user" placeholder="Username" autocomplete="off">
+    <input type="password" id="l-pass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" onclick="doLogin()">Masuk →</button>
+    <div class="login-err" id="login-err">Username atau password salah.</div>
+    <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #1e2d4d">
+      <a href="index.html" style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;color:#4a5470;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#7fa8ff'" onmouseout="this.style.color='#4a5470'">
+        ← Kembali ke Beranda Peserta
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ ADMIN APP ══════════════════ -->
+<div id="admin-app">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">📊</div>
+      <div class="sidebar-logo-text">Admin Panel<br>Asesmen Mansoskul</div>
+    </div>
+    <div class="nav-section">Menu</div>
+    <div class="nav-item active" onclick="showPage('dashboard')" id="nav-dashboard">
+      <span class="nav-icon">🏠</span> Dashboard
+    </div>
+    <div class="nav-item" onclick="showPage('peserta')" id="nav-peserta">
+      <span class="nav-icon">👥</span> Daftar Peserta
+    </div>
+    <div class="nav-item" onclick="showPage('kompetensi')" id="nav-kompetensi">
+      <span class="nav-icon">📈</span> Analisis Kompetensi
+    </div>
+    <div class="nav-item" onclick="showPage('jpmpage')" id="nav-jpmpage">
+      <span class="nav-icon">🎯</span> Job-Person Match
+    </div>
+    <a class="nav-item" href="panduan_pe.html" target="_blank" id="nav-panduan" style="text-decoration:none">
+      <span class="nav-icon">📚</span> Panduan PE ↗
+    </a>
+    <div class="sidebar-bottom">
+      <a href="index.html" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:13px;font-weight:500;color:#7a88aa;text-decoration:none;margin-bottom:6px;transition:all .15s" onmouseover="this.style.background='#1e2d4d';this.style.color='#e8ecf8'" onmouseout="this.style.background='';this.style.color='#7a88aa'">
+        <span style="font-size:16px;width:20px;text-align:center">🏠</span> Beranda Peserta
+      </a>
+      <button class="btn-logout" onclick="doLogout()">Keluar dari Admin</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Dashboard Overview</div>
+      <div class="topbar-right">
+        <div class="fb-badge"><div class="fb-dot"></div> Firebase Live</div>
+        <div class="last-refresh" id="last-refresh">–</div>
+        <button class="btn-refresh" onclick="loadData()">↻ Refresh</button>
+      </div>
+    </div>
+
+    <!-- PAGE: DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Peserta</div>
+          <div class="stat-num stat-blue" id="s-total">–</div>
+          <div class="stat-sub" id="s-total-sub">loading...</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">PE Selesai</div>
+          <div class="stat-num stat-green" id="s-pe">–</div>
+          <div class="stat-sub" id="s-pe-sub">loading...</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">SJT Selesai</div>
+          <div class="stat-num stat-amber" id="s-sjt">–</div>
+          <div class="stat-sub" id="s-sjt-sub">loading...</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Rata-rata Skor SJT</div>
+          <div class="stat-num stat-blue" id="s-avg">–</div>
+          <div class="stat-sub" id="s-avg-sub">dari 54 soal</div>
+        </div>
+      </div>
+
+      <div class="filters-bar">
+        <div class="filter-group filter-search">
+          <input class="filter-input" type="text" id="f-search" placeholder="🔍  Cari nama, NIP, atau unit kerja..." oninput="renderTable()">
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Modul</span>
+          <select class="filter-input" id="f-modul" onchange="renderTable()">
+            <option value="">Semua</option>
+            <option value="pe">PE Selesai</option>
+            <option value="sjt">SJT Selesai</option>
+            <option value="keduanya">Keduanya</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Jenjang</span>
+          <select class="filter-input" id="f-jenjang" onchange="renderTable()">
+            <option value="">Semua</option>
+            <option value="Administrator">Administrator</option>
+            <option value="Pengawas">Pengawas</option>
+            <option value="Pratama">Pratama</option>
+          </select>
+        </div>
+        <button class="btn-export" onclick="exportCSV()">⬇ Export CSV</button>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-title">Riwayat Pengerjaan</div>
+          <div class="record-count" id="record-count">– data</div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:36px">#</th>
+                <th>Nama Peserta</th>
+                <th>Unit Kerja</th>
+                <th>Jenjang</th>
+                <th>PE</th>
+                <th>SJT Skor</th>
+                <th>Waktu</th>
+                <th style="width:100px"></th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <tr class="loading-row"><td colspan="8"><span class="spinner"></span> Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: PESERTA (alias ke dashboard dengan scroll) -->
+    <div class="page" id="page-peserta">
+      <div class="filters-bar">
+        <div class="filter-group filter-search">
+          <input class="filter-input" type="text" id="f-search2" placeholder="🔍  Cari nama, NIP, atau unit kerja..." oninput="renderTable2()">
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">Urutkan</span>
+          <select class="filter-input" id="f-sort" onchange="renderTable2()">
+            <option value="newest">Terbaru</option>
+            <option value="oldest">Terlama</option>
+            <option value="score_desc">Skor SJT ↓</option>
+            <option value="score_asc">Skor SJT ↑</option>
+            <option value="name">Nama A-Z</option>
+          </select>
+        </div>
+        <button class="btn-export" onclick="exportCSV()">⬇ Export CSV</button>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-title">Semua Peserta</div>
+          <div class="record-count" id="record-count2">– data</div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:36px">#</th>
+                <th>Nama Peserta</th>
+                <th>NIP</th>
+                <th>Unit Kerja</th>
+                <th>Jenjang</th>
+                <th>PE</th>
+                <th>SJT Skor</th>
+                <th>Keduanya</th>
+                <th>Waktu Submit</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="table-body2">
+              <tr class="loading-row"><td colspan="10"><span class="spinner"></span> Memuat data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: KOMPETENSI -->
+    <div class="page" id="page-kompetensi">
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card">
+          <div class="stat-label">Peserta SJT</div>
+          <div class="stat-num stat-blue" id="k-total">–</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Rata-rata Skor</div>
+          <div class="stat-num stat-green" id="k-avg">–%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Kompetensi Terkuat</div>
+          <div class="stat-num" id="k-best" style="font-size:14px;color:#4caf7d;padding-top:.4rem">–</div>
+        </div>
+      </div>
+      <div class="komp-grid" id="komp-cards">
+        <div style="color:#4a5470;font-size:13px;text-align:center;padding:2rem;grid-column:1/-1">Memuat data analisis kompetensi...</div>
+      </div>
+    </div>
+
+    <!-- PAGE: JPM AGGREGATE -->
+    <div class="page" id="page-jpmpage">
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat-card"><div class="stat-label">Total Analisis JPM</div><div class="stat-num stat-blue" id="jpm-total-analyzed">–</div></div>
+        <div class="stat-card"><div class="stat-label">Rata-rata Match</div><div class="stat-num stat-green" id="jpm-avg-match">–</div></div>
+        <div class="stat-card"><div class="stat-label">Kompetensi Terkuat</div><div class="stat-num" id="jpm-strongest" style="font-size:12px;color:#4caf7d;padding-top:.6rem">–</div></div>
+        <div class="stat-card"><div class="stat-label">Kompetensi Terlemah</div><div class="stat-num" id="jpm-weakest" style="font-size:12px;color:#e06c6c;padding-top:.6rem">–</div></div>
+      </div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <div class="table-title">Rekapitulasi Job-Person Match</div>
+          <div class="record-count" id="jpm-table-count">– data teranalisis</div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Nama</th><th>Jenjang</th>
+                <th>INT</th><th>KRJ</th><th>KOM</th><th>ORH</th><th>PP</th>
+                <th>PDO</th><th>MP</th><th>PK</th><th>PB</th>
+                <th>Match %</th><th>Status</th><th></th>
+              </tr>
+            </thead>
+            <tbody id="jpm-table-body">
+              <tr class="loading-row"><td colspan="15" style="color:#4a5470">Belum ada analisis JPM. Buka detail peserta → klik "Jalankan Analisis JPM".</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main -->
+</div><!-- end admin-app -->
+
+<!-- ══════════════════ DETAIL PANEL ══════════════════ -->
+<div class="overlay" id="overlay" onclick="closeDetail(event)">
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-header">
+      <div class="detail-header-left">
+        <div class="detail-avatar" id="d-avatar">?</div>
+        <div>
+          <div class="detail-name" id="d-name">–</div>
+          <div class="detail-meta" id="d-meta">–</div>
+        </div>
+      </div>
+      <button class="btn-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="detail-body" id="detail-body"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ CUSTOM MODAL ══════════════════ -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="handleModalBackdropClick(event)">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-icon" id="modal-icon">⚠️</div>
+    <div class="modal-title" id="modal-title">Konfirmasi</div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-warn" id="modal-warn" style="display:none"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── MODAL ENGINE ─────────────────────────────────────────
+let _modalResolve = null;
+
+function showModal({ icon='⚠️', title, body, warn='', buttons=[] }){
+  document.getElementById('modal-icon').textContent = icon;
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  const warnEl = document.getElementById('modal-warn');
+  if(warn){ warnEl.textContent = warn; warnEl.style.display = 'block'; }
+  else { warnEl.style.display = 'none'; }
+  const actEl = document.getElementById('modal-actions');
+  actEl.innerHTML = '';
+  buttons.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = `modal-btn modal-btn-${b.type||'cancel'}`;
+    btn.textContent = b.label;
+    btn.onclick = () => { closeModal(); if(b.action) b.action(); };
+    actEl.appendChild(btn);
+  });
+  document.getElementById('modal-backdrop').classList.add('open');
+  return new Promise(res => _modalResolve = res);
+}
+
+function closeModal(){
+  document.getElementById('modal-backdrop').classList.remove('open');
+  if(_modalResolve){ _modalResolve(false); _modalResolve = null; }
+}
+
+function handleModalBackdropClick(e){
+  if(e.target === document.getElementById('modal-backdrop')) closeModal();
+}
+
+// ── DELETE PESERTA ───────────────────────────────────────
+function confirmDelete(docId){
+  const doc = allDocs.find(d => d.id === docId);
+  if(!doc) return;
+  const p = getPeserta(doc);
+  const nama = p.nama || 'Peserta ini';
+  showModal({
+    icon: '🗑️',
+    title: 'Hapus Data Peserta',
+    body: `Anda akan menghapus data asesmen milik <span class="modal-name-highlight">${esc(nama)}</span><br><span style="font-size:12px;color:#4a5470">${esc(p.nip||'')} · ${esc(p.unit||'')}</span>`,
+    warn: 'Tindakan ini tidak dapat dibatalkan. Semua data PE, SJT, dan hasil JPM akan dihapus permanen.',
+    buttons: [
+      { label: 'Batal', type: 'cancel', action: null },
+      { label: 'Ya, Hapus Permanen', type: 'danger', action: () => doDelete(docId, nama) }
+    ]
+  });
+}
+
+async function doDelete(docId, nama){
+  try {
+    await db.collection('asesmen_mansoskul').doc(docId).delete();
+    allDocs = allDocs.filter(d => d.id !== docId);
+    delete jpmCache[docId];
+    updateStats();
+    renderTable();
+    renderTable2();
+    renderKompetensi();
+    renderJPMAggregate();
+    // Close detail panel if open for this doc
+    if(currentDetailDocId === docId){
+      document.getElementById('overlay').classList.remove('open');
+      currentDetailDocId = null;
+    }
+    showToast(`✓ Data "${nama}" berhasil dihapus`);
+  } catch(e){
+    showModal({
+      icon: '❌',
+      title: 'Gagal Menghapus',
+      body: `Terjadi kesalahan saat menghapus data: <br><span style="font-size:12px;color:#e06c6c">${e.message}</span>`,
+      buttons: [{ label: 'Tutup', type: 'cancel', action: null }]
+    });
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  CONFIG & AUTH
+// ═══════════════════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCOCdIx8ThhfLPZNHL8OfQ-kVMzJyiz0_s",
+  authDomain: "simulasi-mansoskul.firebaseapp.com",
+  projectId: "simulasi-mansoskul",
+  storageBucket: "simulasi-mansoskul.firebasestorage.app",
+  messagingSenderId: "648827756309",
+  appId: "1:648827756309:web:c3fc39c202c8920cb4931c",
+  measurementId: "G-NN67C684WZ"
+};
+
+// Credentials – ganti sesuai kebutuhan
+const ADMIN_CREDENTIALS = [
+  { user: "admin", pass: "bps2025" },
+  { user: "koordinator", pass: "mansoskul24" }
+];
+
+const PE_Q_LABELS = [
+  "Integritas","Kerjasama","Komunikasi","Orientasi pada Hasil",
+  "Pelayanan Publik","Pengembangan Diri dan Orang Lain",
+  "Mengelola Perubahan","Pengambilan Keputusan","Perekat Bangsa"
+];
+
+const PE_Q_TEXTS = [
+  "Dalam Anda melaksanakan tugas pasti pernah mengalami situasi yang bertentangan dengan nilai, norma, dan etika organisasi. Ceritakan pengalaman terbaik Anda ketika berhasil menghadapi situasi tersebut!",
+  "Sepanjang perjalanan karir Anda pasti pernah bekerja sama dalam sebuah tim. Ceritakan pengalaman terbaik Anda ketika berhasil bekerja sama dalam tim untuk menyelesaikan suatu tugas pekerjaan!",
+  "Ceritakan pengalaman terbaik Anda ketika berhasil dalam tugas pekerjaan yang menuntut kemampuan untuk berkomunikasi dengan orang lain!",
+  "Ceritakan pengalaman Anda ketika berhasil menyelesaikan tugas dalam situasi yang sulit dengan tetap berpegang pada kualitas hasil dan target kerja!",
+  "Ceritakan pengalaman Anda ketika berhasil memberikan pelayanan yang berhubungan dengan tugas Anda sehari-hari.",
+  "Ceritakan pengalaman Anda ketika berhasil melakukan pengembangan diri dan juga orang lain yang terkait dengan pekerjaan Anda.",
+  "Ceritakan pengalaman keberhasilan Anda ketika dihadapkan pada situasi yang menuntut Anda untuk berubah dengan cepat.",
+  "Ceritakan pengalaman keberhasilan Anda ketika menghadapi situasi yang menyebabkan Anda harus mengambil keputusan diantara banyak pilihan situasi yang sulit.",
+  "Ceritakan pengalaman keberhasilan Anda dalam membina hubungan yang harmonis ketika bekerja dengan kolega dengan keberagaman latar belakang."
+];
+
+let db = null;
+let allDocs = [];
+let filteredDocs = [];
+
+// ═══════════════════════════════════════════════════════
+//  LOGIN
+// ═══════════════════════════════════════════════════════
+function doLogin(){
+  const u = document.getElementById('l-user').value.trim();
+  const p = document.getElementById('l-pass').value;
+  const match = ADMIN_CREDENTIALS.find(c => c.user === u && c.pass === p);
+  if(!match){
+    document.getElementById('login-err').style.display = 'block';
+    document.getElementById('l-pass').value = '';
+    return;
+  }
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-app').style.display = 'block';
+  initFirebaseAndLoad();
+}
+
+function doLogout(){
+  document.getElementById('admin-app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('l-pass').value = '';
+  document.getElementById('l-user').value = '';
+  document.getElementById('login-err').style.display = 'none';
+}
+
+document.getElementById('l-pass').addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
+
+// ═══════════════════════════════════════════════════════
+//  FIREBASE
+// ═══════════════════════════════════════════════════════
+function initFirebaseAndLoad(){
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+  } catch(e) {
+    try { firebase.app(); } catch(e2){}
+  }
+  db = firebase.firestore();
+  loadData();
+}
+
+async function loadData(){
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="8"><span class="spinner"></span> Memuat data dari Firebase...</td></tr>';
+
+  try {
+    const snap = await db.collection('asesmen_mansoskul')
+      .orderBy('timestamp', 'desc')
+      .get();
+
+    allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    document.getElementById('last-refresh').textContent =
+      'Diperbarui ' + new Date().toLocaleTimeString('id-ID');
+
+    updateStats();
+    renderTable();
+    renderTable2();
+    renderKompetensi();
+    loadJPMFromDocs();
+    showToast(`✓ ${allDocs.length} data berhasil dimuat`);
+  } catch(e) {
+    tbody.innerHTML = `<tr class="loading-row"><td colspan="8" style="color:#e06c6c">⚠ Gagal memuat data: ${e.message}</td></tr>`;
+    showToast('⚠ Gagal memuat data dari Firebase', true);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  HELPERS – extract PE / SJT from doc
+// ═══════════════════════════════════════════════════════
+function getPeserta(doc){
+  // peserta bisa di root atau di dalam sub-objek
+  return doc.peserta || {};
+}
+
+function getSJT(doc){
+  // Jika tipe=SJT → data ada di root
+  // Jika tipe=PE dan SJT sudah dikerjakan → data ada di doc.sjt
+  if(doc.tipe === 'SJT' && doc.selesai) return doc;
+  if(doc.sjt && doc.sjt.selesai) return doc.sjt;
+  return null;
+}
+
+function getPE(doc){
+  if(doc.tipe === 'PE' && doc.selesai) return doc;
+  if(doc.pe && doc.pe.selesai) return doc.pe;
+  return null;
+}
+
+function getTimestamp(doc){
+  if(doc.timestamp && doc.timestamp.toDate) return doc.timestamp.toDate();
+  if(doc.timestamp && doc.timestamp.seconds) return new Date(doc.timestamp.seconds * 1000);
+  return null;
+}
+
+function fmtDate(ts){
+  if(!ts) return '–';
+  return ts.toLocaleDateString('id-ID', {day:'2-digit',month:'short',year:'numeric'}) +
+    ' ' + ts.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'});
+}
+
+function scoreColor(pct){
+  if(pct >= 75) return '#4caf7d';
+  if(pct >= 50) return '#f0a04b';
+  return '#e06c6c';
+}
+
+// ═══════════════════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════════════════
+function updateStats(){
+  const total = allDocs.length;
+  const peDone = allDocs.filter(d => getPE(d)).length;
+  const sjtDone = allDocs.filter(d => getSJT(d)).length;
+  const sjtDocs = allDocs.filter(d => getSJT(d));
+  const avgSkor = sjtDocs.length
+    ? Math.round(sjtDocs.reduce((s,d) => s + (getSJT(d).skor || 0), 0) / sjtDocs.length)
+    : 0;
+  const avgPct = sjtDocs.length
+    ? Math.round(sjtDocs.reduce((s,d) => s + (getSJT(d).persentase || 0), 0) / sjtDocs.length)
+    : 0;
+
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-total-sub').textContent = 'total sesi tercatat';
+  document.getElementById('s-pe').textContent = peDone;
+  document.getElementById('s-pe-sub').textContent = `${Math.round(peDone/Math.max(total,1)*100)}% dari total`;
+  document.getElementById('s-sjt').textContent = sjtDone;
+  document.getElementById('s-sjt-sub').textContent = `${Math.round(sjtDone/Math.max(total,1)*100)}% dari total`;
+  document.getElementById('s-avg').textContent = avgPct ? avgPct + '%' : '–';
+  document.getElementById('s-avg-sub').textContent = avgSkor ? `rata-rata ${avgSkor}/54 soal` : 'belum ada data';
+}
+
+// ═══════════════════════════════════════════════════════
+//  TABLE – DASHBOARD
+// ═══════════════════════════════════════════════════════
+function getFiltered(){
+  const q = (document.getElementById('f-search')?.value || '').toLowerCase();
+  const mod = document.getElementById('f-modul')?.value || '';
+  const jen = document.getElementById('f-jenjang')?.value || '';
+  return allDocs.filter(doc => {
+    const p = getPeserta(doc);
+    const matchQ = !q || (p.nama||'').toLowerCase().includes(q) ||
+      (p.nip||'').includes(q) || (p.unit||'').toLowerCase().includes(q);
+    const hasPE = !!getPE(doc), hasSJT = !!getSJT(doc);
+    const matchMod = !mod ||
+      (mod==='pe' && hasPE) || (mod==='sjt' && hasSJT) ||
+      (mod==='keduanya' && hasPE && hasSJT);
+    const matchJen = !jen || (p.jenjang||'') === jen;
+    return matchQ && matchMod && matchJen;
+  });
+}
+
+function renderTable(){
+  filteredDocs = getFiltered();
+  document.getElementById('record-count').textContent = filteredDocs.length + ' data';
+  const tbody = document.getElementById('table-body');
+  if(!filteredDocs.length){
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🔍</div>Tidak ada data ditemukan</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filteredDocs.map((doc, i) => {
+    const p = getPeserta(doc);
+    const sjt = getSJT(doc);
+    const pe = getPE(doc);
+    const pct = sjt ? sjt.persentase : null;
+    const color = pct !== null ? scoreColor(pct) : '#4a5470';
+    const ts = getTimestamp(doc);
+    return `<tr onclick="openDetail('${doc.id}')">
+      <td style="color:#4a5470;font-size:12px">${i+1}</td>
+      <td><div class="td-name">${esc(p.nama||'–')}</div><div class="td-nip">${esc(p.nip||'–')}</div></td>
+      <td style="font-size:12px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.unit||'–')}</td>
+      <td><span class="pill ${jenPill(p.jenjang)}">${esc(p.jenjang||'–')}</span></td>
+      <td>${pe ? '<span class="pill pill-green">✓ Selesai</span>' : '<span class="pill pill-gray">Belum</span>'}</td>
+      <td>${pct !== null
+        ? `<div class="score-bar-wrap"><div class="score-bar"><div class="score-bar-fill" style="width:${pct}%;background:${color}"></div></div><span style="font-size:12px;color:${color}">${pct}%</span></div>`
+        : '<span style="color:#4a5470;font-size:12px">Belum</span>'}</td>
+      <td style="font-size:12px;color:#7a88aa;white-space:nowrap">${ts ? fmtDate(ts) : '–'}</td>
+      <td style="white-space:nowrap">
+        <button class="td-btn" onclick="event.stopPropagation();openDetail('${doc.id}')">Detail →</button>
+        <button class="td-btn" onclick="event.stopPropagation();confirmDelete('${doc.id}')" style="margin-left:4px;border-color:rgba(224,108,108,.3);color:#e06c6c" onmouseover="this.style.background='rgba(224,108,108,.1)'" onmouseout="this.style.background=''">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+// ═══════════════════════════════════════════════════════
+function renderTable2(){
+  const q = (document.getElementById('f-search2')?.value || '').toLowerCase();
+  const sort = document.getElementById('f-sort')?.value || 'newest';
+  let docs = allDocs.filter(doc => {
+    const p = getPeserta(doc);
+    return !q || (p.nama||'').toLowerCase().includes(q) ||
+      (p.nip||'').includes(q) || (p.unit||'').toLowerCase().includes(q);
+  });
+  docs = [...docs].sort((a,b) => {
+    if(sort==='newest') return (getTimestamp(b)||0) - (getTimestamp(a)||0);
+    if(sort==='oldest') return (getTimestamp(a)||0) - (getTimestamp(b)||0);
+    if(sort==='score_desc') return (getSJT(b)?.persentase||0) - (getSJT(a)?.persentase||0);
+    if(sort==='score_asc') return (getSJT(a)?.persentase||0) - (getSJT(b)?.persentase||0);
+    if(sort==='name') return (getPeserta(a).nama||'').localeCompare(getPeserta(b).nama||'');
+    return 0;
+  });
+  document.getElementById('record-count2').textContent = docs.length + ' data';
+  const tbody = document.getElementById('table-body2');
+  if(!docs.length){
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">👥</div>Tidak ada data</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = docs.map((doc, i) => {
+    const p = getPeserta(doc);
+    const sjt = getSJT(doc);
+    const pe = getPE(doc);
+    const pct = sjt ? sjt.persentase : null;
+    const color = pct !== null ? scoreColor(pct) : '#4a5470';
+    const ts = getTimestamp(doc);
+    return `<tr onclick="openDetail('${doc.id}')">
+      <td style="color:#4a5470;font-size:12px">${i+1}</td>
+      <td><div class="td-name">${esc(p.nama||'–')}</div></td>
+      <td class="td-nip">${esc(p.nip||'–')}</td>
+      <td style="font-size:12px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.unit||'–')}</td>
+      <td><span class="pill ${jenPill(p.jenjang)}">${esc(p.jenjang||'–')}</span></td>
+      <td>${pe ? '<span class="pill pill-green">✓</span>' : '<span class="pill pill-gray">–</span>'}</td>
+      <td>${pct !== null
+        ? `<div class="score-bar-wrap"><div class="score-bar"><div class="score-bar-fill" style="width:${pct}%;background:${color}"></div></div><span style="font-size:12px;color:${color}">${sjt.skor||0}/54</span></div>`
+        : '<span style="color:#4a5470;font-size:12px">–</span>'}</td>
+      <td>${(pe && sjt) ? '<span class="pill pill-blue">✓</span>' : '<span class="pill pill-gray">–</span>'}</td>
+      <td style="font-size:12px;color:#7a88aa;white-space:nowrap">${ts ? fmtDate(ts) : '–'}</td>
+      <td style="white-space:nowrap">
+        <button class="td-btn" onclick="event.stopPropagation();openDetail('${doc.id}')">Detail →</button>
+        <button class="td-btn" onclick="event.stopPropagation();confirmDelete('${doc.id}')" style="margin-left:4px;border-color:rgba(224,108,108,.3);color:#e06c6c" onmouseover="this.style.background='rgba(224,108,108,.1)'" onmouseout="this.style.background=''">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+// ═══════════════════════════════════════════════════════
+function renderKompetensi(){
+  const sjtDocs = allDocs.filter(d => getSJT(d));
+  document.getElementById('k-total').textContent = sjtDocs.length;
+  if(!sjtDocs.length){
+    document.getElementById('k-avg').textContent = '–';
+    document.getElementById('k-best').textContent = '–';
+    document.getElementById('komp-cards').innerHTML =
+      '<div style="color:#4a5470;text-align:center;padding:2rem;grid-column:1/-1">Belum ada data SJT</div>';
+    return;
+  }
+
+  const avgPct = Math.round(sjtDocs.reduce((s,d)=>s+(getSJT(d).persentase||0),0)/sjtDocs.length);
+  document.getElementById('k-avg').textContent = avgPct + '%';
+
+  // Aggregate per_kompetensi
+  const agg = {};
+  sjtDocs.forEach(doc => {
+    const sjt = getSJT(doc);
+    if(!sjt.per_kompetensi) return;
+    Object.entries(sjt.per_kompetensi).forEach(([k,v]) => {
+      if(!agg[k]) agg[k] = { benar:0, total:0, peserta:0 };
+      agg[k].benar += (v.benar || 0);
+      agg[k].total += (v.total || 0);
+      agg[k].peserta++;
+    });
+  });
+
+  // Find best competency
+  let bestK = '–', bestPct = 0;
+  Object.entries(agg).forEach(([k,v]) => {
+    const p = v.total > 0 ? Math.round((v.benar/v.total)*100) : 0;
+    if(p > bestPct){ bestPct = p; bestK = k; }
+  });
+  document.getElementById('k-best').textContent = bestK !== '–' ? `${bestK} (${bestPct}%)` : '–';
+
+  const ORDER = ["Integritas","Kerjasama","Komunikasi","Orientasi pada Hasil","Pelayanan Publik",
+    "Pengembangan Diri dan Orang Lain","Mengelola Perubahan","Pengambilan Keputusan","Perekat Bangsa"];
+
+  document.getElementById('komp-cards').innerHTML = ORDER.map(k => {
+    const v = agg[k] || { benar:0, total:0, peserta:0 };
+    const pct = v.total > 0 ? Math.round((v.benar/v.total)*100) : 0;
+    const color = scoreColor(pct);
+    return `<div class="komp-card">
+      <div class="komp-name">${k}</div>
+      <div class="komp-stat-row">
+        <span class="komp-stat-label">Rata-rata skor</span>
+        <span class="komp-stat-val" style="color:${color}">${pct}%</span>
+      </div>
+      <div class="komp-stat-row">
+        <span class="komp-stat-label">Jawaban benar</span>
+        <span class="komp-stat-val">${v.benar} / ${v.total}</span>
+      </div>
+      <div class="komp-stat-row">
+        <span class="komp-stat-label">Peserta</span>
+        <span class="komp-stat-val">${v.peserta}</span>
+      </div>
+      <div class="komp-bar-outer" style="margin-top:.75rem">
+        <div class="komp-bar-inner" style="width:${pct}%;background:${color}"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+//  DETAIL PANEL
+// ═══════════════════════════════════════════════════════
+function openDetail(docId){
+  const doc = allDocs.find(d => d.id === docId);
+  if(!doc) return;
+  const p = getPeserta(doc);
+  const sjt = getSJT(doc);
+  const pe = getPE(doc);
+  const initials = (p.nama||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+  document.getElementById('d-avatar').textContent = initials;
+  document.getElementById('d-name').textContent = p.nama || '–';
+  document.getElementById('d-meta').textContent = `NIP: ${p.nip||'–'} · ${p.unit||'–'} · ${p.jenjang||'–'}`;
+
+  let html = '';
+
+  // ── Info umum ──
+  html += `<div class="detail-section">
+    <div class="detail-section-title">Informasi Peserta</div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-item-label">Nama Lengkap</div><div class="info-item-val">${esc(p.nama||'–')}</div></div>
+      <div class="info-item"><div class="info-item-label">NIP</div><div class="info-item-val" style="font-family:monospace">${esc(p.nip||'–')}</div></div>
+      <div class="info-item"><div class="info-item-label">Unit Kerja</div><div class="info-item-val">${esc(p.unit||'–')}</div></div>
+      <div class="info-item"><div class="info-item-label">Jenjang</div><div class="info-item-val">${esc(p.jenjang||'–')}</div></div>
+      <div class="info-item"><div class="info-item-label">Session ID</div><div class="info-item-val" style="font-size:11px;font-family:monospace;color:#7a88aa">${doc.id}</div></div>
+      <div class="info-item"><div class="info-item-label">Waktu Submit</div><div class="info-item-val">${fmtDate(getTimestamp(doc))}</div></div>
+    </div>
+  </div>`;
+
+  // ── SJT ──
+  if(sjt){
+    const pct = sjt.persentase || 0;
+    const color = scoreColor(pct);
+    let compBars = '';
+    if(sjt.per_kompetensi){
+      const ORDER = ["Integritas","Kerjasama","Komunikasi","Orientasi pada Hasil","Pelayanan Publik",
+        "Pengembangan Diri dan Orang Lain","Mengelola Perubahan","Pengambilan Keputusan","Perekat Bangsa"];
+      ORDER.forEach(k => {
+        const v = sjt.per_kompetensi[k] || {benar:0,total:0};
+        const p2 = v.total > 0 ? Math.round((v.benar/v.total)*100) : 0;
+        const c = scoreColor(p2);
+        compBars += `<div class="comp-row">
+          <span class="comp-name">${k}</span>
+          <div class="comp-bar-outer"><div class="comp-bar-inner" style="width:${p2}%;background:${c}"></div></div>
+          <span class="comp-frac">${v.benar}/${v.total}</span>
+        </div>`;
+      });
+    }
+    html += `<div class="detail-section">
+      <div class="detail-section-title">Hasil SJT – Situational Judgment Test</div>
+      <div class="sjt-summary-grid">
+        <div class="sjt-mini-card"><div class="sjt-mini-num" style="color:${color}">${pct}%</div><div class="sjt-mini-label">Skor Total</div></div>
+        <div class="sjt-mini-card"><div class="sjt-mini-num" style="color:#4caf7d">${sjt.benar||0}</div><div class="sjt-mini-label">Benar</div></div>
+        <div class="sjt-mini-card"><div class="sjt-mini-num" style="color:#e06c6c">${sjt.salah||0}</div><div class="sjt-mini-label">Salah</div></div>
+      </div>
+      <div style="background:#1c2640;border-radius:10px;padding:1rem">${compBars}</div>
+    </div>`;
+  } else {
+    html += `<div class="detail-section">
+      <div class="detail-section-title">Hasil SJT</div>
+      <div style="color:#4a5470;font-size:13px;padding:.75rem 0">SJT belum dikerjakan oleh peserta ini.</div>
+    </div>`;
+  }
+
+  // ── PE ──
+  if(pe && pe.jawaban){
+    const jawaban = pe.jawaban;
+    let peCards = '';
+    jawaban.forEach((a, i) => {
+      const komp = a.kompetensi || PE_Q_LABELS[i] || `Soal ${i+1}`;
+      const qtxt = PE_Q_TEXTS[i] || '';
+      const filled = a.situasi || a.kendala || a.peran || a.hasil;
+      peCards += `<div class="pe-card">
+        <div class="pe-card-header" onclick="togglePECard(this)">
+          <div class="pe-card-num">${i+1}</div>
+          <div class="pe-card-komp">${esc(komp)}</div>
+          ${filled ? '' : '<span style="font-size:11px;color:#4a5470;margin-left:8px">– Kosong</span>'}
+          <span class="pe-card-chevron">▾</span>
+        </div>
+        <div class="pe-card-body">
+          <div class="pe-card-q">${esc(qtxt)}</div>
+          ${starBlock('S','situasi','Situasi','star-s-l',a.situasi)}
+          ${starBlock('K','kendala','Kendala yang Dihadapi','star-k-l',a.kendala)}
+          ${starBlock('P','peran','Peran Saya','star-p-l',a.peran)}
+          ${starBlock('H','hasil','Hasil','star-h-l',a.hasil)}
+        </div>
+      </div>`;
+    });
+
+    // Check if JPM already cached
+    const cachedJPM = jpmCache[doc.id];
+    const jpmResultHTML = cachedJPM
+      ? renderJPMResult(cachedJPM, getPeserta(doc).jenjang)
+      : `<div id="jpm-result-area-${doc.id}">
+          <button class="btn-jpm" onclick="runJPM('${doc.id}')">
+            🎯 Jalankan Analisis Job-Person Match
+          </button>
+        </div>`;
+
+    html += `<div class="detail-section">
+      <div class="detail-section-title">Analisis JPM – Job-Person Match</div>
+      <div style="font-size:12px;color:#7a88aa;line-height:1.6;margin-bottom:1rem;background:#141c30;padding:.75rem 1rem;border-radius:8px;border-left:3px solid #2e3d66">
+        Analisis otomatis berbasis <strong style="color:#7fa8ff">behavioral evidence</strong> pada jawaban STAR.
+        Setiap kompetensi diskor 1–5 sesuai indikator PermenPAN-RB No.38/2017,
+        lalu dibandingkan dengan <strong style="color:#7fa8ff">tuntutan jabatan</strong> yang dilamar.
+      </div>
+      ${jpmResultHTML}
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-title">Jawaban PE – Pertanyaan Efektif</div>
+      <div style="font-size:12px;color:#4a5470;margin-bottom:1rem">Klik setiap soal untuk melihat jawaban lengkap</div>
+      ${peCards}
+    </div>`;
+  } else {
+    html += `<div class="detail-section">
+      <div class="detail-section-title">Jawaban PE</div>
+      <div style="color:#4a5470;font-size:13px;padding:.75rem 0">PE belum dikerjakan oleh peserta ini.</div>
+    </div>`;
+  }
+
+  document.getElementById('detail-body').innerHTML = html;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function starBlock(badge, key, label, cls, text){
+  const content = text && text.trim()
+    ? `<div class="star-block-text">${esc(text)}</div>`
+    : `<div class="star-block-text"><span class="star-block-empty">Tidak diisi</span></div>`;
+  const wc = text && text.trim() ? text.trim().split(/\s+/).length + ' kata' : '';
+  return `<div class="star-block">
+    <div class="star-block-label ${cls}">${badge} – ${label}${wc ? `<span style="font-weight:400;color:#3a4a6a;margin-left:8px">${wc}</span>` : ''}</div>
+    ${content}
+  </div>`;
+}
+
+function togglePECard(header){
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.pe-card-chevron');
+  body.classList.toggle('open');
+  chevron.classList.toggle('open');
+}
+
+function closeDetail(e){
+  if(e && e.target !== document.getElementById('overlay')) return;
+  document.getElementById('overlay').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════════
+//  EXPORT CSV
+// ═══════════════════════════════════════════════════════
+function exportCSV(){
+  const docs = allDocs;
+  if(!docs.length){ showToast('Tidak ada data untuk diekspor', true); return; }
+  const rows = [
+    ['No','Session ID','Nama','NIP','Unit Kerja','Jenjang','PE Selesai','SJT Benar','SJT Salah','SJT Persen',
+     'Integritas','Kerjasama','Komunikasi','Orientasi pd Hasil','Pelayanan Publik',
+     'Pengembangan Diri','Mengelola Perubahan','Pengambilan Keputusan','Perekat Bangsa','Waktu Submit']
+  ];
+  const KOMPS = ["Integritas","Kerjasama","Komunikasi","Orientasi pada Hasil","Pelayanan Publik",
+    "Pengembangan Diri dan Orang Lain","Mengelola Perubahan","Pengambilan Keputusan","Perekat Bangsa"];
+  docs.forEach((doc, i) => {
+    const p = getPeserta(doc);
+    const sjt = getSJT(doc);
+    const pe = getPE(doc);
+    const ts = getTimestamp(doc);
+    const kompScores = KOMPS.map(k => {
+      if(!sjt?.per_kompetensi?.[k]) return '';
+      const v = sjt.per_kompetensi[k];
+      return v.total > 0 ? Math.round((v.benar/v.total)*100)+'%' : '';
+    });
+    rows.push([
+      i+1, doc.id,
+      p.nama||'', p.nip||'', p.unit||'', p.jenjang||'',
+      pe ? 'Ya' : 'Tidak',
+      sjt ? sjt.benar||0 : '', sjt ? sjt.salah||0 : '', sjt ? (sjt.persentase||0)+'%' : '',
+      ...kompScores,
+      ts ? fmtDate(ts) : ''
+    ]);
+  });
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `asesmen_mansoskul_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  showToast(`✓ Export ${docs.length} data berhasil`);
+}
+
+// ═══════════════════════════════════════════════════════
+//  JOB-PERSON MATCH ENGINE
+// ═══════════════════════════════════════════════════════
+
+// Cache hasil JPM (session only) – keyed by docId
+const jpmCache = {};
+
+// Required level per jenjang (PermenPAN-RB 38/2017)
+const REQUIRED_LEVEL = {
+  'Pengawas': 3,
+  'Administrator': 4,
+  'Pratama': 5
+};
+
+const KOMPETENSI_DEFS = {
+  "Integritas": {
+    desc: "Konsisten berperilaku selaras dengan nilai, norma, dan/atau etika organisasi; menciptakan budaya etika tinggi; bertanggung jawab atas keputusan beserta risikonya.",
+    indicators: {
+      1: "Memahami dan mengenali perilaku sesuai kode etik; menjalankan tugas sesuai aturan tanpa penyimpangan.",
+      2: "Mengingatkan rekan kerja untuk bertindak sesuai nilai dan norma; tidak melakukan tindakan yang melanggar aturan.",
+      3: "Memastikan dan menanamkan keyakinan bersama agar anggota yang dipimpin bertindak sesuai nilai dan norma; mengambil tindakan tegas terhadap pelanggaran prosedur.",
+      4: "Mengambil tindakan untuk mengatasi pelanggaran etika secara sistemik; membangun mekanisme pencegahan; berani menghadapi tekanan yang bertentangan dengan integritas.",
+      5: "Menjadi role model integritas di tingkat organisasi; membangun sistem akuntabilitas dan menciptakan budaya etika yang mengakar."
+    }
+  },
+  "Kerjasama": {
+    desc: "Memiliki niat dan kemauan untuk bekerja sama; berkomitmen terhadap tujuan bersama; menghargai masukan dan keahlian anggota tim.",
+    indicators: {
+      1: "Berpartisipasi aktif dalam kelompok kerja; membantu rekan yang membutuhkan.",
+      2: "Menumbuhkan tim yang partisipatif; mendorong semua anggota untuk berkontribusi.",
+      3: "Membangun tim yang efektif; menghargai keberagaman perspektif; menyelaraskan perbedaan dalam tim.",
+      4: "Membangun sinergi lintas unit/instansi; menciptakan mekanisme kolaborasi yang adil dan berkelanjutan.",
+      5: "Menciptakan situasi kerja sama dan sinergi lintas organisasi secara strategis; menjadi katalis kolaborasi nasional."
+    }
+  },
+  "Komunikasi": {
+    desc: "Menyampaikan informasi dengan jelas dan lengkap; menyimak secara aktif; menggunakan metode komunikasi yang tepat.",
+    indicators: {
+      1: "Menyampaikan informasi dengan jelas kepada rekan kerja.",
+      2: "Aktif menjalin komunikasi dua arah; mampu menyimak dan merespons secara tepat.",
+      3: "Berkomunikasi secara asertif; terampil memberi dan menerima umpan balik; menyesuaikan gaya komunikasi dengan audiens.",
+      4: "Menggalang pandangan positif dari berbagai pihak dengan kepentingan berbeda; membangun komunikasi strategis.",
+      5: "Menginspirasi pihak lain melalui komunikasi yang visioner; menjadi juru bicara organisasi yang persuasif dan berpengaruh."
+    }
+  },
+  "Orientasi pada Hasil": {
+    desc: "Mendorong diri sendiri dan unit kerja mencapai target; menetapkan standar keunggulan; berorientasi pada peningkatan berkelanjutan.",
+    indicators: {
+      1: "Bertanggung jawab untuk memenuhi standar kerja yang ditetapkan.",
+      2: "Menetapkan dan berupaya mencapai standar kerja terbaik; tidak puas dengan hasil biasa-biasa saja.",
+      3: "Menetapkan target kerja yang menantang bagi unit kerja; memotivasi dan mendukung anggota tim untuk mencapai target.",
+      4: "Mendorong unit mencapai target pemerintah melalui pendekatan inovatif; merancang ulang strategi pencapaian target secara sistemik.",
+      5: "Menciptakan kondisi dalam lingkungan organisasi yang mendorong orang lain berprestasi melampaui target."
+    }
+  },
+  "Pelayanan Publik": {
+    desc: "Memberikan layanan prima demi kepuasan masyarakat; memahami dan menerapkan prinsip pelayanan yang baik.",
+    indicators: {
+      1: "Menjalankan tugas mengikuti standar pelayanan yang ditetapkan.",
+      2: "Menunjukkan sikap yakin dalam bekerja dan kepatuhan dalam memberikan pelayanan sesuai kewenangan jabatan.",
+      3: "Mampu mendukung orang lain memberikan pelayanan prima; mengidentifikasi kebutuhan pengguna layanan.",
+      4: "Mendorong perubahan sistemik untuk meningkatkan kualitas pelayanan; memastikan inklusivitas dan aksesibilitas layanan.",
+      5: "Mampu membangun sistem yang mendorong kolaborasi dengan mitra pelayanan lintas sektor."
+    }
+  },
+  "Pengembangan Diri dan Orang Lain": {
+    desc: "Meningkatkan pengetahuan dan keterampilan diri; menginspirasi orang lain untuk mengembangkan kompetensi yang relevan.",
+    indicators: {
+      1: "Mengidentifikasi kebutuhan pengembangan diri; mengikuti pelatihan yang diwajibkan.",
+      2: "Meningkatkan kemampuan bawahan dengan memberikan contoh dan penjelasan cara melaksanakan pekerjaan.",
+      3: "Memberikan umpan balik yang konstruktif; membimbing bawahan dalam pengembangan kompetensi.",
+      4: "Menjadi mentor dan pelatih yang efektif; merancang IDP yang dipersonalisasi; membangun bench strength organisasi.",
+      5: "Menciptakan situasi yang mendorong seluruh pemangku kepentingan untuk saling belajar dan berkembang."
+    }
+  },
+  "Mengelola Perubahan": {
+    desc: "Menyesuaikan diri dan bekerja secara efektif dalam situasi apa pun; membantu orang lain melakukan hal serupa.",
+    indicators: {
+      1: "Mengikuti perubahan dengan arahan dari atasan; menerima perubahan kebijakan tanpa resistensi berarti.",
+      2: "Proaktif beradaptasi mengikuti arah perubahan; mencari informasi tentang perubahan yang akan terjadi.",
+      3: "Membantu orang lain mengikuti perubahan; menjelaskan alasan perubahan kepada tim.",
+      4: "Memimpin perubahan pada unit kerja; membangun koalisi perubahan; mengubah resistensi menjadi energi positif.",
+      5: "Memimpin, menggalang, dan mendukung upaya perubahan di tingkat instansi/lintas instansi."
+    }
+  },
+  "Pengambilan Keputusan": {
+    desc: "Membuat keputusan yang baik secara tepat waktu dan dengan keyakinan diri setelah mempertimbangkan prinsip kehati-hatian.",
+    indicators: {
+      1: "Mengumpulkan informasi dan mengidentifikasi masalah secara sistematis.",
+      2: "Menganalisis masalah secara mendalam; mempertimbangkan berbagai faktor sebelum mengambil keputusan.",
+      3: "Membandingkan berbagai alternatif; menyeimbangkan risiko keberhasilan dalam implementasi.",
+      4: "Menyelesaikan masalah yang mengandung risiko tinggi; mengantisipasi dampak keputusan; mendokumentasikan asumsi secara transparan.",
+      5: "Menghasilkan solusi dan keputusan untuk mengatasi permasalahan jangka panjang lintas organisasi."
+    }
+  },
+  "Perekat Bangsa": {
+    desc: "Mendayagunakan keberagaman latar belakang, agama, suku, gender, dan preferensi sebagai sumber daya untuk meningkatkan efektivitas organisasi.",
+    indicators: {
+      1: "Menghargai dan menerima perbedaan di lingkungan kerja; tidak melakukan diskriminasi.",
+      2: "Mendukung lingkungan kerja yang menghargai keberagaman; membantu rekan dari latar belakang berbeda.",
+      3: "Mengembangkan hubungan kerja yang harmonis lintas perbedaan; memfasilitasi dialog antar kelompok.",
+      4: "Mendayagunakan perbedaan secara konstruktif; membangun jembatan kepercayaan lintas kelompok; menyajikan temuan sensitif secara bertanggung jawab.",
+      5: "Memberdayakan keberagaman sebagai keunggulan strategis organisasi; menjadi mediator konflik lintas identitas."
+    }
+  }
+};
+
+// Build the scoring prompt
+function buildJPMPrompt(peserta, jawaban, requiredLevel){
+  const jawabanText = jawaban.map((a, i) => {
+    const k = a.kompetensi || PE_Q_LABELS[i];
+    return `### Kompetensi ${i+1}: ${k}
+Situasi: ${a.situasi || '(kosong)'}
+Kendala: ${a.kendala || '(kosong)'}
+Peran Saya: ${a.peran || '(kosong)'}
+Hasil: ${a.hasil || '(kosong)'}`;
+  }).join('\n\n');
+
+  const indDefs = Object.entries(KOMPETENSI_DEFS).map(([k,v]) =>
+    `${k}: Level 1="${v.indicators[1]}" | Level 2="${v.indicators[2]}" | Level 3="${v.indicators[3]}" | Level 4="${v.indicators[4]}" | Level 5="${v.indicators[5]}"`
+  ).join('\n');
+
+  // Benchmark calibration answers (real JPM 92.5 reference)
+  const BENCHMARK = `JAWABAN BENCHMARK (Referensi kalibrasi — skor JPM 92,5 / Sangat Sesuai Level 4):
+- Integritas L4: Menghadapi instruksi pimpinan untuk menahan data IKG yang bertentangan dengan perjanjian. Melakukan pendekatan persuasif ke pimpinan dan mitra, mengingatkan kewajiban perjanjian. Konflik terselesaikan, hubungan harmonis kembali.
+- Kerjasama L3.5: Terpilih menjadi petugas SKJHI (Survei Kepuasan Jamaah Haji), berinisiatif bangun sinergi internal-eksternal, jadi public relationship tim, inovasi penyediaan transportasi (belum pernah ada sebelumnya). Rilis publikasi tercepat sejak 2010.
+- Komunikasi L4: Memimpin tim adhoc PEKPPP, integrasikan informasi lintas bidang, strategi presentasi persuasif. BPS Babel masuk 10 besar nasional, dapat sertifikasi ISO 9001:2015.
+- Orientasi pada Hasil L5: Ketua Tim ZI skala provinsi, 4 satker diusulkan WBK/WBBM melampaui target 3 satker, BPS Babel raih terbaik pertama nasional dari BPS RI.
+- Pelayanan Publik L4: Inisiasi PST Make Over (SOP + PST digital + chatbot), indeks pelayanan naik ke kategori prima, raih ISO 9001:2015.
+- Pengembangan Diri L4: Rekrut 8 CA, knowledge sharing formal-informal, kaderisasi berhasil (CA jadi CC tahun berikutnya), BPS Babel terbaik 3 nasional manajemen perubahan.
+- Mengelola Perubahan L4: Admin SPBE, sosialisasi manfaat 3 jangka, knowledge sharing, asistensi langsung pegawai. Implementasi backoffice+kipApp berjalan sesuai jadwal, diterima semua pegawai.
+- Pengambilan Keputusan L4: PJ teknis Regsosek, inventarisir infrastruktur + mitigasi risiko, keputusan sentralisasi pengolahan 3 kab/kota ke BPS Provinsi. Selesai sebelum deadline + quality check.
+- Perekat Bangsa L3.5: Penempatan di Maluku Tengah pasca-konflik SARA, strategi aktif belajar bahasa daerah, komunikasi intensif. Hubungan harmonis, kerja sama meningkat dengan semua rekan.`;
+
+  return `Anda adalah asesor kompetensi ASN berpengalaman. Tugasnya adalah menganalisis jawaban PE (Pertanyaan Efektif) seorang peserta asesmen menggunakan metode STAR (Situasi-Kendala-Peran-Hasil) dan menilai level kompetensinya berdasarkan PermenPAN-RB No.38 Tahun 2017.
+
+PESERTA:
+- Nama: ${peserta.nama}
+- Jenjang yang Dilamar: ${peserta.jenjang}
+- Tuntutan Jabatan: Level ${requiredLevel} untuk semua kompetensi
+
+INDIKATOR LEVEL PER KOMPETENSI:
+${indDefs}
+
+${BENCHMARK}
+
+JAWABAN PE PESERTA YANG AKAN DINILAI:
+${jawabanText}
+
+INSTRUKSI PENILAIAN:
+1. Gunakan jawaban benchmark di atas sebagai KALIBRASI — jawaban benchmark menghasilkan skor JPM 92,5 dan profil kompetensi rata-rata Level 4. Bandingkan kualitas evidence peserta dengan benchmark tersebut.
+2. Analisis setiap jawaban STAR secara holistic. Nilailah berdasarkan KESELURUHAN narasi, bukan hanya satu kalimat.
+3. Tentukan level kompetensi (1-5). Skor 0 hanya untuk jawaban kosong atau tidak relevan sama sekali.
+4. Identifikasi evidence (bukti perilaku konkret) dari jawaban
+5. Kualitas STAR: nilai setiap komponen (Spesifik, Terukur, Relevan, Kuat)
+6. Hitung match_pct = min(100, round(skor / tuntutan * 100))
+
+Kalibrasi skoring:
+- Level 5: bukti dampak organisasi/nasional yang terverifikasi, penghargaan formal, melampaui target secara sistemik
+- Level 4: tindakan strategis, inisiatif sistemik, menggerakkan orang lain, dampak terukur unit/bidang
+- Level 3: tindakan terarah, melibatkan tim, hasil positif tapi cakupan terbatas
+- Level 2: tindakan individual, hasil kurang terukur
+- Level 1: pasif/mengikuti, tidak ada inisiatif yang jelas
+
+Berikan output HANYA dalam format JSON berikut (tidak ada teks lain di luar JSON):
+{
+  "scoring": [
+    {
+      "kompetensi": "Integritas",
+      "skor": 3,
+      "level_label": "Level 3 – Memastikan dan menanamkan keyakinan bersama",
+      "tuntutan": ${requiredLevel},
+      "gap": 0,
+      "match_pct": 75,
+      "evidence": "Peserta menggambarkan situasi di mana...",
+      "kekuatan": ["Berani menghadapi tekanan", "Mendokumentasikan secara formal"],
+      "pengembangan": ["Perlu membangun sistem pencegahan yang lebih sistemik"],
+      "kualitas_star": {
+        "situasi": "Jelas dan spesifik",
+        "kendala": "Cukup detail namun kurang kuantifikasi",
+        "peran": "Spesifik dengan tindakan aktif",
+        "hasil": "Terukur dengan dampak nyata"
+      }
+    }
+  ],
+  "jpm_overall": 75,
+  "jpm_kategori": "Memenuhi Syarat",
+  "profil_singkat": "Peserta menunjukkan kompetensi yang...",
+  "rekomendasi": [
+    "Perkuat kompetensi X melalui...",
+    "Leverage kekuatan di bidang Y untuk..."
+  ],
+  "catatan_asesor": "Secara keseluruhan..."
+}
+
+Aturan JPM kategori: ≥90% = Sangat Sesuai, 75-89% = Memenuhi Syarat, 60-74% = Perlu Pengembangan, <60% = Tidak Memenuhi Syarat`;
+}
+
+// Run JPM analysis
+async function runJPM(docId){
+  const doc = allDocs.find(d => d.id === docId);
+  if(!doc) return;
+  const pe = getPE(doc);
+  const p = getPeserta(doc);
+  if(!pe || !pe.jawaban){ showToast('PE tidak ditemukan', true); return; }
+
+  const reqLevel = REQUIRED_LEVEL[p.jenjang] || 4;
+  const areaEl = document.getElementById(`jpm-result-area-${docId}`);
+  if(!areaEl) return;
+
+  // Show loading
+  areaEl.innerHTML = `
+    <div class="jpm-loading">
+      <div class="spinner"></div>
+      <div style="font-size:13px;color:#7fa8ff;font-weight:600;margin-top:.5rem">Menganalisis 9 kompetensi...</div>
+      <div class="jpm-loading-step" id="jpm-step">Membaca jawaban STAR peserta...</div>
+    </div>`;
+
+  const steps = [
+    'Membaca jawaban STAR peserta...',
+    'Mengidentifikasi behavioral evidence...',
+    'Mencocokkan indikator level per kompetensi...',
+    'Menghitung gap tuntutan jabatan vs profil...',
+    'Menyusun rekomendasi pengembangan...'
+  ];
+  let si = 0;
+  const stepInterval = setInterval(() => {
+    si = (si + 1) % steps.length;
+    const el = document.getElementById('jpm-step');
+    if(el) el.textContent = steps[si];
+  }, 2000);
+
+  try {
+    const prompt = buildJPMPrompt(p, pe.jawaban, reqLevel);
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        system: 'Anda adalah asesor kompetensi ASN senior. Selalu balas HANYA dengan JSON yang valid, tanpa markdown, tanpa komentar, tanpa teks tambahan apapun.',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    clearInterval(stepInterval);
+
+    if(!resp.ok){ throw new Error(`API error ${resp.status}`); }
+    const data = await resp.json();
+    const raw = data.content?.[0]?.text || '';
+
+    // Parse JSON - strip any possible markdown fences
+    const cleaned = raw.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+    const result = JSON.parse(cleaned);
+
+    // Cache result
+    jpmCache[docId] = result;
+
+    // Render result
+    areaEl.innerHTML = renderJPMResult(result, p.jenjang);
+
+    // Save to Firebase
+    try {
+      await db.collection('asesmen_mansoskul').doc(docId).update({
+        jpm_result: result,
+        jpm_timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch(e){}
+
+    // Update aggregate page
+    renderJPMAggregate();
+    showToast('✓ Analisis JPM selesai');
+
+  } catch(err) {
+    clearInterval(stepInterval);
+    areaEl.innerHTML = `<div style="color:#e06c6c;font-size:13px;padding:.75rem;background:#1c2640;border-radius:8px;border:1px solid rgba(224,108,108,.3)">
+      ⚠ Gagal menjalankan analisis: ${err.message}.<br>
+      <span style="color:#4a5470;font-size:12px">Pastikan koneksi internet tersedia dan coba kembali.</span><br><br>
+      <button class="btn-jpm" onclick="runJPM('${docId}')">↻ Coba Lagi</button>
+    </div>`;
+    showToast('Analisis JPM gagal', true);
+  }
+}
+
+// Render JPM result HTML
+function renderJPMResult(result, jenjang){
+  const overall = result.jpm_overall || 0;
+  const cat = result.jpm_kategori || '';
+  const reqLevel = REQUIRED_LEVEL[jenjang] || 4;
+
+  // Grade class
+  let gradeClass = 'jpm-grade-poor';
+  if(overall >= 90) gradeClass = 'jpm-grade-excellent';
+  else if(overall >= 75) gradeClass = 'jpm-grade-good';
+  else if(overall >= 60) gradeClass = 'jpm-grade-fair';
+
+  // SVG ring
+  const r = 44, cx = 56, cy = 56, circ = 2 * Math.PI * r;
+  const fill = (overall / 100) * circ;
+  const ringColor = overall >= 90 ? '#4caf7d' : overall >= 75 ? '#7fa8ff' : overall >= 60 ? '#f0a04b' : '#e06c6c';
+
+  const svgRing = `<svg width="112" height="112" viewBox="0 0 112 112">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1e2d4d" stroke-width="10"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${ringColor}" stroke-width="10"
+      stroke-linecap="round" stroke-dasharray="${circ}"
+      stroke-dashoffset="${circ - fill}" transform="rotate(-90 ${cx} ${cy})"/>
+    <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle"
+      font-size="18" font-weight="700" fill="${ringColor}">${overall}%</text>
+  </svg>`;
+
+  // Gap table rows
+  const ORDER = ["Integritas","Kerjasama","Komunikasi","Orientasi pada Hasil","Pelayanan Publik",
+    "Pengembangan Diri dan Orang Lain","Mengelola Perubahan","Pengambilan Keputusan","Perekat Bangsa"];
+  const SHORT = ["INT","KRJ","KOM","ORH","PP","PDO","MP","PK","PB"];
+
+  let tableRows = '';
+  ORDER.forEach((k, i) => {
+    const sc = result.scoring?.find(s => s.kompetensi === k) || {};
+    const skor = sc.skor ?? 0;
+    const gap = skor - reqLevel;
+
+    // Level dots (max 5)
+    let dots = '';
+    for(let d = 1; d <= 5; d++){
+      let cls = 'level-dot';
+      if(d <= reqLevel && d <= skor) cls += ' filled-person';
+      else if(d <= reqLevel) cls += ' filled-req';
+      else if(d <= skor) cls += ' gap-positive';
+      dots += `<div class="${cls}" title="Level ${d}">${d}</div>`;
+    }
+
+    let gapPill = '';
+    if(skor === 0) gapPill = '<span class="gap-pill gap-below2">Tidak Dinilai</span>';
+    else if(gap === 0) gapPill = '<span class="gap-pill gap-match">✓ Sesuai</span>';
+    else if(gap > 0) gapPill = `<span class="gap-pill gap-above">+${gap} Melampaui</span>`;
+    else if(gap === -1) gapPill = `<span class="gap-pill gap-below1">−1 Gap</span>`;
+    else gapPill = `<span class="gap-pill gap-below2">−${Math.abs(gap)} Gap</span>`;
+
+    const matchPct = reqLevel > 0 ? Math.min(100, Math.round((skor / reqLevel) * 100)) : 0;
+    const mc = matchPct >= 100 ? '#4caf7d' : matchPct >= 75 ? '#7fa8ff' : matchPct >= 50 ? '#f0a04b' : '#e06c6c';
+
+    tableRows += `<tr onclick="toggleJPMKomp('jpmk-${i}')" style="cursor:pointer">
+      <td style="font-size:12px;font-weight:600;color:#e8ecf8">${SHORT[i]}</td>
+      <td style="font-size:12px;color:#c8d0e8;max-width:150px">${k}</td>
+      <td><div class="level-dots">${dots}</div></td>
+      <td style="font-size:13px;font-weight:700;color:${mc}">${skor}/5</td>
+      <td>${gapPill}</td>
+      <td style="font-size:12px;color:${mc};font-weight:600">${matchPct}%</td>
+    </tr>`;
+  });
+
+  // Per-competency accordion
+  let accordions = '';
+  ORDER.forEach((k, i) => {
+    const sc = result.scoring?.find(s => s.kompetensi === k) || {};
+    const skor = sc.skor ?? 0;
+    const gap = skor - reqLevel;
+    const mc = skor >= reqLevel ? '#4caf7d' : skor >= reqLevel - 1 ? '#f0a04b' : '#e06c6c';
+
+    const kekuatan = (sc.kekuatan || []).map(x => `<span class="jpm-tag">${esc(x)}</span>`).join('');
+    const pengembangan = (sc.pengembangan || []).map(x => `<span class="jpm-tag" style="border-color:rgba(240,160,75,.3);color:#f0a04b">${esc(x)}</span>`).join('');
+
+    const starKualitas = sc.kualitas_star ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:.75rem">
+        ${['situasi','kendala','peran','hasil'].map(s =>
+          `<div style="background:#0f1523;border-radius:6px;padding:6px 8px">
+            <div style="font-size:10px;color:#4a5470;font-weight:700;text-transform:uppercase">${s}</div>
+            <div style="font-size:11px;color:#c8d0e8">${esc(sc.kualitas_star[s]||'–')}</div>
+          </div>`).join('')}
+      </div>` : '';
+
+    accordions += `<div class="jpm-komp-accord">
+      <div class="jpm-komp-header" id="jpmk-${i}-hdr">
+        <div class="jpm-komp-num">${i+1}</div>
+        <div class="jpm-komp-name">${k}</div>
+        <span class="jpm-komp-score" style="color:${mc}">L${skor}/${reqLevel}</span>
+        <span class="jpm-komp-chev" id="jpmk-${i}-chev">▾</span>
+      </div>
+      <div class="jpm-komp-body" id="jpmk-${i}-body">
+        <div class="jpm-sublabel jpm-sub-blue">Level Teridentifikasi: ${esc(sc.level_label||`Level ${skor}`)}</div>
+        <div class="jpm-evidence-box">${esc(sc.evidence||'–')}</div>
+        <div class="jpm-sublabel jpm-sub-blue">Kualitas STAR</div>
+        ${starKualitas}
+        ${kekuatan ? `<div class="jpm-sublabel jpm-sub-green">Kekuatan Teridentifikasi</div><div class="jpm-tag-list">${kekuatan}</div>` : ''}
+        ${pengembangan ? `<div class="jpm-sublabel jpm-sub-amber">Area Pengembangan</div><div class="jpm-tag-list">${pengembangan}</div>` : ''}
+      </div>
+    </div>`;
+  });
+
+  // Rekomendasi
+  const rekos = (result.rekomendasi || []).map(r =>
+    `<div class="jpm-reko-item"><div class="jpm-reko-bullet"></div><span>${esc(r)}</span></div>`
+  ).join('');
+
+  return `
+    <div class="jpm-hero">
+      <div class="jpm-ring-wrap">${svgRing}</div>
+      <div class="jpm-hero-right">
+        <div class="jpm-match-label">Job-Person Match Score</div>
+        <div class="jpm-match-grade ${gradeClass}">${cat}</div>
+        <div class="jpm-match-desc">${esc(result.profil_singkat||'')}</div>
+      </div>
+    </div>
+
+    <div class="jpm-section-label">Tabel Gap Tuntutan Jabatan vs Profil Individu</div>
+    <div class="table-wrap" style="margin-bottom:1.25rem">
+      <table class="jpm-table">
+        <thead><tr><th>Kode</th><th>Kompetensi</th><th>Level (Req / Aktual)</th><th>Skor</th><th>Status Gap</th><th>Match</th></tr></thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+
+    <div class="jpm-section-label">Detail Evidence per Kompetensi</div>
+    ${accordions}
+
+    <div class="jpm-reko-box" style="margin-top:1rem">
+      <div class="jpm-reko-title">📋 Rekomendasi Pengembangan</div>
+      ${rekos || '<div style="color:#4a5470;font-size:12px">–</div>'}
+      ${result.catatan_asesor ? `<div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid #2e3d66;font-size:12px;color:#7a88aa;line-height:1.6"><strong style="color:#c8d0e8">Catatan Asesor:</strong> ${esc(result.catatan_asesor)}</div>` : ''}
+    </div>
+
+    <div style="text-align:right;margin-top:.75rem">
+      <button class="td-btn" onclick="runJPM('${currentDetailDocId}')">↻ Analisis Ulang</button>
+    </div>`;
+}
+
+function toggleJPMKomp(id){
+  const body = document.getElementById(id+'-body');
+  const chev = document.getElementById(id+'-chev');
+  if(body){ body.classList.toggle('open'); }
+  if(chev){ chev.classList.toggle('open'); }
+}
+
+// Track current open detail
+let currentDetailDocId = null;
+const _origOpenDetail = openDetail;
+// Override openDetail to track current doc
+function openDetail(docId){
+  currentDetailDocId = docId;
+  _origOpenDetail(docId);
+}
+
+// ── JPM AGGREGATE PAGE ──────────────────────────────────
+function renderJPMAggregate(){
+  const analyzed = allDocs.filter(d => jpmCache[d.id] || d.jpm_result);
+  document.getElementById('jpm-total-analyzed').textContent = analyzed.length;
+
+  if(!analyzed.length){
+    document.getElementById('jpm-avg-match').textContent = '–';
+    document.getElementById('jpm-strongest').textContent = '–';
+    document.getElementById('jpm-weakest').textContent = '–';
+    document.getElementById('jpm-table-count').textContent = '0 data teranalisis';
+    document.getElementById('jpm-table-body').innerHTML =
+      '<tr class="loading-row"><td colspan="15" style="color:#4a5470">Belum ada analisis JPM.</td></tr>';
+    return;
+  }
+
+  const ORDER = ["Integritas","Kerjasama","Komunikasi","Orientasi pada Hasil","Pelayanan Publik",
+    "Pengembangan Diri dan Orang Lain","Mengelola Perubahan","Pengambilan Keputusan","Perekat Bangsa"];
+  const SHORT = ["INT","KRJ","KOM","ORH","PP","PDO","MP","PK","PB"];
+
+  const results = analyzed.map(d => ({ doc: d, r: jpmCache[d.id] || d.jpm_result }));
+
+  // Aggregate
+  const avgMatch = Math.round(results.reduce((s,{r})=>s+(r.jpm_overall||0),0)/results.length);
+  document.getElementById('jpm-avg-match').textContent = avgMatch + '%';
+
+  // Best/worst competency across all
+  const kompAvg = {};
+  ORDER.forEach(k => {
+    const vals = results.map(({r}) => r.scoring?.find(s=>s.kompetensi===k)?.match_pct||0);
+    kompAvg[k] = vals.length ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length) : 0;
+  });
+  const sorted = Object.entries(kompAvg).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('jpm-strongest').textContent = sorted[0] ? `${sorted[0][0]} (${sorted[0][1]}%)` : '–';
+  document.getElementById('jpm-weakest').textContent = sorted[sorted.length-1] ? `${sorted[sorted.length-1][0]} (${sorted[sorted.length-1][1]}%)` : '–';
+
+  document.getElementById('jpm-table-count').textContent = results.length + ' data teranalisis';
+
+  const tbody = document.getElementById('jpm-table-body');
+  tbody.innerHTML = results.map(({doc, r}, i) => {
+    const p = getPeserta(doc);
+    const overall = r.jpm_overall || 0;
+    const oc = overall>=90?'#4caf7d':overall>=75?'#7fa8ff':overall>=60?'#f0a04b':'#e06c6c';
+    const reqLevel = REQUIRED_LEVEL[p.jenjang||'Administrator']||4;
+
+    const kompCells = ORDER.map(k => {
+      const sc = r.scoring?.find(s=>s.kompetensi===k);
+      const skor = sc?.skor ?? 0;
+      const c = skor >= reqLevel ? '#4caf7d' : skor >= reqLevel-1 ? '#f0a04b' : '#e06c6c';
+      return `<td style="text-align:center;font-size:11px;font-weight:700;color:${skor>0?c:'#3a4a6a'}">${skor>0?skor:'–'}</td>`;
+    }).join('');
+
+    const cat = r.jpm_kategori||'–';
+    const catCls = cat.includes('Sangat')?'pill-green':cat.includes('Memenuhi')?'pill-blue':cat.includes('Perlu')?'pill-amber':'pill-red';
+
+    return `<tr onclick="openDetail('${doc.id}')" style="cursor:pointer">
+      <td style="color:#4a5470;font-size:11px">${i+1}</td>
+      <td style="font-weight:600;font-size:13px;color:#e8ecf8">${esc(p.nama||'–')}</td>
+      <td><span class="pill ${jenPill(p.jenjang)}" style="font-size:10px">${esc(p.jenjang||'–')}</span></td>
+      ${kompCells}
+      <td style="font-weight:700;font-size:13px;color:${oc}">${overall}%</td>
+      <td><span class="pill ${catCls}" style="font-size:10px">${esc(cat)}</span></td>
+      <td><button class="td-btn" onclick="event.stopPropagation();openDetail('${doc.id}')">↗</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// Load cached JPM from Firestore docs
+function loadJPMFromDocs(){
+  allDocs.forEach(d => {
+    if(d.jpm_result && !jpmCache[d.id]){
+      jpmCache[d.id] = d.jpm_result;
+    }
+  });
+  renderJPMAggregate();
+}
+const PAGE_TITLES = {
+  dashboard: 'Dashboard Overview',
+  peserta: 'Daftar Peserta',
+  kompetensi: 'Analisis Kompetensi SJT',
+  jpmpage: 'Job-Person Match – PE Analysis'
+};
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  document.getElementById('topbar-title').textContent = PAGE_TITLES[id] || '';
+  if(id === 'jpmpage') renderJPMAggregate();
+}
+
+// ═══════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function jenPill(j){
+  if(j==='Pratama') return 'pill-red';
+  if(j==='Administrator') return 'pill-blue';
+  if(j==='Pengawas') return 'pill-amber';
+  return 'pill-gray';
+}
+
+function showToast(msg, isErr){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = isErr ? '#e06c6c' : '#4caf7d';
+  t.style.color = isErr ? '#e06c6c' : '#4caf7d';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
