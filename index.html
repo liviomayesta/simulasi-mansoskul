@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulasi Asesmen Mansoskul – BPS</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#EEF2FB;color:#1a1a1a;min-height:100vh}
+.screen{display:none;min-height:100vh;padding:1.5rem 1rem}
+.screen.active{display:block}
+.container{max-width:860px;margin:0 auto}
+
+/* ── Topbar ── */
+.topbar{background:#1F3A8C;color:#fff;padding:0.75rem 1.5rem;display:flex;justify-content:space-between;align-items:center;border-radius:12px;margin-bottom:1.5rem}
+.topbar-title{font-size:15px;font-weight:600}
+.topbar-timer{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;background:rgba(255,255,255,0.15);padding:5px 14px;border-radius:8px}
+.topbar-timer.warn{background:#BA7517}
+.topbar-timer.danger{background:#A32D2D;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+
+/* ── Cards ── */
+.card{background:#fff;border:0.5px solid #ccd2e8;border-radius:14px;padding:1.5rem;margin-bottom:1.25rem}
+.card-title{font-size:16px;font-weight:600;color:#1F3A8C;margin-bottom:0.75rem}
+
+/* ── Buttons ── */
+.btn{border:none;border-radius:10px;padding:12px 28px;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-primary{background:#1F3A8C;color:#fff}.btn-primary:hover{background:#162c6e}
+.btn-success{background:#0F6E56;color:#fff}.btn-success:hover{background:#085041}
+.btn-outline{background:transparent;border:1.5px solid #1F3A8C;color:#1F3A8C}.btn-outline:hover{background:#EEF2FB}
+.btn-danger{background:#A32D2D;color:#fff}.btn-danger:hover{background:#7a1f1f}
+.btn-sm{padding:8px 18px;font-size:13px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── Forms ── */
+input,select,textarea{width:100%;padding:10px 14px;border:1px solid #ccd2e8;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:#1F3A8C}
+label{font-size:13px;font-weight:500;color:#444;margin-bottom:5px;display:block}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.form-group{margin-bottom:1rem}
+.form-hint{font-size:12px;color:#888;margin-top:4px}
+
+/* ── Setup screen ── */
+#screen-setup{background:linear-gradient(135deg,#EEF2FB 0%,#E0E8F8 100%)}
+.setup-hero{text-align:center;padding:2rem 0 1.5rem}
+.setup-badge{display:inline-block;background:#1F3A8C;color:#fff;font-size:12px;font-weight:600;padding:4px 14px;border-radius:20px;margin-bottom:1rem;letter-spacing:.06em}
+.setup-title{font-size:28px;font-weight:700;color:#1F3A8C;margin-bottom:.5rem}
+.setup-sub{font-size:14px;color:#666;margin-bottom:2rem}
+
+
+/* ── Dashboard ── */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-top:1rem}
+.dash-card{background:#fff;border:1.5px solid #ccd2e8;border-radius:14px;padding:1.5rem;cursor:pointer;transition:all .2s;text-align:center}
+.dash-card:hover{border-color:#1F3A8C;transform:translateY(-2px);box-shadow:0 4px 16px rgba(31,58,140,.12)}
+.dash-card.done{border-color:#0F6E56;background:#F0FBF7}
+.dash-icon{font-size:36px;margin-bottom:.75rem}
+.dash-card-title{font-size:17px;font-weight:700;color:#1F3A8C;margin-bottom:.4rem}
+.dash-card-sub{font-size:13px;color:#666;margin-bottom:.75rem}
+.dash-status{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px}
+.status-ready{background:#EEF2FB;color:#1F3A8C}
+.status-done{background:#E1F5EE;color:#0B5E3E}
+.status-saved{background:#FDF0E4;color:#7A3B00}
+.peserta-bar{background:#1F3A8C;color:#fff;border-radius:10px;padding:.75rem 1.25rem;margin-bottom:1.25rem;display:flex;gap:2rem;flex-wrap:wrap}
+.peserta-field{font-size:13px}.peserta-label{opacity:.7;font-size:11px;display:block}
+
+/* ── PE Screen ── */
+.pe-progress{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap}
+.pe-dot{width:32px;height:32px;border-radius:50%;border:2px solid #ccd2e8;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;color:#888;flex-shrink:0}
+.pe-dot.current{border-color:#1F3A8C;background:#1F3A8C;color:#fff}
+.pe-dot.filled{border-color:#0F6E56;background:#E1F5EE;color:#0B5E3E}
+.pe-dot.partial{border-color:#BA7517;background:#FDF0E4;color:#7A3B00}
+.pe-q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;flex-wrap:wrap;gap:.5rem}
+.pe-kompetensi{background:#EEF2FB;color:#1F3A8C;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:.04em}
+.pe-q-text{font-size:15px;line-height:1.75;font-weight:500;color:#1a1a1a;margin-bottom:1.25rem;padding:1rem;background:#F8F9FF;border-radius:10px;border-left:4px solid #1F3A8C}
+.star-grid{display:grid;grid-template-columns:1fr;gap:.75rem}
+.star-item{}
+.star-label{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.star-badge{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.star-s{background:#EEF2FB;color:#1F3A8C}.star-k{background:#FDF0E4;color:#7A3B00}
+.star-p{background:#E1F5EE;color:#0B5E3E}.star-h{background:#FAECE7;color:#712B13}
+.star-name{font-size:13px;font-weight:600;color:#444}
+.star-hint{font-size:11px;color:#999;margin-left:auto}
+textarea.star-input{height:90px;resize:vertical;font-size:13.5px;line-height:1.65}
+.pe-nav{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-top:1rem}
+.pe-counter{font-size:13px;color:#888}
+.word-count{font-size:11px;color:#aaa;text-align:right;margin-top:3px}
+
+/* ── SJT Screen ── */
+.sjt-progress-wrap{margin-bottom:1.25rem}
+.sjt-progress-bar{background:#D3D1C7;border-radius:4px;height:5px}
+.sjt-progress-fill{height:5px;border-radius:4px;background:#1F3A8C;transition:width .4s}
+.sjt-meta{display:flex;justify-content:space-between;font-size:13px;color:#666;margin-bottom:6px}
+.sjt-comp-tag{background:#EEF2FB;color:#1F3A8C;font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;letter-spacing:.05em}
+.sjt-level-tag{background:#FDF0E4;color:#7A3B00;font-size:11px;font-weight:600;padding:3px 10px;border-radius:12px}
+.q-text{font-size:14.5px;line-height:1.75;color:#1a1a1a;margin-bottom:1.25rem}
+.options{display:flex;flex-direction:column;gap:9px}
+.option{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid #ccd2e8;border-radius:10px;cursor:pointer;transition:all .15s}
+.option:hover{border-color:#4B6FD0;background:#EEF2FB}
+.option.selected{border-color:#1F3A8C;background:#EEF2FB}
+.option.correct{border-color:#0F6E56;background:#E1F5EE}
+.option.wrong{border-color:#993C1D;background:#FAECE7}
+.opt-circle{width:28px;height:28px;border-radius:50%;border:1.5px solid #ccd2e8;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#888;margin-top:1px}
+.option.selected .opt-circle{border-color:#1F3A8C;background:#1F3A8C;color:#fff}
+.option.correct .opt-circle{border-color:#0F6E56;background:#0F6E56;color:#fff}
+.option.wrong .opt-circle{border-color:#993C1D;background:#993C1D;color:#fff}
+.opt-text{font-size:13.5px;line-height:1.65;color:#333}
+.option.correct .opt-text{color:#085041}
+.option.wrong .opt-text{color:#712B13}
+.sjt-nav{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-top:1rem}
+
+/* ── Review (SJT) ── */
+.review-card{background:#fff;border:0.5px solid #ccd2e8;border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem}
+.review-header{display:flex;align-items:center;gap:8px;margin-bottom:.75rem;flex-wrap:wrap}
+.review-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.badge-c{background:#E1F5EE;color:#085041}.badge-w{background:#FAECE7;color:#712B13}.badge-s{background:#f1efe8;color:#888}
+.review-q{font-size:13.5px;line-height:1.65;color:#1a1a1a;margin-bottom:.75rem}
+.r-opts{display:flex;flex-direction:column;gap:6px;margin-bottom:.75rem}
+.r-opt{display:flex;gap:9px;padding:8px 12px;border-radius:8px;border:0.5px solid #e8e6e0;font-size:13px;line-height:1.5}
+.r-opt.rc{background:#E1F5EE;border-color:#5DCAA5;color:#085041}
+.r-opt.rw{background:#FAECE7;border-color:#F0997B;color:#712B13}
+.r-exp{background:#EEF2FB;border-left:3px solid #1F3A8C;border-radius:0 8px 8px 0;padding:9px 12px;font-size:12.5px;color:#1F3A8C;line-height:1.6}
+
+/* ── Results ── */
+.result-hero{text-align:center;padding:1.5rem 0}
+.result-icon{font-size:52px;margin-bottom:.75rem}
+.result-grade{font-size:28px;font-weight:700;color:#1F3A8C;margin-bottom:.3rem}
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:1.25rem 0}
+.score-box{background:#fff;border:0.5px solid #ccd2e8;border-radius:12px;padding:1rem;text-align:center}
+.score-num{font-size:24px;font-weight:700}
+.score-lbl{font-size:12px;color:#888;margin-top:3px}
+.comp-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.comp-bar-name{font-size:12px;color:#444;min-width:175px}
+.comp-bar-outer{flex:1;background:#EEF2FB;border-radius:4px;height:10px}
+.comp-bar-inner{height:10px;border-radius:4px;background:#1F3A8C;transition:width 1s ease}
+.comp-bar-score{font-size:12px;font-weight:600;color:#1F3A8C;min-width:38px;text-align:right}
+.firebase-status{border-radius:10px;padding:1rem 1.25rem;margin-bottom:1rem;font-size:13px;display:flex;align-items:center;gap:10px}
+.firebase-status.saving{background:#FDF0E4;color:#7A3B00}
+.firebase-status.saved{background:#E1F5EE;color:#0B5E3E}
+.firebase-status.error{background:#FAECE7;color:#712B13}
+.firebase-id{font-size:11px;font-family:monospace;margin-top:4px;opacity:.8}
+
+/* ── PE Review ── */
+.pe-review-card{background:#fff;border:0.5px solid #ccd2e8;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.pe-review-q{font-size:13.5px;font-weight:500;color:#1F3A8C;margin-bottom:1rem;line-height:1.65}
+.star-review-item{margin-bottom:.5rem}
+.star-review-label{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.star-review-text{font-size:13px;line-height:1.65;color:#333;white-space:pre-wrap;background:#F8F9FF;padding:8px 12px;border-radius:8px;min-height:36px}
+
+/* ── Misc ── */
+.divider{border:none;border-top:1px solid #e8ecf8;margin:1.25rem 0}
+.alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:1rem}
+.alert-info{background:#EEF2FB;color:#1F3A8C;border-left:3px solid #1F3A8C}
+.alert-warn{background:#FDF0E4;color:#7A3B00;border-left:3px solid #BA7517}
+.section-title{font-size:18px;font-weight:700;color:#1F3A8C;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid #EEF2FB}
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.sjt-grid{display:flex;flex-wrap:wrap;gap:5px;margin-top:.75rem}
+.sjt-dot{width:28px;height:28px;border-radius:6px;border:1px solid #ccd2e8;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;cursor:pointer;transition:all .15s;color:#888}
+.sjt-dot:hover{border-color:#1F3A8C;background:#EEF2FB}
+.sjt-dot.answered{background:#EEF2FB;border-color:#4B6FD0;color:#1F3A8C}
+.sjt-dot.current{background:#1F3A8C;border-color:#1F3A8C;color:#fff}
+@media(max-width:600px){.form-row,.dash-grid,.mini-grid,.score-grid{grid-template-columns:1fr}.pe-dot{width:28px;height:28px;font-size:11px}}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ SETUP SCREEN ══════════════════ -->
+<div id="screen-setup" class="screen active">
+<div class="container">
+  <div class="setup-hero">
+    <div class="setup-badge">ASESMEN KOMPETENSI MANAJERIAL & SOSIAL KULTURAL</div>
+    <div class="setup-title">Simulasi Asesmen Mansoskul</div>
+    <div class="setup-sub">Sistem Terintegrasi PE + SJT dengan Penyimpanan Firebase<br>Berdasarkan PermenPAN-RB No. 38 Tahun 2017</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Data Peserta</div>
+    <div class="form-row">
+      <div class="form-group"><label>Nama Lengkap *</label><input id="f-nama" type="text" placeholder="Nama sesuai dokumen"></div>
+      <div class="form-group"><label>NIP *</label><input id="f-nip" type="text" placeholder="19XXXXXXXXXXXXXX"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Unit Kerja *</label><input id="f-unit" type="text" placeholder="BPS Provinsi / Kab / Kota ..."></div>
+      <div class="form-group"><label>Jenjang yang Dilamar</label>
+        <select id="f-jenjang">
+          <option value="Pengawas">Pengawas (Eselon IV)</option>
+          <option value="Administrator" selected>Administrator / Madya (Eselon III)</option>
+          <option value="Pratama">Pratama (Eselon II)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Panduan Pengerjaan</div>
+    <div class="mini-grid">
+      <div>
+        <div style="font-weight:600;color:#1F3A8C;margin-bottom:.5rem">📝 PE – Pertanyaan Efektif</div>
+        <div style="font-size:13px;line-height:1.7;color:#444">9 soal essay berbasis pengalaman nyata. Setiap soal dijawab menggunakan kerangka STAR (Situasi – Kendala – Peran – Hasil). Waktu: <strong>120 menit</strong>.</div>
+      </div>
+      <div>
+        <div style="font-weight:600;color:#1F3A8C;margin-bottom:.5rem">🎯 SJT – Situational Judgment Test</div>
+        <div style="font-size:13px;line-height:1.7;color:#444">54 soal pilihan ganda skenario kerja. Pilih satu jawaban terbaik untuk setiap situasi. Waktu: <strong>90 menit</strong>.</div>
+      </div>
+    </div>
+  </div>
+  <button class="btn btn-primary" style="width:100%;padding:14px" onclick="doSetup()">Mulai Asesmen →</button>
+</div>
+</div>
+
+<!-- ══════════════════ DASHBOARD ══════════════════ -->
+<div id="screen-dashboard" class="screen">
+<div class="container">
+  <div class="peserta-bar" id="peserta-bar"></div>
+  <div class="section-title">Pilih Modul Asesmen</div>
+  <div class="alert alert-warn" id="dash-alert" style="display:none"></div>
+  <div class="dash-grid">
+    <div class="dash-card" id="dash-pe" onclick="startPE()">
+      <div class="dash-icon">📝</div>
+      <div class="dash-card-title">PE – Pertanyaan Efektif</div>
+      <div class="dash-card-sub">9 soal essay STAR · 9 kompetensi · Jenjang Madya</div>
+      <div><span class="dash-status status-ready" id="pe-status-badge">Belum Dikerjakan</span></div>
+      <div style="font-size:12px;color:#888;margin-top:.5rem">⏱ 120 menit</div>
+    </div>
+    <div class="dash-card" id="dash-sjt" onclick="startSJT()">
+      <div class="dash-icon">🎯</div>
+      <div class="dash-card-title">SJT – Situational Judgment</div>
+      <div class="dash-card-sub">54 soal pilihan ganda · 9 kompetensi · Level 2–4</div>
+      <div><span class="dash-status status-ready" id="sjt-status-badge">Belum Dikerjakan</span></div>
+      <div style="font-size:12px;color:#888;margin-top:.5rem">⏱ 90 menit</div>
+    </div>
+  </div>
+  <div style="margin-top:1.5rem;text-align:center">
+    <button class="btn btn-outline btn-sm" onclick="showResults()">Lihat Hasil Lengkap</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════ PE SCREEN ══════════════════ -->
+<div id="screen-pe" class="screen">
+<div class="container">
+  <div class="topbar">
+    <div class="topbar-title">PE – Pertanyaan Efektif</div>
+    <div class="topbar-timer" id="pe-timer">120:00</div>
+  </div>
+  <div class="pe-progress" id="pe-dots"></div>
+  <div class="card" id="pe-card">
+    <div class="pe-q-header">
+      <div style="font-size:12px;font-weight:700;color:#888" id="pe-q-num">SOAL 1 DARI 9</div>
+      <div class="pe-kompetensi" id="pe-kompetensi-tag">Integritas</div>
+    </div>
+    <div class="pe-q-text" id="pe-q-text"></div>
+    <div class="star-grid" id="pe-star-grid"></div>
+  </div>
+  <div class="pe-nav">
+    <button class="btn btn-outline btn-sm" id="pe-btn-prev" onclick="peNav(-1)">← Sebelumnya</button>
+    <div class="pe-counter" id="pe-save-status">●</div>
+    <button class="btn btn-primary btn-sm" id="pe-btn-next" onclick="peNav(1)">Berikutnya →</button>
+  </div>
+  <div style="margin-top:1rem;text-align:center">
+    <button class="btn btn-success" onclick="finishPE()">Selesai & Simpan PE</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════ SJT SCREEN ══════════════════ -->
+<div id="screen-sjt" class="screen">
+<div class="container">
+  <div class="topbar">
+    <div class="topbar-title">SJT — Soal <span id="sjt-cur-num">1</span>/54</div>
+    <div class="topbar-timer" id="sjt-timer">90:00</div>
+  </div>
+  <div class="sjt-progress-wrap">
+    <div class="sjt-meta">
+      <span id="sjt-comp-tag" class="sjt-comp-tag">Integritas</span>
+      <span id="sjt-level-tag" class="sjt-level-tag">Level 3</span>
+    </div>
+    <div class="sjt-progress-bar"><div class="sjt-progress-fill" id="sjt-bar" style="width:1.85%"></div></div>
+  </div>
+  <div class="card">
+    <div style="font-size:11px;font-weight:700;color:#1F3A8C;letter-spacing:.07em;margin-bottom:.6rem" id="sjt-q-num">SOAL 1</div>
+    <div class="q-text" id="sjt-q-text"></div>
+    <div class="options" id="sjt-options"></div>
+  </div>
+  <div class="sjt-grid" id="sjt-map"></div>
+  <div class="sjt-nav" style="margin-top:1rem">
+    <button class="btn btn-outline btn-sm" id="sjt-btn-prev" onclick="sjtNav(-1)">← Sebelumnya</button>
+    <button class="btn btn-outline btn-sm" onclick="sjtNav(1)">Lewati →</button>
+    <button class="btn btn-primary btn-sm" id="sjt-btn-next" onclick="sjtNav(1)">Berikutnya →</button>
+  </div>
+  <div style="margin-top:1rem;text-align:center">
+    <button class="btn btn-success" onclick="finishSJT()">Selesai & Simpan SJT</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════ RESULTS SCREEN ══════════════════ -->
+<div id="screen-results" class="screen">
+<div class="container">
+  <div class="result-hero">
+    <div class="result-icon" id="r-icon">📊</div>
+    <div class="result-grade" id="r-grade">Hasil Asesmen</div>
+    <div style="font-size:14px;color:#666" id="r-sub"></div>
+  </div>
+  <div id="firebase-save-status" class="firebase-status saving" style="display:none">
+    <span id="fb-status-text">⏳ Menyimpan ke Firebase...</span>
+  </div>
+  <div id="r-pe-section"></div>
+  <div id="r-sjt-section"></div>
+  <hr class="divider">
+  <div style="text-align:center;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+    <button class="btn btn-outline" onclick="goTo('dashboard')">← Kembali ke Dashboard</button>
+    <button class="btn btn-primary" onclick="location.reload()">Mulai Ulang</button>
+  </div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  PE QUESTIONS (9 soal – STAR format)
+// ═══════════════════════════════════════════════════════
+const PE_Q = [
+  {kompetensi:"Integritas",
+   text:"Dalam Anda melaksanakan tugas pasti pernah mengalami situasi yang bertentangan dengan nilai, norma, dan etika organisasi. Ceritakan pengalaman terbaik Anda ketika berhasil menghadapi situasi tersebut! Jelaskan situasinya seperti apa, kendala yang dihadapi, peran Anda dan hasilnya seperti apa!"},
+  {kompetensi:"Kerjasama",
+   text:"Sepanjang perjalanan karir Anda pasti pernah bekerja sama dalam sebuah tim. Ceritakan pengalaman terbaik Anda ketika berhasil bekerja sama dalam tim untuk menyelesaikan suatu tugas pekerjaan! Jelaskan situasinya seperti apa, kendala yang dihadapi, peran Anda dan hasilnya seperti apa!"},
+  {kompetensi:"Komunikasi",
+   text:"Ceritakan pengalaman terbaik Anda ketika berhasil dalam tugas pekerjaan yang menuntut kemampuan untuk berkomunikasi dengan orang lain (menyatakan pendapat, ide/gagasan, argumen, baik secara lisan maupun tertulis)! Jelaskan situasinya seperti apa, kendala yang dihadapi, peran Anda dan hasilnya seperti apa!"},
+  {kompetensi:"Orientasi pada Hasil",
+   text:"Ceritakan pengalaman Anda ketika berhasil menyelesaikan tugas dalam situasi yang sulit dengan tetap berpegang pada kualitas hasil dan target kerja! Jelaskan situasinya seperti apa, kendala yang dihadapi, peran Anda dan hasilnya seperti apa!"},
+  {kompetensi:"Pelayanan Publik",
+   text:"Ceritakan pengalaman Anda ketika berhasil memberikan pelayanan yang berhubungan dengan tugas Anda sehari-hari. Jelaskan situasinya seperti apa, kendala yang dihadapi, peran Anda dan hasilnya seperti apa!"},
+  {kompetensi:"Pengembangan Diri dan Orang Lain",
+   text:"Ceritakan pengalaman Anda ketika berhasil melakukan pengembangan diri dan juga orang lain yang terkait dengan pekerjaan Anda. Jelaskan situasinya seperti apa, kendala yang Anda hadapi, peran Anda saat itu dan seperti apa hasilnya!"},
+  {kompetensi:"Mengelola Perubahan",
+   text:"Ceritakan pengalaman keberhasilan Anda ketika dihadapkan pada situasi yang menuntut Anda untuk berubah dengan cepat. Anda dan Tim kerja Anda harus melakukan penyesuaian secara cepat untuk menghadapi tuntutan perubahan tersebut! Jelaskan situasinya seperti apa, kendala yang Anda hadapi, peran Anda saat itu dan seperti apa hasilnya!"},
+  {kompetensi:"Pengambilan Keputusan",
+   text:"Dalam menyelesaikan tugas sehari-hari tentu Anda pernah bertemu dengan situasi yang menyebabkan Anda harus mengambil keputusan diantara banyak pilihan situasi yang sulit. Ceritakan pengalaman keberhasilan Anda ketika menghadapi situasi tersebut! Jelaskan situasinya seperti apa, kendala yang Anda hadapi, peran Anda saat itu dan seperti apa hasilnya!"},
+  {kompetensi:"Perekat Bangsa",
+   text:"Sepanjang perjalanan karir Anda tentu pernah atau bahkan sering berinteraksi dengan kolega, baik dari internal maupun eksternal organisasi, yang memiliki karakter dan latar belakang yang beragam baik dari sisi agama, sifat, budaya, ataupun ras. Ceritakan pengalaman keberhasilan Anda dalam membina hubungan yang harmonis ketika bekerja dengan kolega dengan keberagaman tersebut! Jelaskan situasinya seperti apa, kendala yang Anda hadapi, peran Anda saat itu dan seperti apa hasilnya!"}
+];
+
+// ═══════════════════════════════════════════════════════
+//  SJT QUESTIONS (54 soal)
+//  t=teks, o=options[], a=jawaban index, k=kompetensi, lv=level, e=explanation
+// ═══════════════════════════════════════════════════════
+const SJT_Q=[
+// ── INTEGRITAS (soal 1-6) ──
+{k:"Integritas",lv:"L3",t:"Sebagai ketua tim yang bertanggung jawab atas kualitas data statistik, Anda menemukan bahwa salah satu anggota tim mengabaikan prosedur verifikasi data untuk mengejar tenggat waktu, dengan alasan keterbatasan waktu dan kurangnya pelatihan teknis. Akibatnya, data yang diajukan berisiko mengurangi kepercayaan pada laporan yang akan dipublikasikan. Langkah apa yang Anda lakukan?",
+o:["Menyampaikan teguran lisan kepada anggota tim, tetapi tetap melanjutkan publikasi laporan karena waktu sudah mendesak.","Mengabaikan kejadian tersebut dan berharap tidak akan terulang lagi.","Memperbaiki sendiri kesalahan dalam data tanpa memberitahu anggota tim, agar laporan bisa segera dipublikasikan.","Mengkaji ulang data bersama tim, memberikan umpan balik, lalu menyusun ulang jadwal untuk pelatihan teknis.","Melakukan evaluasi menyeluruh, berdiskusi terbuka terkait pelanggaran prosedur, dan menyusun langkah konkret berupa pelatihan serta sistem pengawasan."],
+a:4,e:"Jawaban E paling komprehensif: evaluasi kualitas data, akuntabilitas terbuka, dan pencegahan sistemik jangka panjang."},
+
+{k:"Integritas",lv:"L3",t:"Sebagai ketua tim pengolah data survei nasional, Anda menemukan bahwa salah satu anggota tim telah menyunting data tanpa koordinasi atau mengikuti prosedur yang berlaku. Akibatnya, validitas data terganggu menjelang tahap pengumpulan. Apa langkah yang Anda ambil?",
+o:["Memperbaiki data yang disunting dan meminta anggota lebih berhati-hati.","Mengoreksi kesalahan data dan menyerahkan tindak lanjut sepenuhnya kepada anggota yang bersangkutan.","Menginstruksikan anggota tim untuk segera memperbaiki data dan mengingatkan seluruh tim pentingnya prosedur.","Menunda pengumpulan data untuk memverifikasi kembali hasil, mendiskusikan langsung dengan anggota terkait, serta menyampaikan peringatan tertulis.","Memberikan arahan tegas kepada anggota tim, dan menyusun langkah preventif seperti pelatihan atau evaluasi SOP agar tidak terulang."],
+a:4,e:"Jawaban E: tindakan tegas + langkah preventif struktural adalah respons paling komprehensif."},
+
+{k:"Integritas",lv:"L4",t:"Anda adalah Kepala Bidang Statistik Sosial. Anda menemukan bahwa metodologi pengolahan data yang digunakan selama tiga tahun terakhir mengandung bias sistemik yang menyebabkan angka kemiskinan terlihat lebih rendah sekitar 15%. Memperbaikinya akan berpotensi mencoreng reputasi instansi. Pimpinan sudah siap mempresentasikan laporan ini. Apa yang Anda lakukan?",
+o:["Melanjutkan publikasi laporan karena revisi mendadak akan menimbulkan pertanyaan yang lebih besar.","Menghubungi pimpinan secara pribadi dan membiarkan pimpinan yang memutuskan apakah akan dikoreksi.","Mendokumentasikan temuan secara resmi, menyampaikan kepada pimpinan dengan analisis dampak lengkap, dan mengusulkan langkah koreksi termasuk revisi metodologi dan komunikasi publik yang transparan.","Memperbaiki angka secara diam-diam pada versi akhir tanpa memberi tahu siapapun.","Menunda publikasi dengan alasan teknis sampai kondisi lebih kondusif."],
+a:2,e:"Jawaban C: dokumentasi resmi + penyampaian kepada pimpinan + rencana koreksi sistemik = integritas level 4."},
+
+{k:"Integritas",lv:"L4",t:"Seorang vendor IT yang memenangkan tender pengembangan sistem informasi statistik diketahui memiliki hubungan kekeluargaan dengan salah satu anggota tim evaluasi tender—meski nilai kontrak tidak dimanipulasi dan vendor memang terpilih secara objektif. Seorang staf Anda melaporkan kejanggalan ini. Apa tindakan Anda?",
+o:["Membiarkan kondisi ini karena secara substantif tidak ada manipulasi nilai.","Melaporkan temuan ini kepada Inspektorat dan meminta dilakukan audit independen atas proses tender, sambil mendokumentasikan seluruh kronologi kejadian.","Hanya memperingatkan anggota tim evaluasi yang bersangkutan secara lisan.","Membatalkan hasil tender dan memulai ulang proses pengadaan dengan tim evaluasi yang baru.","Menyimpan informasi ini sebagai catatan internal tanpa melaporkan ke pihak manapun."],
+a:1,e:"Jawaban B: konflik kepentingan harus ditangani formal meski tidak mengubah hasil, untuk melindungi institusi."},
+
+{k:"Integritas",lv:"L4",t:"Seorang tokoh berpengaruh di daerah meminta Anda untuk 'menyesuaikan' data inflasi daerah agar terlihat lebih baik sebelum Pilkada, dengan iming-iming dukungan anggaran tambahan. Jika Anda menolak, ia mengancam akan melaporkan 'kinerja buruk' unit Anda kepada Gubernur. Apa yang Anda lakukan?",
+o:["Menolak permintaan tersebut secara lisan, namun tidak mendokumentasikannya agar tidak terjadi eskalasi konflik.","Mempertimbangkan permintaan tersebut karena anggaran tambahan akan sangat membantu operasional unit.","Menolak dengan tegas secara tertulis, mendokumentasikan seluruh kejadian, melaporkan kepada atasan langsung dan Inspektorat, serta memastikan tidak ada perubahan apapun pada data inflasi.","Berpura-pura menyanggupi untuk meredam situasi, lalu menunda-nunda sampai Pilkada selesai.","Meminta tokoh tersebut untuk menyampaikan permintaannya secara tertulis agar ada bukti formal."],
+a:2,e:"Jawaban C: penolakan tertulis + dokumentasi + pelaporan formal = satu-satunya respons yang konsisten dengan integritas level 4."},
+
+{k:"Integritas",lv:"L3",t:"Anda ditugaskan sebagai koordinator dalam penyiapan laporan kinerja triwulanan. Rekan kerja Anda meminta Anda untuk 'sedikit memperbaiki' angka-angka yang terlihat buruk agar laporan tampak lebih baik di mata atasan. Ia beralasan bahwa hal ini biasa dilakukan dan demi menjaga citra tim. Langkah apa yang Anda lakukan?",
+o:["Menyarankan agar data tetap ditampilkan apa adanya dan mengusulkan penjelasan naratif kontekstual.","Menolak langsung mengubah data, tetapi tidak melaporkan permintaan tersebut untuk menghindari konflik.","Menyetujui permintaan rekan tanpa pertimbangan, karena menurut Anda hal seperti itu sudah biasa.","Menjaga keakuratan data dan mengajak rekan berdiskusi untuk menyampaikan laporan dengan cara yang jujur namun tetap komunikatif.","Mengubah data sesuai permintaan rekan, tapi hanya sedikit dengan catatan akan diperbaiki nanti jika diminta."],
+a:3,e:"Jawaban D: mempertahankan integritas data + pendekatan kolaboratif untuk penyampaian yang jujur namun profesional."},
+
+// ── KERJASAMA (soal 7-12) ──
+{k:"Kerjasama",lv:"L3",t:"Anda ditugaskan sebagai ketua tim yang bertanggungjawab dalam pembinaan statistik sektoral. Salah satu anggota tim memiliki pemahaman teknis yang kurang, memperlambat proses kerja, dan terjadi potensi konflik akibat pembagian tugas yang dianggap tidak adil. Apa tindakan Anda untuk menangani situasi ini?",
+o:["Mengarahkan anggota tim fokus pada tugas yang mendesak dan menunda pembahasan masalah pembagian tugas.","Mengadakan pertemuan untuk diskusi pembagian tugas dan meminta anggota tim memberi masukan terkait cara kerja.","Mengabaikan masalah pembagian tugas untuk sementara waktu dan hanya fokus pada menyelesaikan tugas yang ada.","Menyusun ulang pembagian tugas, memberikan pelatihan tambahan, dan memastikan semua anggota memahami peran mereka.","Meminta anggota yang kesulitan bekerja sama dengan rekan berpengalaman untuk membantu."],
+a:3,e:"Jawaban D: redistribusi tugas + pelatihan teknis + klarifikasi peran = pendekatan menyeluruh untuk masalah tim."},
+
+{k:"Kerjasama",lv:"L3",t:"Anda memimpin tim proyek pemanfaatan big data untuk mendukung kebijakan statistik. Tim Anda menghadapi hambatan teknis akibat kurangnya koordinasi antar anggota dan perbedaan pemahaman tentang kebutuhan data. Beberapa deadline proyek mulai tertunda. Apa tindakan yang akan Anda ambil?",
+o:["Mengorganisir pertemuan untuk meminta masukan dari semua anggota tim, tetapi tetap mengandalkan keputusan akhir pada tim teknis.","Meningkatkan komunikasi dengan beberapa anggota tim yang paling berpengalaman untuk segera mengatasi masalah teknis.","Mengadakan pertemuan untuk mendiskusikan masalah, mencari solusi bersama, dan membuat penyesuaian dalam pembagian tugas.","Membagi tugas lebih terfokus pada anggota yang memiliki keahlian teknis, sambil memberikan kesempatan bagi anggota lain untuk mendalami tantangan.","Mengadakan pertemuan dengan seluruh tim untuk mengevaluasi kekuatan dan kelemahan anggota, membagi tugas sesuai keahlian, dan menyusun strategi bersama."],
+a:4,e:"Jawaban E: evaluasi komprehensif + distribusi tugas berbasis keahlian + strategi bersama = pendekatan tim terbaik."},
+
+{k:"Kerjasama",lv:"L3",t:"Anda ditugaskan sebagai koordinator tim dalam menyusun strategi publikasi data sektoral lintas bidang. Ada tekanan dari pimpinan untuk segera menyepakati strategi bersama namun setiap anggota mengusulkan pendekatan yang berbeda. Beberapa anggota tim mulai menunjukkan ketidaksabaran. Apa yang Anda lakukan?",
+o:["Memetakan semua usulan ke dalam komponen-komponen kerja yang bisa dibagi sesuai keahlian dengan pengambilan keputusan berbasis konsensus.","Mengajak tim menyusun poin-poin utama dari tiap usulan, lalu memfasilitasi diskusi untuk merumuskan strategi gabungan yang mempertimbangkan semua perspektif.","Membiarkan anggota tim memilih metode mereka sendiri.","Mengambil keputusan berdasarkan diskusi, memilih pendekatan yang sesuai dengan tujuan jangka panjang.","Menggunakan pendekatan suara terbanyak untuk memilih salah satu usulan yang paling menonjol."],
+a:1,e:"Jawaban B: fasilitasi sintesis ide dari semua perspektif = kepemimpinan kolaboratif yang efektif."},
+
+{k:"Kerjasama",lv:"L3",t:"Anda ditunjuk sebagai ketua tim lintas fungsi yang terdiri dari pegawai dari berbagai unit. Setiap unit cenderung bekerja terpisah dan enggan berbagi data atau konsep, karena khawatir kontribusinya tidak akan dihargai secara adil dalam laporan akhir. Tindakan apa yang akan anda ambil?",
+o:["Menyampaikan ke atasan langsung bahwa tim sulit diajak kerja sama dan meminta agar peran Anda dibatasi saja.","Mengusulkan agar setiap unit menyelesaikan bagiannya secara mandiri dan digabungkan belakangan.","Menginisiasi pertemuan terbuka untuk membahas kendala, mengusulkan mekanisme kerja kolaboratif yang adil, dan mendorong saling tukar informasi agar semua merasa dihargai.","Menyetujui usulan rekan untuk menyelesaikan laporan seibanya saja karena kondisi tim sedang tidak mendukung.","Mengajak satu atau dua anggota tim dari unit lain untuk berdiskusi informal, lalu menyusun draft awal sebagai bahan pemersatu."],
+a:2,e:"Jawaban C: pertemuan terbuka + mekanisme kolaboratif yang adil + saling tukar informasi = mengatasi akar masalah ketidakpercayaan."},
+
+{k:"Kerjasama",lv:"L4",t:"Anda adalah Kepala Bidang yang ditunjuk mengkoordinasikan penyusunan Sistem Terintegrasi Data Statistik Sektoral yang melibatkan 7 kementerian/lembaga. Koordinasi macet setelah tiga bulan karena setiap lembaga merasa formatnya yang paling standar. Batas waktu tinggal 3 bulan lagi. Apa yang Anda lakukan?",
+o:["Melaporkan kebuntuan kepada pimpinan dan meminta mereka menggunakan otoritas hierarki untuk memaksa lembaga lain.","Membuat sistem secara mandiri menggunakan format instansi Anda, lalu mengundang lembaga lain untuk bergabung.","Menginisiasi sesi fasilitasi teknis dengan menghadirkan pakar independen, membangun mekanisme pengambilan keputusan berbasis konsensus teknis, mendistribusikan 'quick win' yang menguntungkan masing-masing pihak, dan membentuk working group kecil untuk setiap isu teknis.","Memperpanjang timeline dan membiarkan setiap lembaga menyiapkan data dalam formatnya masing-masing, lalu disesuaikan di backend.","Mengusulkan sistem terpisah yang dihubungkan melalui API tanpa harus menyatukan format."],
+a:2,e:"Jawaban C: fasilitasi netral + konsensus teknis + quick win + working group = membangun sinergi dari kebuntuan."},
+
+{k:"Kerjasama",lv:"L4",t:"Unit Anda sedang menyelesaikan studi dampak ekonomi bersama tiga lembaga mitra. Salah satu lembaga mitra menarik diri karena pimpinannya berganti dan kebijakan prioritas berubah. Kualitas studi akan turun signifikan. Dua lembaga mitra lainnya mulai ragu-ragu. Sisa waktu 2 bulan. Apa langkah Anda?",
+o:["Melanjutkan studi dengan data yang tersedia dan mencatat keterbatasan secara jujur dalam laporan.","Menghentikan studi dan memulai dari awal setelah kondisi lebih kondusif.","Bertemu langsung dengan pimpinan baru lembaga yang menarik diri untuk membangun relasi, menawarkan ulang nilai kolaborasi yang disesuaikan dengan prioritas kebijakan baru mereka, sambil menjaga motivasi dua mitra lainnya melalui komunikasi rutin.","Mencari lembaga pengganti yang memiliki data serupa untuk mengisi kekosongan.","Melaporkan situasi kepada pimpinan tingkat atas agar mereka yang melakukan lobi."],
+a:2,e:"Jawaban C: pemulihan sinergi secara proaktif dengan adaptasi terhadap konteks baru = kepemimpinan kolaboratif level 4."},
+
+// ── KOMUNIKASI (soal 13-18) ──
+{k:"Komunikasi",lv:"L3",t:"Anda sebagai Ketua Tim yang bertanggungjawab dalam Pengembangan SDM. Salah satu bawahan Anda merasa tidak puas karena merasa kesempatannya untuk berkembang lebih lambat dibandingkan rekan-rekannya. Ia menunjukkan tanda-tanda demotivasi yang memengaruhi kinerjanya. Apa tindakan yang akan Anda ambil?",
+o:["Mengadakan diskusi tim informal untuk membahas tantangan pengembangan karier secara umum, lalu mendekati bawahan tersebut secara pribadi.","Mengatur pertemuan pribadi di lingkungan yang nyaman, menyampaikan umpan balik secara jujur namun empatik, dan memberikan saran konkret untuk pengembangan karier berdasarkan evaluasi kinerja.","Memberi waktu kepada bawahan untuk merefleksikan sendiri situasinya tanpa intervensi langsung.","Mengirimkan email resmi yang berisi umpan balik terkait kinerjanya dan saran pengembangan.","Memberikan umpan balik secara langsung di hadapan rekan-rekan lain agar menjadi contoh bagi tim."],
+a:1,e:"Jawaban B: pertemuan pribadi + jujur namun empatik + saran konkret berbasis evaluasi = komunikasi pengembangan yang efektif."},
+
+{k:"Komunikasi",lv:"L3",t:"Anda baru saja menerima hasil evaluasi kinerja tahunan dari tim Anda. Beberapa anggota tim mendapatkan penilaian yang kurang memuaskan karena tidak memenuhi target yang ditetapkan. Anda harus menyampaikan hal ini secara langsung kepada anggota tim, namun topik ini sensitif dan bisa mempengaruhi motivasi mereka. Apa yang akan anda lakukan?",
+o:["Menyampaikan hasil evaluasi dengan penjelasan dasar tentang pencapaian yang kurang memadai, tanpa solusi untuk perbaikan.","Menyampaikan hasil evaluasi secara langsung dan tanpa banyak penjelasan, karena mereka harus tahu secepatnya.","Menyampaikan hasil evaluasi dengan menunjukkan area yang perlu perbaikan, namun hanya fokus pada hasil yang kurang baik.","Menyampaikan hasil evaluasi dengan cara yang transparan dan empatik, fokus pada pengembangan pribadi dan profesional, memberikan ruang untuk diskusi dan merencanakan langkah-langkah konkrit untuk perbaikan ke depan.","Menjelaskan hasil evaluasi dengan cara yang konstruktif, menyoroti area yang perlu perbaikan sambil memberikan pujian atas pencapaian positif, dan menawarkan dukungan serta solusi."],
+a:3,e:"Jawaban D: transparan + empatik + fokus pengembangan + ruang diskusi + rencana konkret = komunikasi evaluasi kinerja terbaik."},
+
+{k:"Komunikasi",lv:"L3",t:"Unit Anda baru saja menerima arahan dari pimpinan untuk mengimplementasikan kebijakan baru yang cukup kontroversial terkait pengurangan anggaran untuk pelatihan SDM. Beberapa anggota tim merasa kecewa dan khawatir. Anda diminta untuk menyampaikan informasi ini kepada tim secara terbuka dalam pertemuan mendatang. Apa yang Anda lakukan?",
+o:["Memulai dengan mengakui adanya ketidaknyamanan terhadap kebijakan tersebut, lalu menjelaskan alasan di baliknya secara rasional.","Mempersiapkan penjelasan tentang kebijakan ini dengan cara yang transparan, menggali potensi solusi, dan membuka kesempatan bagi anggota tim untuk berdiskusi tentang alternatif yang mungkin meminimalkan dampak negatif.","Menyampaikan kebijakan tersebut dengan tegas karena ini adalah keputusan pimpinan, tanpa penjelasan tambahan.","Menjelaskan kebijakan tersebut dengan bahasa yang sederhana, menunjukkan bagaimana kebijakan ini dapat meningkatkan efisiensi, serta memberikan ruang bagi anggota tim untuk mengajukan pertanyaan.","Menjelaskan kebijakan tersebut dengan fakta-fakta terkait penghematan anggaran, namun tidak mengurangi kekhawatiran anggota tim."],
+a:1,e:"Jawaban B: transparansi + menggali solusi + ruang diskusi = komunikasi perubahan yang membangun legitimasi dan mengelola resistensi."},
+
+{k:"Komunikasi",lv:"L4",t:"Anda adalah Kepala Bidang yang harus menyampaikan hasil Sensus Ekonomi kepada DPR yang memiliki agenda politik berbeda. Sebagian mendukung kebijakan A yang data Anda tidak tunjukkan efektif; sebagian mendukung kebijakan B yang juga tidak sepenuhnya didukung data. Ada tekanan implisit agar Anda 'menyajikan data yang mendukung pandangan tertentu'. Apa yang Anda lakukan?",
+o:["Menyajikan data apa adanya tanpa penjelasan konteks, membiarkan anggota DPR menginterpretasikan sendiri.","Menyiapkan dua versi presentasi—satu untuk masing-masing kubu—dan menyesuaikan berdasarkan audiensnya.","Menyusun presentasi yang menyajikan data secara objektif dan komprehensif, mengantisipasi pertanyaan dari berbagai perspektif politik dengan jawaban berbasis bukti, dan mengundang dialog terbuka tentang implikasi kebijakan tanpa memihak.","Meminta pimpinan untuk mewakili instansi dalam presentasi tersebut agar menghindari tekanan politik langsung.","Menolak presentasi sampai ada jaminan tertulis bahwa data tidak akan digunakan secara parsial."],
+a:2,e:"Jawaban C: objektivitas + antisipasi multi-perspektif + dialog terbuka = komunikasi yang membangun kepercayaan dari berbagai pihak."},
+
+{k:"Komunikasi",lv:"L4",t:"Instansi Anda akan meluncurkan kebijakan baru yang akan membatasi akses peneliti eksternal terhadap data mikro sensitif. Kebijakan ini diperlukan karena alasan perlindungan privasi, namun diperkirakan akan mendapat penolakan keras dari komunitas akademik. Anda ditugaskan memimpin proses sosialisasi. Apa strategi komunikasi Anda?",
+o:["Mengumumkan kebijakan melalui surat resmi dan website instansi, memberi waktu 30 hari untuk tanggapan.","Mengadakan forum dialog multi-pihak sebelum kebijakan final, mengundang komunitas akademik untuk memberikan masukan, mengidentifikasi kekhawatiran legitim yang perlu diakomodasi, membangun koalisi pendukung, dan menawarkan alternatif akses data.","Menunda sosialisasi sampai kebijakan benar-benar final dan tidak bisa diubah lagi.","Hanya berkomunikasi dengan pemimpin organisasi akademik besar, mengabaikan peneliti individual.","Menyusun siaran pers yang menekankan aspek positif saja tanpa mengakui dampak yang mungkin dirasakan peneliti."],
+a:1,e:"Jawaban B: dialog inklusif sebelum finalisasi + mengakomodasi kekhawatiran valid + koalisi pendukung = membangun legitimasi kebijakan."},
+
+{k:"Komunikasi",lv:"L4",t:"Anda adalah Kepala Bidang yang mendapat kabar bahwa rencana restrukturisasi organisasi akan menghapus satu subbidang di unit Anda dan sebagian besar stafnya akan dimutasi. Pimpinan meminta Anda menyampaikan ini kepada tim besok pagi—sebelum pengumuman resmi. Apa yang Anda lakukan?",
+o:["Menyampaikan berita ini secepat mungkin besok pagi dalam rapat besar agar semua mendengar sekaligus.","Menunda penyampaian sampai Anda mendapatkan informasi yang lebih lengkap dan resmi dari pimpinan.","Melakukan percakapan individual terlebih dahulu dengan staf yang paling terdampak, menyiapkan informasi sejujurnya tentang apa yang diketahui dan tidak diketahui, menyampaikan dengan empati, mengakui ketidakpastian, dan menyatakan komitmen memperjuangkan kepentingan mereka dalam proses transisi.","Menyampaikan dalam forum tim dengan fokus pada aspek positif restrukturisasi untuk meminimalkan reaksi negatif.","Menghubungi pimpinan untuk meminta menunda pengumuman sampai rasionalisasi keputusan lebih jelas."],
+a:2,e:"Jawaban C: percakapan individual + kejujuran + empati + komitmen advokasi = komunikasi krisis yang humanis dan bermartabat."},
+
+// ── ORIENTASI PADA HASIL (soal 19-24) ──
+{k:"Orientasi pada Hasil",lv:"L3",t:"Anda adalah ketua tim yang bertanggung jawab atas alokasi dana untuk berbagai program penting. Pihak internal organisasi baru saja menginstruksikan adanya pengurangan anggaran yang signifikan untuk salah satu program yang sangat diharapkan oleh masyarakat. Anda diminta untuk menyampaikan keputusan ini kepada tim. Apa yang Anda lakukan?",
+o:["Memberitahukan tim melalui email yang mencakup informasi dasar mengenai pemotongan anggaran, tanpa memberikan banyak konteks.","Menginformasikan tim secara langsung dengan cara yang empatik, menjelaskan dengan rinci mengenai alasan pengurangan anggaran, dampaknya pada program yang berjalan, serta langkah-langkah mitigasi, dan bersama-sama mencari solusi.","Memberikan informasi perubahan secara umum dan membiarkan pegawai menyesuaikan rencana mereka sendiri.","Mengadakan pertemuan untuk menjelaskan kepada tim tentang pengurangan anggaran, memberikan alasan terkait keputusan tersebut, dan menawarkan saran alternatif.","Menginformasikan tim mengenai pengurangan anggaran dan memberikan beberapa alasan umum, namun tidak menawarkan banyak solusi."],
+a:1,e:"Jawaban B: empatik + penjelasan rinci + mitigasi + cari solusi bersama = menjaga orientasi hasil meski dalam keterbatasan."},
+
+{k:"Orientasi pada Hasil",lv:"L3",t:"Organisasi Anda telah menetapkan target publikasi data tematik sebanyak 4 laporan dalam satu tahun. Berdasarkan evaluasi tahun sebelumnya, Anda melihat bahwa unit Anda sebenarnya mampu menghasilkan hingga 6 laporan tanpa mengganggu kualitas. Sebagian anggota tim menyarankan untuk mengikuti target resmi saja. Apa yang Anda lakukan?",
+o:["Menyampaikan kepada tim bahwa kita sebaiknya fokus pada target utama dulu, dan baru mempertimbangkan tambahan jika ada waktu luang.","Menetapkan target unit sebesar 6 publikasi dengan strategi penjadwalan ulang, pembagian tugas yang jelas, dan pemantauan rutin, sambil menyampaikan kepada pimpinan bahwa ini adalah inisiatif peningkatan kinerja unit.","Mengajak tim berdiskusi untuk mengevaluasi kapasitas kerja dan menyusun strategi agar kita bisa menambah 1-2 output tanpa mengorbankan kualitas.","Mencoba menaikkan target secara informal, tanpa mendokumentasikannya secara resmi.","Memilih untuk mengikuti target organisasi saja agar tidak terlalu membebani tim."],
+a:1,e:"Jawaban B: mengoptimalkan kapasitas + terstruktur + dikomunikasikan resmi ke pimpinan = orientasi pada hasil yang proaktif dan bertanggung jawab."},
+
+{k:"Orientasi pada Hasil",lv:"L3",t:"Anda adalah Ketua Tim yang bertanggung jawab mengelola kinerja tim di divisi Anda. Organisasi telah menetapkan target tahunan yang cukup menantang, namun setelah melakukan evaluasi, Anda yakin tim memiliki potensi untuk mencapai target yang lebih tinggi. Di sisi lain, ada risiko terkait beban kerja yang dapat memengaruhi kualitas hasil. Apa tindakan yang akan Anda ambil?",
+o:["Menetapkan target yang lebih tinggi dengan menganalisis risiko secara menyeluruh dan memberikan panduan kerja yang jelas kepada tim.","Menetapkan target yang tinggi setelah berdiskusi dengan tim, mengevaluasi risiko, merancang strategi mitigasi yang jelas agar hasil optimal.","Berpegang pada target organisasi tanpa berusaha meningkatkan potensi kinerja tim.","Menetapkan target yang sama dengan organisasi, sambil memotivasi tim untuk bekerja lebih efisien.","Menetapkan target yang lebih tinggi tanpa mempertimbangkan risiko secara detail dan mengandalkan semangat kerja tim."],
+a:1,e:"Jawaban B: diskusi + evaluasi risiko + mitigasi = menetapkan target ambisius secara bertanggung jawab."},
+
+{k:"Orientasi pada Hasil",lv:"L4",t:"Instansi Anda mendapat mandat dari pemerintah pusat untuk meningkatkan cakupan data statistik perdesaan dari 60% menjadi 90% dalam 18 bulan—target yang belum pernah dicapai sebelumnya. Sumber daya manusia dan anggaran hanya cukup untuk target 75% dengan metode konvensional. Sebagai Kepala Bidang yang bertanggung jawab, apa pendekatan Anda?",
+o:["Melaporkan kepada pimpinan bahwa target 90% tidak realistis dan meminta revisi target menjadi 75%.","Menerima target 90% dan mendistribusikan beban kerja secara merata kepada seluruh staf.","Melakukan analisis kesenjangan kapasitas secara mendalam, mengidentifikasi inovasi metodologi (digital enumeration, kolaborasi dengan pemda, pemanfaatan data administratif), membangun koalisi sumber daya dari mitra eksternal, menetapkan milestone triwulanan yang progresif, dan merancang sistem monitoring adaptif.","Fokus mencapai 75% dulu dengan sempurna, baru eskalasi ke 90% di periode berikutnya.","Menggunakan data estimasi statistik untuk 'melengkapi' cakupan yang tidak terjangkau."],
+a:2,e:"Jawaban C: analisis kesenjangan + inovasi metodologi + mobilisasi mitra + monitoring adaptif = orientasi pada hasil level 4."},
+
+{k:"Orientasi pada Hasil",lv:"L4",t:"Anda adalah Ketua Tim yang bertanggung jawab atas pencapaian target kinerja triwulanan. Hasil evaluasi menunjukkan bahwa tim Anda tidak berhasil mencapai target. Analisis awal mengindikasikan bahwa metode kerja saat ini kurang efektif dan menyebabkan hambatan dalam proses operasional. Apa tindakan yang akan Anda ambil?",
+o:["Menganalisis sendiri data kinerja untuk menemukan kelemahan metode saat ini, lalu mengubah alur kerja tanpa melibatkan masukan dari tim.","Mengadakan rapat evaluasi untuk mengidentifikasi hambatan utama, melibatkan tim dalam merancang metode kerja yang lebih efisien, menerapkannya secara bertahap dengan monitoring berkala.","Memberikan teguran keras kepada anggota tim tanpa menganalisis metode kerja.","Menginstruksikan tim untuk bekerja lebih keras dengan metode yang sama.","Menunda evaluasi metode kerja hingga periode berikutnya."],
+a:1,e:"Jawaban B: rapat evaluasi + libatkan tim + metode baru + monitoring = pendekatan improvement yang sistematis."},
+
+{k:"Orientasi pada Hasil",lv:"L4",t:"Unit Anda telah melampaui target kuantitas publikasi, namun hasil evaluasi kualitas independen menunjukkan bahwa 30% publikasi memiliki kesalahan metodologi minor yang tidak terdeteksi oleh proses review internal. Staf merasa bangga dengan pencapaian kuantitas dan pimpinan juga lebih memperhatikan angka kuantitas. Apa yang Anda lakukan?",
+o:["Tidak mengangkat isu ini karena tim sudah bekerja keras mencapai target kuantitas.","Meminta tim untuk melakukan self-check sederhana sebelum publikasi berikutnya.","Menetapkan standar kualitas baru yang ketat, meredesain proses review dengan quality gate yang lebih robust, menginvestigasi akar penyebab kesalahan metodologi, menyampaikan temuan kualitas kepada pimpinan dengan rekomendasi keseimbangan kuantitas-kualitas, dan membangun budaya bahwa 'kualitas adalah reputasi institusi jangka panjang'.","Mengurangi target kuantitas secara unilateral agar tim punya lebih banyak waktu menjaga kualitas.","Menugaskan satu staf khusus sebagai quality checker tanpa mengubah proses kerja yang ada."],
+a:2,e:"Jawaban C: redesain sistem QA + investigasi akar masalah + advokasi ke pimpinan + budaya kualitas = mendefinisikan ulang 'hasil' yang bermakna."},
+
+// ── PELAYANAN PUBLIK (soal 25-30) ──
+{k:"Pelayanan Publik",lv:"L3",t:"Sebagai ketua tim yang bertanggung jawab mendukung implementasi SPBE, Anda menemukan beberapa pelanggaran prosedur terkait pengelolaan akses sistem yang tidak sesuai dengan kebijakan yang berlaku. Masalah ini berpotensi menurunkan kepercayaan terhadap sistem dan menghambat keberhasilan implementasi SPBE. Langkah apa yang Anda lakukan?",
+o:["Menindaklanjuti pelanggaran sesuai aturan yang berlaku, kemudian melakukan evaluasi bersama tim untuk memastikan prosedur akses dipahami dan dipatuhi.","Menelusuri pelanggaran yang terjadi dan memberikan peringatan langsung kepada pihak terkait, namun belum mengambil langkah perbaikan sistem yang lebih luas.","Melaporkan masalah ini kepada atasan dan menunggu keputusan tanpa mengambil langkah lebih lanjut.","Mengingatkan tim secara umum pentingnya mengikuti prosedur, tanpa menyelidiki lebih lanjut siapa yang melanggar.","Menyelidiki pelanggaran prosedur, memberikan sanksi sesuai ketentuan, memperbaiki sistem pengelolaan akses, serta mengadakan pelatihan ulang agar seluruh tim memahami pentingnya tata kelola SPBE yang sesuai kebijakan."],
+a:4,e:"Jawaban E: investigasi + sanksi + perbaikan sistem + pelatihan ulang = respons komprehensif untuk memulihkan kualitas pelayanan SPBE."},
+
+{k:"Pelayanan Publik",lv:"L3",t:"Anda bertugas di unit layanan konsultasi data untuk publik. Suatu hari, Anda menerima dua permintaan bimbingan teknis di waktu yang hampir bersamaan: satu dari kelompok masyarakat dan satu lagi dari tim internal yang ditugaskan untuk menjalankan program unggulan pimpinan daerah. Beberapa rekan mendorong agar layanan untuk tim internal didahulukan karena dianggap lebih strategis secara politik. Apa yang akan anda lakukan?",
+o:["Memegang prinsip pelayanan publik yang adil dan netral, memastikan bahwa masyarakat tetap dilayani sesuai antrean, serta memberikan alternatif waktu lain untuk tim internal tanpa memengaruhi jadwal yang sudah ditetapkan.","Menyampaikan kepada kedua pihak bahwa layanan diberikan berdasarkan antrean dan jadwal yang sudah disusun, sambil mengevaluasi kemungkinan menyesuaikan sumber daya bila memang mendesak.","Meminta arahan atasan mengenai prioritas, meskipun dalam hati saya merasa layanan seharusnya diberikan sesuai urutan.","Memprioritaskan permintaan dari tim internal karena mendukung agenda pimpinan.","Menyarankan untuk memindahkan jadwal layanan masyarakat agar bisa memberi ruang pada program unggulan."],
+a:0,e:"Jawaban A: prinsip pelayanan publik yang adil + alternatif waktu untuk tim internal = menegakkan keadilan tanpa mengorbankan siapapun."},
+
+{k:"Pelayanan Publik",lv:"L3",t:"Anda memimpin tim dalam suatu survei ekonomi berbasis sektor yang melibatkan kerja sama dengan lembaga eksternal yang tidak sepenuhnya mendukung ide anda karena perbedaan tujuan jangka panjang. Beberapa anggota tim Anda mengusulkan untuk melanjutkan tanpa mereka. Apa yang Anda lakukan?",
+o:["Melanjutkan kebijakan yang ada dan berharap pemangku kepentingan dapat menyesuaikan diri.","Mengusulkan kepada pimpinan untuk terus bernegosiasi dengan lembaga eksternal, namun tetap mencari alternatif data dari sumber lain sebagai cadangan.","Mengadakan pertemuan dengan pemangku kepentingan eksternal untuk mencari kesamaan tujuan dan mencoba merumuskan pendekatan yang saling menguntungkan.","Memutuskan untuk tidak terlalu mendalami masalah dengan lembaga eksternal dan memilih untuk bekerja dengan sumber data lain.","Mengajak tim untuk mengevaluasi kembali pendekatan kolaborasi ini, membangun aliansi lebih erat dengan pemangku kepentingan eksternal, dan secara transparan menawarkan solusi yang menguntungkan kedua belah pihak."],
+a:4,e:"Jawaban E: evaluasi ulang + bangun aliansi lebih erat + solusi transparan yang saling menguntungkan = mempertahankan layanan berkualitas melalui kolaborasi."},
+
+{k:"Pelayanan Publik",lv:"L4",t:"Hasil survei kepuasan pengguna menunjukkan bahwa layanan konsultasi data statistik di unit Anda mendapat skor rendah: antrian panjang, waktu tunggu tidak pasti, dan staf dianggap kurang ramah. Anggaran untuk peningkatan terbatas. Pimpinan meminta Anda menyusun rencana perbaikan yang signifikan dalam 3 bulan. Apa langkah Anda?",
+o:["Mengadakan pelatihan etika pelayanan untuk seluruh staf.","Memotong layanan yang paling banyak menghasilkan keluhan untuk mengurangi beban kerja staf.","Melakukan analisis proses layanan end-to-end untuk mengidentifikasi bottleneck, mendesain ulang alur layanan dengan prinsip lean service, membangun sistem antrian digital dan notifikasi real-time, melibatkan pengguna dalam co-design perbaikan layanan, dan menetapkan standar pelayanan minimum yang terukur.","Menambah jumlah staf layanan dengan memindahkan staf dari bidang lain.","Membuat aplikasi mandiri sederhana agar pengguna dapat mencari data tanpa harus menghubungi staf."],
+a:2,e:"Jawaban C: analisis end-to-end + lean redesain + antrian digital + co-design + standar terukur = transformasi sistemik kualitas layanan."},
+
+{k:"Pelayanan Publik",lv:"L4",t:"Anda mengetahui bahwa kelompok masyarakat rentan (lansia, penyandang disabilitas, masyarakat adat terpencil) sangat kesulitan mengakses layanan statistik digital yang baru diluncurkan. Staf Anda berpendapat ini bukan prioritas karena jumlah mereka kecil. Apa yang Anda lakukan?",
+o:["Menerima argumen staf karena platform sudah memenuhi standar teknis yang berlaku.","Menambahkan halaman FAQ dalam bahasa yang lebih sederhana sebagai solusi kompromi.","Memimpin inisiatif inklusi digital dengan melakukan need assessment langsung kepada kelompok rentan, berkolaborasi dengan organisasi disabilitas dan pemda setempat untuk merancang solusi layanan hibrida, mengadvokasi alokasi anggaran untuk aksesibilitas, dan menjadikan inklusivitas sebagai indikator kinerja layanan.","Menyerahkan isu ini kepada bidang lain yang secara organisasi lebih relevan dengan isu sosial.","Meluncurkan pilot program aksesibilitas di satu daerah dulu untuk melihat efektivitasnya."],
+a:2,e:"Jawaban C: need assessment langsung + solusi hibrida + advokasi anggaran + inklusivitas sebagai KPI = pelayanan publik yang berkeadilan."},
+
+{k:"Pelayanan Publik",lv:"L4",t:"Seorang jurnalis investigatif meminta akses ke data mikro survei yang mengandung informasi sensitif tentang rumah tangga. Secara hukum, data ini tidak bisa diberikan dalam bentuk aslinya. Namun jurnalis tersebut mengklaim sedang menyelidiki dugaan penyimpangan program bantuan sosial yang merugikan jutaan warga. Apa yang Anda lakukan?",
+o:["Menolak permintaan sepenuhnya karena regulasi melarang pemberian data mikro kepada pihak eksternal.","Memberikan data yang diminta karena kepentingan publik lebih penting dari regulasi teknis.","Menjelaskan dasar hukum pembatasan akses secara transparan, mengeksplorasi alternatif yang memenuhi kebutuhan investigasi tanpa melanggar privasi (data agregat, analisis khusus oleh tim internal, akses terbatas di secure room), berkoordinasi dengan pejabat hukum, dan membangun mekanisme layanan data riset yang lebih sistematis untuk kebutuhan serupa di masa depan.","Meminta jurnalis untuk mengajukan permintaan resmi melalui jalur PPID dan menunggu proses normal.","Berkonsultasi dengan pimpinan dan meminta mereka yang memutuskan."],
+a:2,e:"Jawaban C: transparansi hukum + eksplorasi alternatif kreatif + koordinasi legal + mekanisme sistematis = pelayanan publik yang inovatif dan bertanggung jawab."},
+
+// ── PENGEMBANGAN DIRI DAN ORANG LAIN (soal 31-36) ──
+{k:"Pengembangan Diri dan Orang Lain",lv:"L3",t:"Anda memimpin tim yang baru saja menyelesaikan kegiatan pengumpulan data lapangan. Hasilnya cukup baik secara umum, namun terdapat perbedaan mencolok antar anggota tim. Sebagian petugas sangat disiplin dan teliti, sementara beberapa lainnya bekerja seadanya dan sempat terlambat menyerahkan laporan. Anda perlu menyampaikan evaluasi kepada seluruh tim. Apa yang Anda lakukan?",
+o:["Memilih tidak menyinggung perbedaan kinerja secara langsung agar suasana tim tetap harmonis.","Memberikan pujian ketika kinerja baik dan mengingatkan secara pribadi saat ada penurunan.","Mengapresiasi kinerja yang baik secara terbuka sebagai contoh positif, dan memberikan umpan balik yang jelas dan membangun secara langsung kepada anggota yang belum memenuhi ekspektasi.","Mengapresiasi kinerja tim secara umum dan hanya menyampaikan kekurangan dalam forum tertutup ke atasan saja.","Menyampaikan apresiasi kepada tim secara umum dan berharap anggota yang belum optimal akan memperbaiki diri tanpa perlu ditegur."],
+a:2,e:"Jawaban C: apresiasi terbuka sebagai role model positif + umpan balik konstruktif langsung = pembinaan kinerja yang efektif dan adil."},
+
+{k:"Pengembangan Diri dan Orang Lain",lv:"L3",t:"Tim Anda berhasil menyelesaikan penyusunan publikasi statistik 2 minggu lebih cepat dari target, dengan kualitas yang tetap terjaga. Ini berkat kerja sama yang solid, ide-ide baru dari staf muda, serta disiplin dalam pemantauan harian. Namun, beberapa anggota tim mengeluhkan karena tidak ada bentuk apresiasi dari pimpinan. Apa yang akan anda lakukan?",
+o:["Anggap wajar saja, karena itu memang tugas mereka.","Mengirim pesan apresiasi di grup internal sebagai bentuk ucapan terima kasih kepada seluruh tim.","Memberikan apresiasi tertulis dan menyampaikan pencapaian tim ke pimpinan, serta mengusulkan reward simbolis agar semangat tim tetap terjaga dan menjadi budaya positif di unit kerja.","Menyampaikan apresiasi secara langsung kepada tim, menyebutkan kontribusi spesifik, dan mengusulkan agar pencapaian ini dilaporkan ke pimpinan sebagai bukti kinerja.","Menyampaikan terima kasih dalam rapat rutin, tanpa perlu menjadikan hal itu sesuatu yang istimewa."],
+a:2,e:"Jawaban C: apresiasi formal + laporan ke pimpinan + reward simbolis = membangun budaya apresiasi jangka panjang."},
+
+{k:"Pengembangan Diri dan Orang Lain",lv:"L3",t:"Anda menyadari bahwa sebagian besar waktu tim Anda dihabiskan untuk menyusun laporan manual yang sebenarnya bisa disederhanakan dengan otomatisasi. Namun, sebagian anggota tim sudah terbiasa dengan cara lama dan merasa ragu-ragu untuk berubah karena khawatir proses baru akan lebih rumit. Apa tindakan yang akan Anda ambil?",
+o:["Mempertahankan cara lama karena sudah terbukti dan menghindari potensi resistensi dari tim.","Menyarankan agar tim mencoba cara baru di proyek lain terlebih dahulu.","Mengajak tim mengidentifikasi bagian proses yang bisa diotomatisasi, menyusun panduan penggunaan, dan memberikan pelatihan untuk memastikan transisi berjalan lancar.","Merancang sistem otomatisasi sendiri, lalu mendemonstrasikannya kepada tim untuk menunjukkan efisiensi waktu.","Mengusulkan perubahan metode kepada pimpinan, namun menunggu persetujuan resmi sebelum melakukan apapun."],
+a:2,e:"Jawaban C: identifikasi bersama + panduan + pelatihan = manajemen perubahan yang inklusif dan mengurangi resistensi."},
+
+{k:"Pengembangan Diri dan Orang Lain",lv:"L4",t:"Anda memiliki tiga staf potensial yang berbeda profil: analis senior dengan keahlian teknis tinggi namun kurang kemampuan komunikasi, staf muda yang kreatif namun belum berpengalaman dalam manajemen proyek, dan pegawai berpengalaman yang mulai kehilangan motivasi karena merasa kariernya stagnan. Apa pendekatan Anda untuk memaksimalkan potensi ketiganya?",
+o:["Memberikan pelatihan komunikasi kepada analis senior, pelatihan manajemen proyek kepada staf muda, dan memberi tugas rutin kepada pegawai yang stagnan.","Menunggu ada pelatihan formal dari instansi karena pengembangan staf adalah tanggung jawab bidang kepegawaian.","Merancang Individual Development Plan yang dipersonalisasi: menugaskan analis senior sebagai presenter teknis di forum lintas instansi (stretch assignment), memberikan tanggung jawab sub-proyek yang nyata kepada staf muda dengan mentoring langsung, dan merancang peran 'subject matter expert' yang memanfaatkan pengalaman pegawai stagnan sambil membuka jalur kontribusi baru.","Memprioritaskan pengembangan staf muda yang berpotensi karena ROI jangka panjangnya lebih besar.","Mengadakan pelatihan team bulanan untuk seluruh staf dengan topik yang relevan dengan pekerjaan unit."],
+a:2,e:"Jawaban C: IDP dipersonalisasi + stretch assignment + mentoring langsung + reframing peran = mentor efektif level 4."},
+
+{k:"Pengembangan Diri dan Orang Lain",lv:"L4",t:"Anda menyadari bahwa unit Anda sangat bergantung pada 2-3 individu kunci untuk pekerjaan teknis yang kompleks. Jika mereka pindah atau pensiun, unit akan lumpuh. Pimpinan tidak memprioritaskan isu ini. Apa yang Anda lakukan?",
+o:["Menunggu pimpinan memprioritaskan isu ini sebelum mengambil langkah apapun.","Meminta individu kunci untuk mendokumentasikan semua pekerjaan mereka agar bisa ditransfer jika perlu.","Merancang program knowledge transfer yang terstruktur: mengidentifikasi kompetensi kritis, membangun sistem mentoring berpasangan, menciptakan peluang co-working pada tugas kompleks, mendokumentasikan proses dan keputusan, dan menyajikan business case risiko ketergantungan SDM kepada pimpinan disertai solusi konkret.","Merekrut staf baru yang sudah terampil di bidang tersebut.","Membagi semua tugas secara merata agar tidak ada individu yang terlalu dominan."],
+a:2,e:"Jawaban C: knowledge transfer terstruktur + mentoring berpasangan + business case risiko = membangun bench strength secara proaktif."},
+
+{k:"Pengembangan Diri dan Orang Lain",lv:"L4",t:"Seorang staf Anda yang sangat berbakat mendapat tawaran posisi yang lebih menarik di instansi lain. Ia datang kepada Anda untuk meminta saran. Anda sangat membutuhkan kontribusinya untuk proyek besar yang sedang berjalan. Apa yang Anda lakukan?",
+o:["Memintanya untuk tetap karena proyek saat ini sangat bergantung pada kontribusinya.","Mendukung penuh keputusannya untuk pindah dan langsung mencari pengganti.","Berdiskusi secara jujur tentang pro dan kontra kedua pilihan dari perspektif pengembangan karier jangka panjangnya, mengeksplorasi apakah ada yang bisa dilakukan di unit saat ini untuk memenuhi aspirasi kariernya, dan menghormati keputusan finalnya—sambil menyiapkan rencana transisi yang baik jika ia memutuskan untuk pergi.","Menawarkan berbagai insentif untuk mempertahankannya.","Memberi tahu pimpinan tentang situasi ini dan meminta mereka yang berbicara dengan staf tersebut."],
+a:2,e:"Jawaban C: diskusi jujur + eksplorasi peluang internal + hormati otonomi staf + siapkan transisi = mentor yang autentik menempatkan kepentingan staf di atas kepentingan unit."},
+
+// ── MENGELOLA PERUBAHAN (soal 37-42) ──
+{k:"Mengelola Perubahan",lv:"L3",t:"Anda baru saja menyelesaikan kegiatan pengumpulan data lapangan. Sebagian anggota tim mendapat penilaian yang kurang memuaskan karena tidak memenuhi target. Setelah mengevaluasi, Anda menyimpulkan bahwa metode kerja saat ini kurang efektif. Bagaimana Anda mendorong perubahan metode kerja ini?",
+o:["Mengubah prosedur secara langsung tanpa konsultasi tim untuk mempercepat perubahan.","Meminta staf mencari sendiri metode baru yang lebih efisien melalui riset mandiri.","Mengadakan rapat evaluasi untuk mengidentifikasi hambatan utama, melibatkan tim dalam merancang metode kerja yang lebih efisien, menerapkannya secara bertahap dengan monitoring berkala.","Menunggu hasil periode berikutnya untuk memastikan metode lama memang perlu diganti.","Meminta konsultan eksternal untuk menganalisis metode kerja dan memberi rekomendasi perubahan."],
+a:2,e:"Jawaban C: evaluasi partisipatif + desain solusi bersama + implementasi bertahap + monitoring = mengelola perubahan yang inklusif."},
+
+{k:"Mengelola Perubahan",lv:"L3",t:"Sebagai Ketua Tim yang bertanggung jawab dalam implementasi Agile Methodology dalam pengembangan sistem informasi statistik, Anda diminta untuk menyusun proposal rinci yang mencakup kebutuhan sistem, manfaat, jadwal implementasi, risiko, serta rencana mitigasi sesegera mungkin. Terdapat perbedaan prioritas kebutuhan antar tim, dan data pendukung belum sepenuhnya lengkap. Apa tindakan yang akan Anda ambil?",
+o:["Menghubungi perwakilan tiap tim untuk menyatukan pandangan secara singkat, lalu menyusun bagian risiko berdasarkan asumsi umum.","Menyusun proposal secara menyeluruh dengan struktur sistematis, menyampaikan risiko berdasarkan diskusi awal dan tren umum, serta menambahkan keterangan bahwa bagian risiko akan diperbarui setelah data lengkap.","Menyusun proposal seadanya dan tidak memasukkan detail risiko karena belum ada data yang cukup.","Fokus pada penyusunan bagian yang sudah memiliki data lengkap, dan menunda bagian risiko sampai semua tim sepakat.","Segera menginisiasi diskusi singkat lintas tim untuk menyelaraskan prioritas, menyusun proposal lengkap dan terstruktur, termasuk risiko dan mitigasi berbasis pengalaman proyek serupa, disertai catatan analitis atas keterbatasan data yang ada."],
+a:4,e:"Jawaban E: diskusi lintas tim + proposal lengkap berbasis pengalaman + catatan keterbatasan = pengambilan tindakan proaktif dalam situasi perubahan."},
+
+{k:"Mengelola Perubahan",lv:"L3",t:"Sebagai Ketua Tim, Anda ditugaskan untuk menyiapkan laporan tahunan tentang pengembangan kompetensi SDM yang harus selesai dalam waktu 1 minggu. Namun, beberapa unit kerja belum melengkapi berkas yang dibutuhkan hingga H-3. Apa tindakan yang akan Anda ambil?",
+o:["Menghubungi perwakilan unit yang belum mengirim data dan memberi batas waktu akhir H-2, lalu menyusun laporan dengan catatan bahwa beberapa bagian bersifat sementara.","Menyusun laporan tanpa menunggu data tambahan agar laporan cepat selesai.","Menyusun laporan seadanya dengan data yang sudah tersedia.","Mengirimkan pengingat resmi kepada unit terkait, memberikan tenggat waktu, serta mulai menyusun laporan dengan memaksimalkan data yang ada serta memproyeksikan berdasarkan tren sebelumnya.","Berkoordinasi aktif dengan unit-unit terkait untuk mempercepat pengumpulan data, lalu menyusun laporan yang sistematis, menyertakan catatan metodologis, analisis berbasis data terkini, serta rekomendasi terukur, dan menyisipkan ruang revisi pasca-publikasi."],
+a:4,e:"Jawaban E: koordinasi aktif + laporan sistematis + catatan metodologis + ruang revisi = mengelola situasi tidak pasti dengan hasil terbaik."},
+
+{k:"Mengelola Perubahan",lv:"L4",t:"Instansi Anda akan mengimplementasikan sistem digitalisasi penuh—paperless office—yang mengubah hampir semua prosedur kerja yang sudah berjalan belasan tahun. Sebagian besar staf, terutama yang senior, mengekspresikan resistensi kuat. Anda diminta memimpin transformasi ini di unit. Apa strategi Anda?",
+o:["Menjalankan implementasi sesuai rencana tanpa kompromi karena resistensi adalah hal yang normal.","Memperlambat implementasi agar staf senior punya lebih banyak waktu beradaptasi.","Membangun 'koalisi perubahan' internal dengan mengidentifikasi early adopters sebagai champion, merancang program pengembangan kapasitas digital yang berjenjang dan tidak mengancam, menciptakan 'quick win' yang membuktikan manfaat nyata sistem baru, mendengarkan dan mengakomodasi kekhawatiran legitim dalam desain implementasi, dan membangun narasi bahwa perubahan ini adalah peningkatan profesionalisme—bukan penggantian SDM.","Memberikan konsekuensi bagi staf yang menolak mengikuti sistem baru setelah tenggat waktu tertentu.","Membuat dua jalur paralel—digital dan konvensional—secara permanen agar staf yang tidak mau berubah tetap bisa bekerja."],
+a:2,e:"Jawaban C: koalisi perubahan + kapasitas berjenjang + quick win + akomodasi kekhawatiran + narasi pemberdayaan = memimpin transformasi level 4."},
+
+{k:"Mengelola Perubahan",lv:"L4",t:"Anda baru dipindahtugaskan sebagai Kepala Bidang di unit yang dikenal memiliki kinerja buruk, budaya kerja pasif, dan konflik internal yang mengakar. Pimpinan memberikan Anda mandat untuk 'membenahi' unit ini dalam 1 tahun. Apa pendekatan Anda dalam 90 hari pertama?",
+o:["Segera membuat aturan baru yang lebih ketat dan memberi konsekuensi tegas bagi yang tidak patuh.","Menunggu sampai Anda benar-benar memahami semua isu sebelum mengambil tindakan apapun.","Melakukan listening tour intensif untuk memahami akar masalah dari berbagai perspektif, mengidentifikasi 'bright spots' (individu/proses yang sudah baik), menetapkan 1-2 quick win yang membuktikan perubahan adalah mungkin, membangun kepercayaan melalui konsistensi dan keadilan dalam tindakan kecil, dan merancang 'north star' bersama tim tentang seperti apa unit yang berhasil itu.","Segera mengganti staf yang kinerjanya paling buruk untuk memberi sinyal bahwa ada perubahan nyata.","Meminta staf membuat self-assessment dan action plan individual, lalu mengevaluasi hasilnya setelah 3 bulan."],
+a:2,e:"Jawaban C: listening tour + bright spots + quick win + kepercayaan + north star bersama = fondasi transformasi budaya yang tahan lama."},
+
+{k:"Mengelola Perubahan",lv:"L4",t:"Kebijakan nasional baru mengharuskan unit Anda mengintegrasikan pendekatan 'big data' dalam metodologi survei yang selama ini menggunakan pendekatan konvensional. Banyak staf merasa pendekatan konvensional masih relevan dan mempertanyakan kualitas big data. Deadline implementasi adalah 12 bulan. Apa yang Anda lakukan?",
+o:["Mengundang konsultan eksternal untuk menjelaskan pentingnya big data kepada staf yang skeptis.","Mewajibkan semua staf mengikuti pelatihan big data dan mengevaluasi mereka setelahnya.","Merancang roadmap transformasi yang memposisikan big data sebagai pelengkap (bukan pengganti) metodologi konvensional, membangun pilot project kolaboratif yang menunjukkan nilai tambah nyata, menciptakan peran 'data scientist' yang berpasangan dengan surveyor konvensional, dan mengembangkan kurikulum pembelajaran berbasis praktik langsung yang menghargai keahlian yang sudah ada.","Memulai implementasi big data hanya untuk proyek baru, mempertahankan metode konvensional untuk proyek yang sedang berjalan.","Mengidentifikasi staf muda yang tertarik big data dan membentuk tim khusus terpisah untuk menjalankan pendekatan baru."],
+a:2,e:"Jawaban C: big data sebagai pelengkap + pilot kolaboratif + peran berpasangan + pembelajaran berbasis praktik = transisi yang inklusif dan menghormati keahlian yang ada."},
+
+// ── PENGAMBILAN KEPUTUSAN (soal 43-48) ──
+{k:"Pengambilan Keputusan",lv:"L3",t:"Sebagai ketua tim yang bertanggung jawab atas survei nasional, Anda menghadapi usulan perubahan metodologi dari pihak eksternal yang dapat meningkatkan efisiensi tetapi berisiko terhadap akurasi data. Beberapa anggota tim mendukung perubahan ini, sementara yang lain khawatir akan dampaknya. Tindakan apa yang dapat Anda ambil?",
+o:["Meminta tim untuk melakukan analisis lebih lanjut tentang potensi dampak perubahan metodologi terhadap akurasi data.","Mengajak tim untuk berdiskusi lebih lanjut, memastikan ada langkah-langkah mitigasi, dan memutuskan secara kolektif.","Meminta tim untuk mempertimbangkan usulan perubahan sambil menjaga standar metodologi yang ada.","Meminta pihak eksternal memberikan bukti lebih lanjut, mengajak seluruh tim mengeksplorasi alternatif yang meningkatkan efisiensi tanpa mengorbankan kualitas data, dan memastikan keputusan berbasis konsensus dan bukti yang kuat.","Menyetujui perubahan metodologi yang diusulkan tanpa konsultasi lebih lanjut."],
+a:3,e:"Jawaban D: bukti dari eksternal + eksplorasi alternatif + konsensus berbasis bukti = pengambilan keputusan yang kehati-hatian dan komprehensif."},
+
+{k:"Pengambilan Keputusan",lv:"L3",t:"Sebagai Ketua Tim yang bertanggung jawab dalam implementasi Agile Methodology, Anda diminta untuk menyusun proposal rinci sesegera mungkin. Namun dalam prosesnya, terdapat perbedaan prioritas kebutuhan antar tim, dan pimpinan meminta laporan tersebut harus mencakup detail risiko meski data pendukung belum sepenuhnya lengkap. Apa tindakan yang akan Anda ambil?",
+o:["Menghubungi perwakilan tiap tim secara singkat, lalu menyusun bagian risiko berdasarkan asumsi umum dan mencantumkan bahwa bagian tersebut bersifat sementara.","Menyusun proposal secara menyeluruh dengan struktur sistematis, menyampaikan risiko berdasarkan diskusi awal dan tren umum, serta menambahkan keterangan bahwa bagian risiko akan diperbarui setelah data lengkap.","Menyusun proposal seadanya dan tidak memasukkan detail risiko karena belum ada data yang cukup.","Fokus pada penyusunan bagian yang sudah memiliki data lengkap, dan menunda bagian risiko sampai semua tim sepakat.","Segera menginisiasi diskusi singkat lintas tim untuk menyelaraskan prioritas, menyusun proposal lengkap dan terstruktur, termasuk risiko dan mitigasi berbasis pengalaman proyek serupa, disertai catatan analitis atas keterbatasan data yang ada agar tetap akurat dan terbuka."],
+a:4,e:"Jawaban E: diskusi lintas tim + proposal lengkap + berbasis pengalaman + catatan keterbatasan = pengambilan keputusan level 4 dalam kondisi tidak pasti."},
+
+{k:"Pengambilan Keputusan",lv:"L3",t:"Anda memimpin tim yang baru saja menyelesaikan kegiatan pengumpulan data lapangan. Terdapat perbedaan mencolok antar anggota tim: sebagian sangat disiplin, sementara beberapa lainnya bekerja seadanya dan terlambat menyerahkan laporan. Anda perlu mengambil keputusan tentang bagaimana menyampaikan evaluasi ini. Apa keputusan Anda?",
+o:["Memilih tidak menyinggung perbedaan kinerja secara langsung agar suasana tim tetap harmonis.","Memberikan pujian ketika kinerja baik dan mengingatkan secara pribadi saat ada penurunan.","Mengapresiasi kinerja yang baik secara terbuka sebagai contoh positif, dan memberikan umpan balik yang jelas dan membangun secara langsung kepada anggota yang belum memenuhi ekspektasi.","Mengapresiasi kinerja tim secara umum dan hanya menyampaikan kekurangan dalam forum tertutup ke atasan saja.","Menyampaikan apresiasi kepada tim secara umum dan berharap anggota yang belum optimal akan memperbaiki diri."],
+a:2,e:"Jawaban C: keputusan yang adil dan transparan—apresiasi terbuka + umpan balik langsung = membangun akuntabilitas tim."},
+
+{k:"Pengambilan Keputusan",lv:"L4",t:"Tim Anda menemukan bahwa data Sensus Penduduk yang sudah dipublikasikan 3 bulan lalu mengandung kesalahan penghitungan pada 2 provinsi yang menyebabkan angka populasi nasional meleset sekitar 0,8%. Data ini sudah dikutip dalam belasan kebijakan pemerintah dan laporan internasional. Mempublikasikan koreksi akan menimbulkan konsekuensi hukum, reputasional, dan finansial yang signifikan. Pimpinan meminta rekomendasi Anda. Apa yang Anda rekomendasikan?",
+o:["Menerbitkan koreksi senyap dalam versi digital tanpa pengumuman resmi.","Menunggu sampai ada siklus publikasi berikutnya dan memasukkan koreksi dalam pembaruan rutin.","Merekomendasikan publikasi koreksi resmi yang proaktif dan segera, disertai analisis dampak pada kebijakan yang terdampak, rencana komunikasi yang terkoordinasi dengan kementerian pengguna data, investigasi mendalam atas penyebab kesalahan, dan implementasi sistem quality assurance yang mencegah kejadian serupa.","Mengkaji apakah 0,8% secara statistik cukup signifikan untuk dikoreksi.","Menyiapkan koreksi namun hanya memberitahukannya secara langsung kepada kementerian yang terdampak tanpa publikasi publik."],
+a:2,e:"Jawaban C: koreksi proaktif + analisis dampak + koordinasi + investigasi penyebab + perbaikan sistemik = keputusan berani berbasis integritas."},
+
+{k:"Pengambilan Keputusan",lv:"L4",t:"Anda dihadapkan pada keputusan yang harus diambil dalam 48 jam: apakah menyetujui metodologi survei baru yang akan memotong biaya 40% namun mengorbankan representativitas data dari wilayah terpencil, atau mempertahankan metodologi lama yang lebih representatif namun terancam tidak mendapat alokasi anggaran tahun depan? Data untuk analisis penuh tidak tersedia. Apa yang Anda lakukan?",
+o:["Memilih opsi hemat biaya karena anggaran adalah kendala nyata yang tidak bisa diabaikan.","Menolak mengambil keputusan dalam 48 jam dan meminta perpanjangan waktu.","Melakukan rapid assessment: mengidentifikasi risiko kritis dari kedua opsi, berkonsultasi dengan pakar metodologi dan pengguna data utama, mengeksplorasi apakah ada opsi ketiga (hibrid), menyiapkan rekomendasi dengan analisis risiko yang jujur dan rencana mitigasi, dan mendokumentasikan asumsi dan keterbatasan yang mendasari keputusan.","Memilih mempertahankan metodologi lama karena kualitas data tidak bisa dikompromikan.","Mendelegasikan keputusan ini kepada tim teknis."],
+a:2,e:"Jawaban C: rapid assessment + konsultasi cepat + eksplorasi opsi ketiga + dokumentasi transparansi = keputusan berkualitas dalam tekanan waktu."},
+
+{k:"Pengambilan Keputusan",lv:"L4",t:"Unit Anda mendapat laporan bahwa seorang staf senior yang sangat berkinerja tinggi diduga melakukan intimidasi verbal terhadap staf junior, namun staf junior tersebut tidak mau melaporkan secara resmi karena takut konsekuensinya. Anda mendapat informasi ini dari pihak ketiga yang tidak ingin diidentifikasi. Apa yang Anda lakukan?",
+o:["Tidak mengambil tindakan karena tidak ada laporan resmi.","Memanggil staf senior tersebut dan mengkonfrontasinya langsung dengan informasi yang Anda terima.","Melakukan pendekatan diskreet: bertemu secara informal dengan staf junior untuk memberi ruang yang aman bercerita tanpa tekanan untuk melapor resmi, melakukan observasi independen terhadap dinamika kerja, mengevaluasi apakah ada pola sistemik, dan merancang intervensi yang melindungi korban potensial tanpa mengekspos sumber informasi—serta memperkuat sistem pelaporan anonim untuk mencegah situasi serupa.","Memindahkan staf junior ke unit lain untuk menghilangkan sumber konflik.","Meminta HR untuk memantau situasi tanpa mengungkapkan apa yang Anda ketahui."],
+a:2,e:"Jawaban C: pendekatan diskreet + ruang aman + observasi independen + sistem preventif = keputusan yang melindungi integritas tanpa melanggar privasi."},
+
+// ── PEREKAT BANGSA (soal 49-54) ──
+{k:"Perekat Bangsa",lv:"L3",t:"Anda memimpin tim lintas bidang yang bertugas menyusun profil kemiskinan multidimensi. Tim terdiri dari staf dengan latar belakang sangat beragam: peneliti senior yang perfeksionis, staf muda yang inovatif namun kurang pengalaman, dan anggota perbantuan dari bidang lain yang merasa tugasnya 'bukan pekerjaan mereka'. Ketegangan antar kelompok ini menghambat progres. Apa yang Anda lakukan?",
+o:["Menetapkan struktur hirarki yang jelas dalam tim: peneliti senior memimpin, yang lain mengikuti.","Fokus menyelesaikan konflik dengan memisahkan tugas masing-masing kelompok agar tidak perlu berinteraksi terlalu banyak.","Melakukan asesmen kompetensi informal, merancang ulang struktur kontribusi yang memanfaatkan kelebihan masing-masing kelompok secara komplementer, membangun narasi bersama tentang tujuan tim, dan menciptakan ritual kolaborasi rutin yang mempertemukan perspektif berbeda secara produktif.","Mengganti anggota perbantuan yang tidak kooperatif dengan staf yang lebih termotivasi.","Membiarkan dinamika tim berjalan alami karena konflik akan mereda dengan sendirinya setelah deadline mendekat."],
+a:2,e:"Jawaban C: asesmen kompetensi + desain kontribusi komplementer + narasi bersama + ritual kolaborasi = mengubah heterogenitas menjadi kekuatan."},
+
+{k:"Perekat Bangsa",lv:"L3",t:"Anda memimpin tim yang sedang melakukan analisis data kemiskinan lintas daerah. Tim menemukan bahwa beberapa temuan menunjukkan disparitas yang sangat tajam berdasarkan wilayah yang berkorelasi dengan identitas etnis mayoritas di wilayah tersebut. Beberapa anggota tim khawatir temuan ini akan memperkeruh hubungan antar wilayah jika dipublikasikan. Apa keputusan Anda?",
+o:["Tidak mempublikasikan temuan yang berkaitan dengan identitas etnis untuk menghindari potensi konflik sosial.","Mempublikasikan data mentah tanpa konteks agar pengguna bisa menginterpretasikan sendiri.","Menyajikan temuan secara komprehensif dengan konteks historis, ekonomi, dan geografis yang menjelaskan disparitas tersebut; memastikan narasi data menekankan faktor struktural dan kebijakan daripada identitas kelompok; berkonsultasi dengan pakar sosiologi dan tokoh masyarakat dalam interpretasi; dan merekomendasikan kebijakan afirmatif yang berbasis kebutuhan bukan identitas.","Menyajikan data hanya pada tingkat agregat nasional tanpa breakdown per wilayah.","Meminta pimpinan untuk memutuskan bagaimana data ini disajikan karena sensitivitasnya terlalu tinggi."],
+a:2,e:"Jawaban C: konteks struktural + narasi berbasis kebijakan + konsultasi pakar + rekomendasi berbasis kebutuhan = menggunakan data sebagai instrumen pemersatu."},
+
+{k:"Perekat Bangsa",lv:"L4",t:"Unit Anda terdiri dari staf dengan latar belakang agama, suku, dan daerah asal yang sangat beragam. Belakangan muncul friksi sosial yang berkaitan dengan isu SARA nasional yang sedang hangat—beberapa staf membuat komentar di grup WhatsApp internal yang dianggap menyinggung oleh rekan dari kelompok lain. Situasi menjadi canggung dan produktivitas menurun. Sebagai Kepala Bidang, apa yang Anda lakukan?",
+o:["Mengeluarkan surat edaran tegas yang melarang diskusi SARA di semua platform komunikasi unit.","Membiarkan situasi mereda sendiri karena intervensi atasan justru dapat memperkeruh suasana.","Memfasilitasi sesi dialog yang aman dan terstruktur di mana semua staf dapat mengekspresikan perasaan mereka dan membangun pemahaman bersama, mengklarifikasi norma komunikasi yang inklusif dalam tim, mempertegas bahwa keberagaman adalah kekuatan unit—bukan sumber konflik, dan menciptakan tradisi yang merayakan perbedaan sebagai bagian dari identitas tim.","Memanggil individu yang membuat komentar kontroversial dan memberi peringatan keras.","Mengadakan kegiatan team building fisik untuk mencairkan suasana tanpa membahas langsung isu yang ada."],
+a:2,e:"Jawaban C: dialog terstruktur + norma inklusif + reframing keberagaman + tradisi perayaan perbedaan = mengubah konflik menjadi fondasi kohesi yang lebih kuat."},
+
+{k:"Perekat Bangsa",lv:"L4",t:"Anda ditugaskan memimpin survei di daerah yang memiliki komunitas adat dengan kepercayaan dan tradisi lokal yang sangat kuat. Komunitas ini secara historis tidak mempercayai pemerintah dan menolak berpartisipasi dalam survei nasional. Tanpa partisipasi mereka, data untuk wilayah tersebut tidak representatif. Pendekatan standar tidak berhasil dalam survei sebelumnya. Apa strategi Anda?",
+o:["Melakukan survei di daerah tersebut menggunakan enumerator dari luar yang tidak dikenal komunitas agar objektif.","Menggunakan data estimasi untuk menggantikan data wilayah tersebut karena ketidakpartisipaan komunitas adalah hak mereka.","Membangun kepercayaan secara bertahap melalui keterlibatan komunitas: bermitra dengan pemimpin adat dan tokoh kepercayaan lokal, melibatkan anggota komunitas sebagai enumerator terlatih, menyesuaikan waktu dan pendekatan survei dengan kalender dan protokol adat, menjelaskan manfaat konkret data bagi komunitas, dan memastikan data yang dikumpulkan juga memberikan umpan balik yang berguna bagi komunitas.","Melaporkan keterbatasan data dari wilayah tersebut kepada pimpinan dan menyerahkan tanggung jawab kepada pejabat daerah.","Menggunakan media sosial untuk membangun kesadaran tentang pentingnya sensus kepada generasi muda komunitas."],
+a:2,e:"Jawaban C: mitra adat + enumerator komunitas + adaptasi protokol budaya + nilai timbal balik = membangun kepercayaan lintas budaya yang autentik."},
+
+{k:"Orientasi pada Hasil",lv:"L3",t:"Anda adalah Kepala Subbidang yang mendapat instruksi mendadak dari pimpinan untuk menyiapkan data dan bahan paparan untuk rapat lintas kementerian yang berlangsung 4 jam lagi, sementara tim Anda sedang dalam tenggat penyelesaian laporan rutin yang juga harus diserahkan hari ini. Anda tidak bisa memenuhi dua tenggat sekaligus dengan kapasitas yang ada. Apa yang Anda lakukan?",
+o:["Fokus pada laporan rutin karena sudah komitmen sebelumnya dan minta pimpinan mencari staf lain untuk rapat.","Mengerjakan bahan rapat sendiri sambil meminta staf melanjutkan laporan rutin tanpa panduan tambahan.","Segera berkomunikasi kepada pimpinan tentang kondisi kapasitas tim, mengusulkan prioritas atau sumber daya tambahan, lalu menyusun rencana eksekusi kedua tugas secara paralel dengan pembagian peran yang jelas.","Menyerahkan laporan rutin yang belum selesai dan fokus penuh pada bahan rapat karena itu lebih mendesak.","Memilih satu tugas yang menurutmu lebih penting dan menyelesaikannya dengan sempurna."],
+a:2,e:"Jawaban C: komunikasi proaktif ke pimpinan + negosiasi sumber daya + rencana paralel yang realistis = orientasi pada hasil dalam situasi tekanan."},
+
+{k:"Perekat Bangsa",lv:"L3",t:"Tim survei Anda terdiri dari 8 orang dengan latar belakang suku, agama, dan daerah asal yang berbeda. Menjelang pelaksanaan survei lapangan di bulan Ramadan, beberapa anggota Muslim mengusulkan penyesuaian jam kerja lapangan, sementara beberapa anggota non-Muslim khawatir penyesuaian ini akan memperberat beban mereka. Ketegangan mulai terasa dalam komunikasi tim. Apa yang Anda lakukan sebagai koordinator?",
+o:["Mempertahankan jadwal standar agar tidak ada yang merasa diperlakukan berbeda.","Menyetujui penyesuaian jam untuk anggota Muslim dan meminta anggota non-Muslim menerima kondisi ini demi menghormati ibadah rekan.","Melakukan dialog terbuka dengan seluruh tim untuk memahami kebutuhan masing-masing, menyusun jadwal yang mengakomodasi kebutuhan keagamaan dengan distribusi beban kerja yang adil bagi semua.","Menyerahkan keputusan kepada tim untuk memutuskan sendiri melalui voting.","Memisahkan tim menjadi dua kelompok agar masing-masing bekerja sesuai preferensi."],
+a:2,e:"Jawaban C: dialog terbuka + akomodasi kebutuhan keagamaan + distribusi beban kerja yang adil = koordinator yang inklusif dan berkeadilan."}
+];
+
+// ═══════════════════════════════════════════════════════
+//  APP STATE
+// ═══════════════════════════════════════════════════════
+const S = {
+  peserta: null,
+  fbApp: null,
+  db: null,
+  sessionId: null,
+  pe: {
+    current: 0,
+    answers: Array(9).fill(null).map(()=>({situasi:'',kendala:'',peran:'',hasil:''})),
+    startTime: null,
+    endTime: null,
+    done: false
+  },
+  sjt: {
+    current: 0,
+    answers: Array(54).fill(null),
+    startTime: null,
+    endTime: null,
+    done: false
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+//  FIREBASE – config hardcoded, auto-init on load
+// ═══════════════════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCOCdIx8ThhfLPZNHL8OfQ-kVMzJyiz0_s",
+  authDomain: "simulasi-mansoskul.firebaseapp.com",
+  projectId: "simulasi-mansoskul",
+  storageBucket: "simulasi-mansoskul.firebasestorage.app",
+  messagingSenderId: "648827756309",
+  appId: "1:648827756309:web:c3fc39c202c8920cb4931c",
+  measurementId: "G-NN67C684WZ"
+};
+
+function initFirebase(){
+  try {
+    S.fbApp = firebase.initializeApp(FIREBASE_CONFIG);
+    S.db = firebase.firestore();
+  } catch(e){
+    try { S.fbApp = firebase.app(); S.db = firebase.firestore(); } catch(e2){}
+  }
+}
+
+async function saveToFirebase(data){
+  if(!S.db) return null;
+  try {
+    const ref = await S.db.collection('asesmen_mansoskul').add({
+      ...data,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    return ref.id;
+  } catch(e){ console.error('Firebase save error:',e); return null; }
+}
+
+async function updateFirebase(docId, data){
+  if(!S.db || !docId) return;
+  try { await S.db.collection('asesmen_mansoskul').doc(docId).update(data); } catch(e){}
+}
+
+// ═══════════════════════════════════════════════════════
+//  SETUP
+// ═══════════════════════════════════════════════════════
+function doSetup(){
+  const nama = document.getElementById('f-nama').value.trim();
+  const nip  = document.getElementById('f-nip').value.trim();
+  const unit = document.getElementById('f-unit').value.trim();
+  if(!nama||!nip||!unit){ alert('Nama, NIP, dan Unit Kerja harus diisi.'); return; }
+
+  S.peserta = { nama, nip, unit, jenjang: document.getElementById('f-jenjang').value };
+  S.sessionId = null;
+
+  renderDashboard();
+  goTo('dashboard');
+}
+
+// Auto-init Firebase when page loads
+window.addEventListener('load', initFirebase);
+
+// ═══════════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════════
+function renderDashboard(){
+  document.getElementById('peserta-bar').innerHTML=`
+    <div class="peserta-field"><span class="peserta-label">Nama</span>${S.peserta.nama}</div>
+    <div class="peserta-field"><span class="peserta-label">NIP</span>${S.peserta.nip}</div>
+    <div class="peserta-field"><span class="peserta-label">Unit Kerja</span>${S.peserta.unit}</div>
+    <div class="peserta-field"><span class="peserta-label">Jenjang</span>${S.peserta.jenjang}</div>`;
+
+  const peBadge = document.getElementById('pe-status-badge');
+  const sjtBadge = document.getElementById('sjt-status-badge');
+
+  if(S.pe.done){ peBadge.className='dash-status status-done'; peBadge.textContent='✓ Selesai & Tersimpan'; document.getElementById('dash-pe').classList.add('done'); }
+  else { peBadge.className='dash-status status-ready'; peBadge.textContent='Belum Dikerjakan'; }
+
+  if(S.sjt.done){ sjtBadge.className='dash-status status-done'; sjtBadge.textContent='✓ Selesai & Tersimpan'; document.getElementById('dash-sjt').classList.add('done'); }
+  else { sjtBadge.className='dash-status status-ready'; sjtBadge.textContent='Belum Dikerjakan'; }
+}
+
+// ═══════════════════════════════════════════════════════
+//  PE MODULE
+// ═══════════════════════════════════════════════════════
+let peTimer=null, peTimeLeft=7200;
+
+function startPE(){
+  if(S.pe.done){ if(!confirm('PE sudah selesai dikerjakan. Apakah Anda ingin mengerjakan ulang?')) return; S.pe.done=false; S.pe.answers=Array(9).fill(null).map(()=>({situasi:'',kendala:'',peran:'',hasil:''})); }
+  S.pe.startTime = Date.now();
+  peTimeLeft = 7200;
+  renderPEDots();
+  renderPEQuestion(S.pe.current);
+  goTo('pe');
+  clearInterval(peTimer);
+  peTimer = setInterval(()=>{
+    peTimeLeft--;
+    updatePETimer();
+    if(peTimeLeft<=0){ clearInterval(peTimer); finishPE(); }
+  },1000);
+}
+
+function updatePETimer(){
+  const m=Math.floor(peTimeLeft/60), s=peTimeLeft%60;
+  const el=document.getElementById('pe-timer');
+  el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className='topbar-timer';
+  if(peTimeLeft<600) el.className='topbar-timer danger';
+  else if(peTimeLeft<1200) el.className='topbar-timer warn';
+}
+
+function renderPEDots(){
+  const el=document.getElementById('pe-dots');
+  el.innerHTML='';
+  PE_Q.forEach((q,i)=>{
+    const a=S.pe.answers[i];
+    const filled=a&&a.situasi&&a.kendala&&a.peran&&a.hasil;
+    const partial=a&&(a.situasi||a.kendala||a.peran||a.hasil);
+    const d=document.createElement('div');
+    d.className='pe-dot'+(i===S.pe.current?' current':filled?' filled':partial?' partial':'');
+    d.textContent=i+1;
+    d.title=q.kompetensi;
+    d.onclick=()=>{ savePECurrent(); renderPEQuestion(i); };
+    el.appendChild(d);
+  });
+}
+
+const STAR_HINTS={
+  situasi:'Kapan dan dimana? Apa konteks situasinya? Apa yang membuat situasi ini menantang?',
+  kendala:'Hambatan apa yang Anda hadapi? Mengapa sulit? Apa tekanan atau risiko yang ada?',
+  peran:'Apa yang konkret Anda lakukan? Langkah-langkah apa yang Anda ambil? Bagaimana Anda memimpin/berkontribusi?',
+  hasil:'Apa dampak tindakan Anda? Apa yang berhasil dicapai? Apa yang Anda pelajari?'
+};
+
+function renderPEQuestion(idx){
+  S.pe.current=idx;
+  const q=PE_Q[idx], a=S.pe.answers[idx];
+  document.getElementById('pe-q-num').textContent=`SOAL ${idx+1} DARI ${PE_Q.length}`;
+  document.getElementById('pe-kompetensi-tag').textContent=q.kompetensi;
+  document.getElementById('pe-q-text').textContent=q.text;
+
+  const keys=[['S','situasi','Situasi'],['K','kendala','Kendala yang Dihadapi'],['P','peran','Peran Saya'],['H','hasil','Hasil']];
+  document.getElementById('pe-star-grid').innerHTML=keys.map(([badge,key,label])=>`
+    <div class="star-item">
+      <div class="star-label">
+        <div class="star-badge star-${badge.toLowerCase()}">${badge}</div>
+        <span class="star-name">${label}</span>
+        <span class="star-hint">${STAR_HINTS[key]}</span>
+      </div>
+      <textarea class="star-input" id="pe-${key}" placeholder="${STAR_HINTS[key]}">${a&&a[key]?a[key]:''}</textarea>
+      <div class="word-count" id="wc-${key}"></div>
+    </div>`).join('');
+
+  keys.forEach(([,key])=>{
+    const ta=document.getElementById('pe-'+key);
+    updateWordCount(key,ta.value);
+    ta.addEventListener('input',()=>{ updateWordCount(key,ta.value); document.getElementById('pe-save-status').textContent='● Mengetik...'; });
+  });
+
+  document.getElementById('pe-btn-prev').disabled=idx===0;
+  document.getElementById('pe-btn-next').textContent=idx===PE_Q.length-1?'Lihat Ringkasan':'Berikutnya →';
+  renderPEDots();
+}
+
+function updateWordCount(key,val){
+  const words=val.trim()?val.trim().split(/\s+/).length:0;
+  const el=document.getElementById('wc-'+key);
+  if(el) el.textContent=`${words} kata`;
+}
+
+function savePECurrent(){
+  const idx=S.pe.current;
+  S.pe.answers[idx]={
+    situasi: document.getElementById('pe-situasi')?.value||'',
+    kendala: document.getElementById('pe-kendala')?.value||'',
+    peran: document.getElementById('pe-peran')?.value||'',
+    hasil: document.getElementById('pe-hasil')?.value||''
+  };
+  document.getElementById('pe-save-status').textContent='● Tersimpan lokal';
+}
+
+function peNav(dir){
+  savePECurrent();
+  const next=S.pe.current+dir;
+  if(next>=0&&next<PE_Q.length){ renderPEQuestion(next); }
+  else if(next>=PE_Q.length){ finishPE(); }
+}
+
+async function finishPE(){
+  savePECurrent();
+  if(!confirm('Apakah Anda yakin ingin menyelesaikan dan menyimpan jawaban PE?')) return;
+  clearInterval(peTimer);
+  S.pe.endTime=Date.now();
+  S.pe.done=true;
+
+  const durasi=Math.round((S.pe.endTime-S.pe.startTime)/60000);
+  const peData={
+    peserta: S.peserta,
+    tipe: 'PE',
+    durasi_menit: durasi,
+    selesai: true,
+    jawaban: S.pe.answers.map((a,i)=>({no:i+1, kompetensi:PE_Q[i].kompetensi, ...a}))
+  };
+
+  const fbStatus=document.getElementById('firebase-save-status');
+  const fbText=document.getElementById('fb-status-text');
+  fbStatus.style.display='flex'; fbStatus.className='firebase-status saving';
+  fbText.textContent='⏳ Menyimpan jawaban PE ke Firebase...';
+
+  if(!S.sessionId){
+    S.sessionId=await saveToFirebase(peData);
+  } else {
+    await updateFirebase(S.sessionId,{pe:peData,timestamp_pe:new Date()});
+  }
+
+  if(S.sessionId){
+    fbStatus.className='firebase-status saved';
+    fbText.innerHTML=`✅ Jawaban PE berhasil disimpan ke Firebase.<br><span class="firebase-id">Session ID: ${S.sessionId}</span>`;
+  } else {
+    fbStatus.className='firebase-status error';
+    fbText.textContent='⚠️ Gagal menyimpan ke Firebase. Data tersimpan lokal.';
+  }
+
+  renderDashboard();
+  showResults();
+  goTo('results');
+}
+
+// ═══════════════════════════════════════════════════════
+//  SJT MODULE
+// ═══════════════════════════════════════════════════════
+let sjtTimer=null, sjtTimeLeft=5400;
+const LABS=['A','B','C','D','E'];
+
+function startSJT(){
+  if(S.sjt.done){ if(!confirm('SJT sudah selesai dikerjakan. Apakah Anda ingin mengerjakan ulang?')) return; S.sjt.done=false; S.sjt.answers=Array(54).fill(null); }
+  S.sjt.startTime=Date.now();
+  sjtTimeLeft=5400;
+  renderSJTQuestion(S.sjt.current);
+  renderSJTMap();
+  goTo('sjt');
+  clearInterval(sjtTimer);
+  sjtTimer=setInterval(()=>{
+    sjtTimeLeft--;
+    updateSJTTimer();
+    if(sjtTimeLeft<=0){ clearInterval(sjtTimer); finishSJT(); }
+  },1000);
+}
+
+function updateSJTTimer(){
+  const m=Math.floor(sjtTimeLeft/60), s=sjtTimeLeft%60;
+  const el=document.getElementById('sjt-timer');
+  el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className='topbar-timer';
+  if(sjtTimeLeft<300) el.className='topbar-timer danger';
+  else if(sjtTimeLeft<600) el.className='topbar-timer warn';
+}
+
+function renderSJTQuestion(idx){
+  S.sjt.current=idx;
+  const q=SJT_Q[idx];
+  document.getElementById('sjt-cur-num').textContent=idx+1;
+  document.getElementById('sjt-q-num').textContent=`SOAL ${idx+1}`;
+  document.getElementById('sjt-q-text').textContent=q.t;
+  document.getElementById('sjt-comp-tag').textContent=q.k;
+  document.getElementById('sjt-level-tag').textContent=q.lv==='L4'?'Level 4 – Madya':q.lv==='L3'?'Level 3':'Level 2-3';
+  document.getElementById('sjt-bar').style.width=`${((idx+1)/54)*100}%`;
+
+  const ol=document.getElementById('sjt-options');
+  ol.innerHTML='';
+  q.o.forEach((opt,i)=>{
+    const div=document.createElement('div');
+    div.className='option'+(S.sjt.answers[idx]===i?' selected':'');
+    div.innerHTML=`<div class="opt-circle">${LABS[i]}</div><div class="opt-text">${opt}</div>`;
+    div.onclick=()=>{
+      S.sjt.answers[idx]=i;
+      document.querySelectorAll('.option').forEach((o,j)=>{o.classList.toggle('selected',j===i);});
+      renderSJTMap();
+    };
+    ol.appendChild(div);
+  });
+
+  document.getElementById('sjt-btn-prev').disabled=idx===0;
+  document.getElementById('sjt-btn-next').textContent=idx===53?'Selesai':'Berikutnya →';
+  renderSJTMap();
+}
+
+function renderSJTMap(){
+  const el=document.getElementById('sjt-map');
+  el.innerHTML='';
+  SJT_Q.forEach((q,i)=>{
+    const d=document.createElement('div');
+    d.className='sjt-dot'+(i===S.sjt.current?' current':S.sjt.answers[i]!==null?' answered':'');
+    d.textContent=i+1;
+    d.title=`Soal ${i+1}: ${q.k}`;
+    d.onclick=()=>renderSJTQuestion(i);
+    el.appendChild(d);
+  });
+}
+
+function sjtNav(dir){
+  const next=S.sjt.current+dir;
+  if(next>=0&&next<54) renderSJTQuestion(next);
+  else if(next>=54) finishSJT();
+}
+
+async function finishSJT(){
+  const answered=S.sjt.answers.filter(a=>a!==null).length;
+  if(answered<54&&!confirm(`Anda baru menjawab ${answered}/54 soal. Lanjutkan menyimpan?`)) return;
+  clearInterval(sjtTimer);
+  S.sjt.endTime=Date.now();
+  S.sjt.done=true;
+
+  const durasi=Math.round((S.sjt.endTime-S.sjt.startTime)/60000);
+  let benar=0,salah=0,lewat=0;
+  const perKomp={};
+  SJT_Q.forEach((q,i)=>{
+    if(!perKomp[q.k]) perKomp[q.k]={benar:0,total:0};
+    perKomp[q.k].total++;
+    if(S.sjt.answers[i]===null){ lewat++; }
+    else if(S.sjt.answers[i]===q.a){ benar++; perKomp[q.k].benar++; }
+    else salah++;
+  });
+
+  const sjtData={
+    peserta: S.peserta,
+    tipe: 'SJT',
+    durasi_menit: durasi,
+    selesai: true,
+    skor: benar,
+    persentase: Math.round((benar/54)*100),
+    benar, salah, lewat,
+    per_kompetensi: perKomp,
+    jawaban: S.sjt.answers
+  };
+
+  const fbStatus=document.getElementById('firebase-save-status');
+  const fbText=document.getElementById('fb-status-text');
+  fbStatus.style.display='flex'; fbStatus.className='firebase-status saving';
+  fbText.textContent='⏳ Menyimpan hasil SJT ke Firebase...';
+
+  if(!S.sessionId){
+    S.sessionId=await saveToFirebase(sjtData);
+  } else {
+    await updateFirebase(S.sessionId,{sjt:sjtData,timestamp_sjt:new Date()});
+  }
+
+  if(S.sessionId){
+    fbStatus.className='firebase-status saved';
+    fbText.innerHTML=`✅ Hasil SJT berhasil disimpan ke Firebase.<br><span class="firebase-id">Session ID: ${S.sessionId}</span>`;
+  } else {
+    fbStatus.className='firebase-status error';
+    fbText.textContent='⚠️ Gagal menyimpan ke Firebase. Data tersimpan lokal.';
+  }
+
+  renderDashboard();
+  showResults();
+  goTo('results');
+}
+
+// ═══════════════════════════════════════════════════════
+//  RESULTS
+// ═══════════════════════════════════════════════════════
+function showResults(){
+  const peSec=document.getElementById('r-pe-section');
+  const sjtSec=document.getElementById('r-sjt-section');
+
+  // SJT Section
+  if(S.sjt.done||S.sjt.answers.some(a=>a!==null)){
+    let benar=0,salah=0,lewat=0;
+    const perKomp={};
+    SJT_Q.forEach((q,i)=>{
+      if(!perKomp[q.k]) perKomp[q.k]={benar:0,total:0};
+      perKomp[q.k].total++;
+      if(S.sjt.answers[i]===null) lewat++;
+      else if(S.sjt.answers[i]===q.a){ benar++; perKomp[q.k].benar++; }
+      else salah++;
+    });
+    const pct=Math.round((benar/54)*100);
+
+    let compBars='';
+    Object.entries(perKomp).forEach(([k,v])=>{
+      const p=Math.round((v.benar/v.total)*100);
+      const color=p>=67?'#1F3A8C':p>=34?'#BA7517':'#A32D2D';
+      compBars+=`<div class="comp-bar-row">
+        <span class="comp-bar-name">${k}</span>
+        <div class="comp-bar-outer"><div class="comp-bar-inner" id="cb-${k.replace(/\s/g,'_')}" style="width:0%;background:${color}"></div></div>
+        <span class="comp-bar-score">${v.benar}/${v.total}</span></div>`;
+    });
+
+    let reviewHtml='';
+    SJT_Q.forEach((q,i)=>{
+      const isSkip=S.sjt.answers[i]===null;
+      const isC=!isSkip&&S.sjt.answers[i]===q.a;
+      const bc=isSkip?'badge-s':isC?'badge-c':'badge-w';
+      const bt=isSkip?'LEWATI':isC?'✓ BENAR':'✗ SALAH';
+      const userNote=!isSkip&&!isC?` · Jawaban Anda: <b>${LABS[S.sjt.answers[i]]}</b>`:'';
+      const opts=q.o.map((o,j)=>{
+        const cls=j===q.a?'rc':(!isSkip&&S.sjt.answers[i]===j?'rw':'');
+        return `<div class="r-opt ${cls}"><span style="font-weight:700;flex-shrink:0;min-width:18px">${LABS[j]}</span><span>${o}</span></div>`;
+      }).join('');
+      reviewHtml+=`<div class="review-card">
+        <div class="review-header"><span class="review-badge ${bc}">${bt}${userNote}</span><span style="font-size:11px;background:#EEF2FB;color:#1F3A8C;padding:3px 10px;border-radius:20px">${q.k}</span><span style="font-size:11px;color:#888">Soal ${i+1}</span></div>
+        <div class="review-q">${q.t}</div>
+        <div class="r-opts">${opts}</div>
+        <div class="r-exp">💡 ${q.e}</div></div>`;
+    });
+
+    sjtSec.innerHTML=`
+      <div class="section-title">📊 Hasil SJT – Situational Judgment Test</div>
+      <div class="score-grid">
+        <div class="score-box"><div class="score-num" style="color:#1F3A8C">${pct}%</div><div class="score-lbl">Skor Total</div></div>
+        <div class="score-box"><div class="score-num" style="color:#1D9E75">${benar}</div><div class="score-lbl">Benar</div></div>
+        <div class="score-box"><div class="score-num" style="color:#D85A30">${salah}</div><div class="score-lbl">Salah</div></div>
+      </div>
+      <div class="card"><div class="card-title">Skor per Kompetensi</div>${compBars}</div>
+      <div class="card-title" style="margin-bottom:1rem">Review Soal & Jawaban</div>
+      ${reviewHtml}`;
+
+    setTimeout(()=>{
+      Object.entries(perKomp).forEach(([k,v])=>{
+        const el=document.getElementById(`cb-${k.replace(/\s/g,'_')}`);
+        if(el) el.style.width=Math.round((v.benar/v.total)*100)+'%';
+      });
+    },300);
+
+    document.getElementById('r-icon').textContent=pct>=80?'🏆':pct>=60?'👍':'📋';
+    document.getElementById('r-grade').textContent=pct>=80?'Sangat Kompeten':pct>=60?'Cukup Kompeten':'Perlu Penguatan';
+    document.getElementById('r-sub').textContent=`SJT: ${benar}/54 benar (${pct}%)`;
+  }
+
+  // PE Section
+  if(S.pe.done||S.pe.answers.some(a=>a.situasi||a.kendala||a.peran||a.hasil)){
+    let peReview='';
+    PE_Q.forEach((q,i)=>{
+      const a=S.pe.answers[i];
+      const filled=a&&(a.situasi||a.kendala||a.peran||a.hasil);
+      peReview+=`<div class="pe-review-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
+          <span style="background:#EEF2FB;color:#1F3A8C;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${q.kompetensi}</span>
+          <span style="font-size:12px;color:#888">Soal ${i+1}</span>
+        </div>
+        <div class="pe-review-q">${q.text}</div>
+        ${['situasi','kendala','peran','hasil'].map((key,ki)=>`
+          <div class="star-review-item">
+            <div class="star-review-label">${['S – Situasi','K – Kendala','P – Peran','H – Hasil'][ki]}</div>
+            <div class="star-review-text">${a&&a[key]?escHtml(a[key]):'<em style="color:#aaa">Belum diisi</em>'}</div>
+          </div>`).join('')}</div>`;
+    });
+    peSec.innerHTML=`<div class="section-title">📝 Hasil PE – Pertanyaan Efektif</div>${peReview}<hr class="divider">`;
+  }
+}
+
+function escHtml(str){ return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ═══════════════════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════════════════
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
