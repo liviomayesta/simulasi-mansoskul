@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<!-- saved from url=(0057)file:///Users/a1234/Downloads/panduan_pe_benchmark_1.html -->
+<html lang="id"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panduan Belajar PE – Benchmark JPM 92.5</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f7ff;--surface:#fff;--surface2:#f0f4ff;
+  --accent:#1F3A8C;--accent2:#4B6FD0;--accent-light:#EEF2FB;
+  --green:#0B5E3E;--green-light:#E4F1EC;--green-mid:#1D9E75;
+  --amber:#7A3B00;--amber-light:#FDF0E4;--amber-mid:#BA7517;
+  --red:#7A1F1F;--red-light:#FAECE7;
+  --text:#1a1a1a;--text2:#444;--text3:#888;
+  --border:#ccd2e8;--radius:12px
+}
+body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+
+/* ── HEADER ── */
+.site-header{background:linear-gradient(135deg,#1F3A8C 0%,#2a5bb5 100%);color:#fff;padding:2.5rem 1.5rem 2rem;text-align:center}
+.header-badge{display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);font-size:12px;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:.07em;margin-bottom:1rem}
+.header-title{font-size:26px;font-weight:800;margin-bottom:.4rem}
+.header-sub{font-size:14px;opacity:.82;margin-bottom:1.5rem}
+.score-showcase{display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap}
+.score-ring-box{text-align:center}
+.score-facts{display:flex;gap:1.25rem;flex-wrap:wrap;justify-content:center}
+.fact-chip{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:.6rem 1rem;text-align:center}
+.fact-num{font-size:20px;font-weight:800}
+.fact-label{font-size:11px;opacity:.75;margin-top:2px}
+
+/* ── NAV TABS ── */
+.nav-tabs{background:#fff;border-bottom:2px solid var(--border);display:flex;overflow-x:auto;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(31,58,140,.08)}
+.nav-tab{padding:.85rem 1.25rem;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all .15s;flex-shrink:0}
+.nav-tab:hover{color:var(--accent);background:var(--accent-light)}
+.nav-tab.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--accent-light)}
+
+/* ── CONTAINER ── */
+.container{max-width:940px;margin:0 auto;padding:2rem 1.25rem}
+.section{display:none}.section.active{display:block}
+
+/* ── INSIGHT CARDS ── */
+.insight-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
+.insight-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;border-top:4px solid var(--accent)}
+.insight-card.green{border-top-color:var(--green-mid)}
+.insight-card.amber{border-top-color:var(--amber-mid)}
+.insight-num{font-size:28px;font-weight:800;color:var(--accent);margin-bottom:.3rem}
+.insight-card.green .insight-num{color:var(--green-mid)}
+.insight-card.amber .insight-num{color:var(--amber-mid)}
+.insight-label{font-size:12px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+
+/* ── COMPETENCY SCORE BARS ── */
+.komp-score-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem}
+.komp-score-title{font-size:15px;font-weight:700;color:var(--accent);margin-bottom:1.25rem}
+.komp-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.komp-name{font-size:13px;color:var(--text2);min-width:195px;font-weight:500}
+.komp-bar-outer{flex:1;background:#e8ecf8;border-radius:4px;height:10px;overflow:hidden}
+.komp-bar-inner{height:10px;border-radius:4px;transition:width 1.2s ease}
+.komp-score{font-size:13px;font-weight:700;min-width:60px;text-align:right}
+.level-label{font-size:11px;color:var(--text3);min-width:80px}
+
+/* ── STAR ANALYSIS CARD ── */
+.pe-question-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1.5rem;overflow:hidden}
+.pe-q-header{background:var(--accent);color:#fff;padding:1rem 1.5rem;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+.pe-q-num{width:32px;height:32px;background:rgba(255,255,255,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.pe-q-komp{font-size:14px;font-weight:700;flex:1}
+.pe-q-score{display:flex;align-items:center;gap:8px}
+.pe-q-badge{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700}
+.pe-q-chevron{font-size:14px;transition:transform .2s}
+.pe-q-chevron.open{transform:rotate(180deg)}
+.pe-q-body{display:none;padding:1.5rem}
+.pe-q-body.open{display:block}
+
+.q-text-box{font-size:14px;font-weight:500;color:var(--text);line-height:1.7;background:var(--accent-light);padding:1rem 1.25rem;border-radius:8px;border-left:4px solid var(--accent);margin-bottom:1.25rem}
+
+/* STAR blocks */
+.star-block{margin-bottom:1.25rem}
+.star-block-header{display:flex;align-items:center;gap:10px;margin-bottom:.6rem}
+.star-letter{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.sl-s{background:#EEF2FB;color:#1F3A8C}.sl-k{background:#FDF0E4;color:#7A3B00}
+.sl-p{background:#E4F1EC;color:#0B5E3E}.sl-h{background:#FAECE7;color:#712B13}
+.star-block-title{font-size:13px;font-weight:700;color:var(--text2)}
+.star-quality-chip{margin-left:auto;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px}
+.chip-excellent{background:#E4F1EC;color:#0B5E3E}.chip-good{background:#EEF2FB;color:#1F3A8C}
+.chip-ok{background:#FDF0E4;color:#7A3B00}.chip-weak{background:#FAECE7;color:#712B13}
+.star-answer{background:#F8F9FF;border:1px solid var(--border);border-radius:8px;padding:.85rem 1rem;font-size:13.5px;line-height:1.7;color:var(--text);margin-bottom:.6rem}
+.star-analysis{background:#fff;border:1px solid #d5e5ff;border-radius:8px;padding:.75rem 1rem}
+.analysis-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);margin-bottom:.4rem}
+.analysis-items{display:flex;flex-direction:column;gap:.35rem}
+.analysis-item{display:flex;gap:8px;font-size:12.5px;line-height:1.55}
+.aitem-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.dot-green{background:var(--green-mid)}.dot-amber{background:var(--amber-mid)}.dot-blue{background:var(--accent2)}
+.aitem-text{color:var(--text2)}
+
+/* ── COMPARISON TABLE ── */
+.compare-table{width:100%;border-collapse:collapse;margin-bottom:1.5rem}
+.compare-table th{padding:.75rem 1rem;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid var(--border)}
+.compare-table th:first-child{color:var(--text3);background:#f8f8f8;border-radius:8px 0 0 0}
+.compare-table th.th-strong{background:var(--accent);color:#fff;border-radius:0 8px 0 0}
+.compare-table th.th-weak{background:#f0f0f0;color:var(--text3)}
+.compare-table td{padding:.75rem 1rem;font-size:13px;line-height:1.6;border-bottom:1px solid #f0f0f0;vertical-align:top}
+.compare-table td:first-child{font-weight:600;color:var(--text2);white-space:nowrap}
+.compare-table .td-strong{background:#FAFBFF;color:var(--green)}
+.compare-table .td-weak{color:var(--red);background:#FFFBFB}
+.td-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-bottom:3px}
+.tag-g{background:var(--green-light);color:var(--green)}.tag-r{background:var(--red-light);color:var(--red)}
+
+/* ── TIPS GRID ── */
+.tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.tip-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.tip-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
+.tip-icon{font-size:22px}
+.tip-title{font-size:14px;font-weight:700;color:var(--accent)}
+.tip-list{display:flex;flex-direction:column;gap:.5rem}
+.tip-item{display:flex;gap:9px;font-size:13px;line-height:1.6}
+.tip-bullet{flex-shrink:0;width:18px;height:18px;border-radius:50%;background:var(--accent-light);color:var(--accent);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+
+/* ── RUBRIC TABLE ── */
+.rubric-wrap{overflow-x:auto;margin-bottom:1.5rem}
+.rubric-table{width:100%;border-collapse:collapse;min-width:700px}
+.rubric-table th{padding:.6rem .85rem;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--accent);color:#fff;text-align:center}
+.rubric-table th:first-child{text-align:left;border-radius:8px 0 0 0}
+.rubric-table th:last-child{border-radius:0 8px 0 0}
+.rubric-table td{padding:.65rem .85rem;font-size:12px;line-height:1.55;border:1px solid #eaeef8;vertical-align:top}
+.rubric-table td:first-child{font-weight:600;color:var(--accent);background:var(--accent-light);width:130px}
+.rubric-table .rl-1{background:#FFFBFB;color:var(--red)}
+.rubric-table .rl-3{background:#FDF8F0;color:var(--amber)}
+.rubric-table .rl-4{background:#F0F8FF;color:#1F3A8C}
+.rubric-table .rl-5{background:#F0FAF5;color:var(--green)}
+
+/* ── CHECKLIST ── */
+.checklist-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.checklist-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.checklist-title{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:.85rem;display:flex;align-items:center;gap:7px}
+.check-item{display:flex;gap:9px;font-size:13px;line-height:1.6;margin-bottom:.5rem;cursor:pointer;user-select:none}
+.check-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);flex-shrink:0;margin-top:2px;cursor:pointer}
+.check-text{color:var(--text2)}
+
+/* ── SECTION TITLE ── */
+.sec-title{font-size:18px;font-weight:800;color:var(--accent);margin-bottom:.4rem;padding-bottom:.6rem;border-bottom:2px solid var(--accent-light)}
+.sec-sub{font-size:13px;color:var(--text3);margin-bottom:1.5rem;line-height:1.65}
+.divider{border:none;border-top:1px solid var(--border);margin:2rem 0}
+
+/* ── HIGHLIGHT BOX ── */
+.highlight-box{border-radius:var(--radius);padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;gap:12px}
+.hb-green{background:var(--green-light);border:1px solid rgba(11,94,62,.2)}
+.hb-amber{background:var(--amber-light);border:1px solid rgba(186,117,23,.2)}
+.hb-blue{background:var(--accent-light);border:1px solid rgba(31,58,140,.2)}
+.hb-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.hb-text{font-size:13px;line-height:1.65}
+.hb-title{font-weight:700;margin-bottom:.3rem}
+.hb-green .hb-title{color:var(--green)}.hb-amber .hb-title{color:var(--amber)}.hb-blue .hb-title{color:var(--accent)}
+
+@media(max-width:600px){
+  .insight-grid{grid-template-columns:1fr 1fr}
+  .tips-grid,.checklist-grid{grid-template-columns:1fr}
+  .pe-q-score{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="site-header">
+  <div class="header-badge">BAHAN PEMBELAJARAN JPM</div>
+  <div class="header-title">Panduan PE Berkualitas Tinggi</div>
+  <div class="header-sub">Analisis jawaban benchmark dengan skor JPM 92,5 — Sangat Sesuai Jabatan Madya (Level 4)</div>
+  <div class="score-showcase">
+    <div class="score-ring-box">
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        <circle cx="55" cy="55" r="44" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="10"></circle>
+        <circle cx="55" cy="55" r="44" fill="none" stroke="#4cff9f" stroke-width="10" stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="20.73" transform="rotate(-90 55 55)"></circle>
+        <text x="55" y="50" text-anchor="middle" font-size="22" font-weight="800" fill="#4cff9f">92.5</text>
+        <text x="55" y="68" text-anchor="middle" font-size="11" fill="rgba(255,255,255,.75)">JPM Score</text>
+      </svg>
+    </div>
+    <div class="score-facts">
+      <div class="fact-chip"><div class="fact-num">9/9</div><div class="fact-label">Kompetensi Dinilai</div></div>
+      <div class="fact-chip"><div class="fact-num">Level 4</div><div class="fact-label">Rata-rata Teridentifikasi</div></div>
+      <div class="fact-chip"><div class="fact-num">Sangat Sesuai</div><div class="fact-label">Kategori JPM</div></div>
+      <div class="fact-chip"><div class="fact-num">Administrator</div><div class="fact-label">Jenjang Dinilai</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <div class="nav-tab" onclick="showSection(&#39;overview&#39;)">📊 Ringkasan Skor</div>
+  <div class="nav-tab" onclick="showSection(&#39;analysis&#39;)">🔍 Analisis Per Soal</div>
+  <div class="nav-tab" onclick="showSection(&#39;compare&#39;)">⚖️ Kuat vs Lemah</div>
+  <div class="nav-tab" onclick="showSection(&#39;rubric&#39;)">📋 Rubrik Penilaian</div>
+  <div class="nav-tab" onclick="showSection(&#39;tips&#39;)">💡 Panduan Menulis</div>
+  <div class="nav-tab active" onclick="showSection(&#39;checklist&#39;)">✅ Self-Checklist</div>
+</div>
+
+<!-- ══════════════════ SECTION: OVERVIEW ══════════════════ -->
+<div class="container">
+<div id="section-overview" class="section">
+  <div class="sec-title">Kenapa Skor 92,5?</div>
+  <div class="sec-sub">Jawaban ini mencapai skor sangat tinggi karena memenuhi hampir semua kriteria behavioral evidence level 4. Berikut analisis terstrukturnya.</div>
+
+  <div class="insight-grid">
+    <div class="insight-card">
+      <div class="insight-num">9/9</div>
+      <div class="insight-label">Kompetensi terjawab</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:.4rem">Semua soal STAR dijawab dengan narasi yang relevan dan terfokus pada satu kompetensi</div>
+    </div>
+    <div class="insight-card green">
+      <div class="insight-num">7/9</div>
+      <div class="insight-label">Mencapai Level 4+</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:.4rem">7 kompetensi teridentifikasi pada level 4–5 berdasarkan indikator perilaku nyata yang spesifik</div>
+    </div>
+    <div class="insight-card amber">
+      <div class="insight-num">2/9</div>
+      <div class="insight-label">Level 3–3,5</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:.4rem">Kerjasama dan Perekat Bangsa memiliki potensi lebih tinggi namun bukti dampak sistemik kurang eksplisit</div>
+    </div>
+  </div>
+
+  <!-- Competency Score Bars -->
+  <div class="komp-score-wrap">
+    <div class="komp-score-title">Profil Kompetensi Teridentifikasi</div>
+    <div id="komp-bars-container"><div class="komp-row">
+      <span class="komp-name">Integritas</span>
+      <div class="komp-bar-outer"><div class="komp-bar-inner" style="width: 100%; background: rgb(76, 175, 125);" data-w="100"></div></div>
+      <span class="komp-score" style="color:#4caf7d">4/5</span>
+      <span class="level-label">L4 tuntutan · L4 aktual</span>
+    </div><div class="komp-row">
+      <span class="komp-name">Kerjasama</span>
+      <div class="komp-bar-outer"><div class="komp-bar-inner" style="width: 88%; background: rgb(127, 168, 255);" data-w="88"></div></div>
+      <span class="komp-score" style="color:#7fa8ff">3.5/5</span>
+      <span class="level-label">L4 tuntutan · L3.5 aktual</span>
+    </div><div class="komp-row">
+      <span class="komp-name">Komunikasi</span>
+      <div class="komp-bar-outer"><div class="komp-bar-inner" style="width: 100%; background: rgb(76, 175, 125);" data-w="100"></div></div>
+      <span class="komp-score" style="color:#4caf7d">4/5</span>
+      <span class="level-label">L4 tuntutan · L4 aktual</span>
+    </div><div class="komp-row">
+      <span class="komp-name">Orientasi pada Hasil</span>
+      <div class="komp-bar-outer"><div class="komp-bar-inner" style="width: 100%; background: rgb(76, 175, 125);" data-w="100"></div></div>
+      <span class="komp-score" style="color:#4caf7d">5/5</span>
+      <span class="level-label">L4 tuntutan · L5 aktual</span>
+    </div><div class="komp-row">
+      <span class="komp-name">Pelayanan Publik</span>
+      <div class="komp-bar-outer"><div class="komp-bar-inner" style="width: 100%; background: rgb(76, 175, 125);" data-w="100"></div></div>
+      <span class="komp-score" style="color:#4caf7d">4/5</span>
+      <span class="level-label">L4 tuntutan · L4 aktual</span>
+    </div><div class="komp-row">
+      <span class="komp-name">Pengembangan Diri dan Orang Lain</span>
+      <div class="komp-bar-outer"><div class="komp-bar-inner" style="width: 100%; background: rgb(76, 175, 125);" data-w="100"></div></div>
+      <span class="komp-score" style="color:#4caf7d">4/5</span>
+      <span class="level-label">L4 tuntutan · L4 aktual</span>
+    </div><div class="komp-row">
+      <span class="komp-name">Mengelola Perubahan</span>
+      <div class="komp-bar-outer"><div class="komp-bar-inner" style="width: 100%; background: rgb(76, 175, 125);" data-w="100"></div></div>
+      <span class="komp-score" style="color:#4caf7d">4/5</span>
+      <span class="level-label">L4 tuntutan · L4 aktual</span>
+    </div><div class="komp-row">
+      <span class="komp-name">Pengambilan Keputusan</span>
+      <div class="komp-bar-outer"><div class="komp-bar-inner" style="width: 100%; background: rgb(76, 175, 125);" data-w="100"></div></div>
+      <span class="komp-score" style="color:#4caf7d">4/5</span>
+      <span class="level-label">L4 tuntutan · L4 aktual</span>
+    </div><div class="komp-row">
+      <span class="komp-name">Perekat Bangsa</span>
+      <div class="komp-bar-outer"><div class="komp-bar-inner" style="width: 88%; background: rgb(127, 168, 255);" data-w="88"></div></div>
+      <span class="komp-score" style="color:#7fa8ff">3.5/5</span>
+      <span class="level-label">L4 tuntutan · L3.5 aktual</span>
+    </div></div>
+  </div>
+
+  <div class="highlight-box hb-green">
+    <div class="hb-icon">✅</div>
+    <div class="hb-text">
+      <div class="hb-title">Kekuatan Utama Jawaban Ini</div>
+      Setiap jawaban menggunakan <strong>pengalaman nyata, terverifikasi, dan bernama jelas</strong> (nama kegiatan, satker, tahun, angka). Peran personal digambarkan dengan tindakan konkret dan ada dampak yang <strong>terukur dan dapat dikonfirmasi</strong> (penghargaan nasional, sertifikasi ISO, rilis tercepat, target melampaui). Ini adalah standar behavioral evidence yang diterima asesor.
+    </div>
+  </div>
+
+  <div class="highlight-box hb-amber">
+    <div class="hb-icon">⚠️</div>
+    <div class="hb-text">
+      <div class="hb-title">Area yang Masih Bisa Ditingkatkan</div>
+      Beberapa jawaban, terutama pada komponen <strong>Kendala</strong>, masih bersifat deskriptif situasional dan belum cukup menggambarkan kompleksitas hambatan yang dihadapi secara personal. Skor bisa mendekati 100 jika setiap kendala dinarasikan sebagai tekanan nyata pada pengambil keputusan.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ SECTION: ANALYSIS ══════════════════ -->
+<div id="section-analysis" class="section">
+  <div class="sec-title">Analisis Per Soal STAR</div>
+  <div class="sec-sub">Klik setiap kartu untuk membaca jawaban lengkap beserta analisis kualitas masing-masing komponen STAR.</div>
+  <div id="pe-accordion-container"><div class="pe-question-card">
+      <div class="pe-q-header" onclick="toggleCard(this)">
+        <div class="pe-q-num">1</div>
+        <div class="pe-q-komp">Integritas</div>
+        <div class="pe-q-score">
+          <span class="pe-q-badge">Level 4 – Mengatasi Pelanggaran Etika Secara Sistemik</span>
+          <span class="pe-q-badge" style="background:rgba(255,255,255,.3)">Skor 4/5</span>
+        </div>
+        <div class="pe-q-chevron">▾</div>
+      </div>
+      <div class="pe-q-body">
+        <div class="q-text-box">Dalam Anda melaksanakan tugas pasti pernah mengalami situasi yang bertentangan dengan nilai, norma, dan etika organisasi. Ceritakan pengalaman terbaik Anda ketika berhasil menghadapi situasi tersebut!</div>
+        <div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-s">S</div>
+          <div class="star-block-title">Situasi</div>
+          <span class="star-quality-chip chip-good">Kuat</span>
+        </div>
+        <div class="star-answer">Ketika kegiatan penyusunan indeks kesulitan geografis (IKG) dimana BPS Kab. Bangka Barat melakukan kerja sama swakelola tipe 2 dengan Diskominfo Kab. Bangka Barat. Di kesepakatan awal akan diadakan konsultasi bersama ke BPS RI sebanyak 2 kali kegiatan yaitu di awal pelaksanaan kegiatan dan di akhir saat finalisasi angka IKG.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Kegiatan disebutkan spesifik: IKG, swakelola tipe 2 dengan Diskominfo</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Konteks perjanjian/kesepakatan yang mengikat dijelaskan dengan baik</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: tambahkan tahun pelaksanaan untuk lebih terverifikasi</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-k">K</div>
+          <div class="star-block-title">Kendala yang Dihadapi</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Proses pengelolaan anggaran oleh Diskominfo Kab. Bangka Barat kurang terbuka. Tatkala Kepala BPS Kab. Bangka Barat mengetahui bahwa anggaran konsultasi kedua telah digunakan oleh Diskominfo Kab. Babar beliau marah dan menginstruksikan saya untuk tidak menyerahkan angka IKG hasil perhitungan. Tentu hal ini bertentangan dengan kesepakatan di perjanjian bahwa BPS Babar bertanggung jawab menyerahkan hasil perhitungan angka IKG.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Tekanan dari atasan langsung disebutkan eksplisit ('beliau marah dan menginstruksikan saya')</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Dilemma etis sangat jelas: loyalitas kepada pimpinan vs kewajiban perjanjian</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Ini adalah kendala integritas yang sesungguhnya — bukan hambatan teknis biasa</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-p">P</div>
+          <div class="star-block-title">Peran Saya</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Peran saya sangat penting, saya dipercaya pimpinan menjadi ketua pelaksana kegiatan, sehingga tindakan yang saya lakukan adalah melakukan pendekatan persuasif ke Kepala BPS Babar dan tim Diskominfo Babar agar mematuhi kesepakatan yang telah dibuat. Kepada Kepala BPS Babar saya mengingatkan bahwa tanggung jawab BPS adalah menyerahkan data IKG, sehingga bila tidak diserahkan berarti telah melalaikan tanggung jawabnya. Kepada tim Diskominfo saya menyampaikan bahwa kesepatakan berupa kebijakan harusnya dijalankan dan bila tidak dapat dipenuhi harus ada komunikasi terbuka sehingga kejadian ini tidak berulang di waktu yang akan datang.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Tindakan dua arah: kepada pimpinan DAN kepada mitra eksternal</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Argumen berbasis nilai dan kewajiban — bukan sekadar negosiasi</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Menyertakan langkah preventif agar tidak terulang — indikator L4</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-h">H</div>
+          <div class="star-block-title">Hasil</div>
+          <span class="star-quality-chip chip-ok">Cukup</span>
+        </div>
+        <div class="star-answer">Alhamdulillah situasi konflik yang sempat membuat hubungan BPS dan Diskominfo merenggang dapat diselesaikan dan hubungan kembali menjadi baik dan harmonis.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Hasil positif namun kurang terukur — tidak ada indikator konkret</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: tambahkan 'angka IKG akhirnya berhasil diserahkan dan menjadi dasar kebijakan [nama kebijakan]'</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Perlu ada dampak yang bisa diverifikasi secara formal</div></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div><div class="pe-question-card">
+      <div class="pe-q-header" onclick="toggleCard(this)">
+        <div class="pe-q-num">2</div>
+        <div class="pe-q-komp">Kerjasama</div>
+        <div class="pe-q-score">
+          <span class="pe-q-badge">Level 3–4 – Sinergi Tim Lintas Instansi</span>
+          <span class="pe-q-badge" style="background:rgba(255,255,255,.3)">Skor 3.5/5</span>
+        </div>
+        <div class="pe-q-chevron">▾</div>
+      </div>
+      <div class="pe-q-body">
+        <div class="q-text-box">Sepanjang perjalanan karir Anda pasti pernah bekerja sama dalam sebuah tim. Ceritakan pengalaman terbaik Anda ketika berhasil bekerja sama dalam tim untuk menyelesaikan suatu tugas pekerjaan!</div>
+        <div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-s">S</div>
+          <div class="star-block-title">Situasi</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Tanggal 10 Mei 2024 saya dihubungi oleh Biro Humas BPS RI menginformasikan bahwa saya terpilih sebagai salah satu petugas Survei Kepuasan Jamaah Haji Indonesia (SKJHI). Saya terpilih melalui jalur prestasi. Tim SKJHI terdiri dari 6 orang, dimana 5 orang lainnya berasal dari BPS RI.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Tanggal spesifik (10 Mei 2024) — dapat diverifikasi</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Jalur seleksi disebutkan: prestasi sebagai Insan Statistik Teladan Nasional</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Komposisi tim jelas: 6 orang, 5 dari BPS RI — konteks lintas hierarki</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-k">K</div>
+          <div class="star-block-title">Kendala yang Dihadapi</div>
+          <span class="star-quality-chip chip-good">Kuat</span>
+        </div>
+        <div class="star-answer">Waktu persiapan pemberangkatan dan pendalaman materi SKJHI sangat singkat, tersisa hanya 8 hari, dimana perlu persiapan tim dan individu. Selain itu jadwal keberangkatan sudah lewat 10 hari dari jadwal pelaksanaan survei dari tahun-tahun sebelumnya. Komposisi tim baru terbentuk dan belum mengenal satu dengan yang lain.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Tekanan waktu dikuantifikasi: '8 hari', 'mundur 10 hari dari jadwal normal'</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Tim baru = tantangan interpersonal yang nyata</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: tambahkan tekanan dari ekspektasi BPS RI sebagai instansi yang mengirim</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-p">P</div>
+          <div class="star-block-title">Peran Saya</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Saya terpilih sebagai petugas SKJHI dari jalur prestasi sebagai Insan Statistik Teladan Nasional dan Change Champion terbaik 3 Nasional. Saya langsung berinisiatif untuk membangun sinergi di internal (antar anggota tim dan petugas senior) dan eksternal (tim kemenag). Selanjutnya saya dipercaya menjadi public relationship oleh ketua tim, untuk semakin memantapkan sinergi dengan stakeholder eksternal seperti Tim Kemenag, Jurnalis, TNI dan Polri. Terobosan yang saya lakukan yang belum pernah ada dalam pelaksanaan SKJHI sebelum-sebelumnya yaitu memfasilitasi mobil antar-jemput untuk petugas SKJHI yang berada di Madinah dan penyediaan konsumsi makan siang di kantor sektor-sektor Madinah.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Inovasi yang belum pernah ada disebutkan eksplisit — sangat kuat</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Peran dipercaya oleh ketua tim sebagai PR menunjukkan kepercayaan kelompok</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Jangkauan sinergi luas: internal, Kemenag, jurnalis, TNI/Polri</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-h">H</div>
+          <div class="star-block-title">Hasil</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Alhamdulillah pelaksanaan SKJHI berjalan lancar dan sukses, rilis publikasi dapat diselesaikan 1 bulan pasca kedatangan di tanah air. Hal ini menjadi rilis tercepat dalam pelaksanaak SKJHI yang telah berlangsung sejak tahun 2010.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">'Rilis tercepat sejak 2010' — benchmark historis yang sangat kuat</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Timeline spesifik: 1 bulan pasca kedatangan</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Dapat diverifikasi oleh asesor melalui arsip BPS</div></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div><div class="pe-question-card">
+      <div class="pe-q-header" onclick="toggleCard(this)">
+        <div class="pe-q-num">3</div>
+        <div class="pe-q-komp">Komunikasi</div>
+        <div class="pe-q-score">
+          <span class="pe-q-badge">Level 4 – Menggalang Pandangan Positif dari Berbagai Pihak</span>
+          <span class="pe-q-badge" style="background:rgba(255,255,255,.3)">Skor 4/5</span>
+        </div>
+        <div class="pe-q-chevron">▾</div>
+      </div>
+      <div class="pe-q-body">
+        <div class="q-text-box">Ceritakan pengalaman terbaik Anda ketika berhasil dalam tugas pekerjaan yang menuntut kemampuan untuk berkomunikasi dengan orang lain!</div>
+        <div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-s">S</div>
+          <div class="star-block-title">Situasi</div>
+          <span class="star-quality-chip chip-good">Kuat</span>
+        </div>
+        <div class="star-answer">Kegiatan pemantauan dan evaluasi kegiatan penyelenggaraan pelayanan publik (PEKPPP) tahun 2023 yang dilaksanakan pada bulan Februari-Mei.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Nama kegiatan resmi disebutkan: PEKPPP</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Periode waktu spesifik: Februari-Mei 2023</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: jelaskan sedikit lebih lanjut bobot/implikasi penilaian PEKPPP ini</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-k">K</div>
+          <div class="star-block-title">Kendala yang Dihadapi</div>
+          <span class="star-quality-chip chip-ok">Cukup</span>
+        </div>
+        <div class="star-answer">Selama ini pelaksanaan PEKPPP di BPS Provinsi Kep. Babel dibebankan pada penanggung jawab PST dan tim IPDS. Terbatasnya sumber daya manusia dan infrastruktur dimana PEKPPP ini aspek yang dinilai tidak hanya dalam ruang lingkup PST namun mencakup seluruh perkantoran.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Kendala SDM dan infrastruktur tergambar tapi masih bisa lebih spesifik</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: berapa banyak staf yang tersedia vs yang dibutuhkan?</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: sebutkan konsekuensi jika PEKPPP tidak berhasil</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-p">P</div>
+          <div class="star-block-title">Peran Saya</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Sebagai anggota tim IPDS dan ketua tim RB, saya mengusulkan gagasan ke pimpinan agar dibentuk tim adhoc yang bertugas khusus melengkapi bukti dukung pada LKE PEKPPP. Pimpinan setuju dan memercayakan saya sebagai ketua tim pelaksana. Saya bertanggung jawab agar kegiatan ini diselesaikan dengan baik, tepat dan cepat. Untuk dapat menyelesaikan pekerjaan ini saya merancang strategi dengan mengintegrasikan informasi-informasi dari berbagai pihak ke dalam konsep yang dibuat dalam paparan. Langkah berikutnya saya membentuk tim yang disesuaikan dengan aspek-aspek dalam LKE. Saya memilih orang-orang yang kompeten dan mengutamakan yang beririsan pekerjaan rutin dengan aspek dalam LKE.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Inisiatif tinggi: mengusulkan gagasan pembentukan tim adhoc</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Kepercayaan diberikan dari atas: 'pimpinan setuju dan memercayakan saya'</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Strategi integrasi informasi menunjukkan kompetensi komunikasi L4</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-h">H</div>
+          <div class="star-block-title">Hasil</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Hasil penilaian mandiri PEKPPP oleh BPS RI, BPS Babel berhasil masuk 10 besar dengan kategori indeks pelayanan publik berkategori sangat baik, dan berkesampatan tahun berikutnya ikut sertifikasi ISO 9001:2015.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Masuk 10 besar nasional — terukur dan terverifikasi</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Dampak jangka panjang: diikutsertakan sertifikasi ISO 9001:2015</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Kausalitas antara tindakan dan hasil sangat jelas</div></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div><div class="pe-question-card">
+      <div class="pe-q-header" onclick="toggleCard(this)">
+        <div class="pe-q-num">4</div>
+        <div class="pe-q-komp">Orientasi pada Hasil</div>
+        <div class="pe-q-score">
+          <span class="pe-q-badge">Level 5 – Mendorong Melampaui Target, Penghargaan Nasional</span>
+          <span class="pe-q-badge" style="background:rgba(255,255,255,.3)">Skor 5/5</span>
+        </div>
+        <div class="pe-q-chevron">▾</div>
+      </div>
+      <div class="pe-q-body">
+        <div class="q-text-box">Ceritakan pengalaman Anda ketika berhasil menyelesaikan tugas dalam situasi yang sulit dengan tetap berpegang pada kualitas hasil dan target kerja!</div>
+        <div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-s">S</div>
+          <div class="star-block-title">Situasi</div>
+          <span class="star-quality-chip chip-good">Kuat</span>
+        </div>
+        <div class="star-answer">Pengumpulan bukti dukung lembar kerja pembangunan (LKE) pembangunan zona integritas (ZI) BPS se-Provinsi Kepulauan Babel.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Kegiatan ZI skala provinsi — cakupan lebih luas dari unit sendiri</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">LKE ZI adalah dokumen formal yang hasilnya diverifikasi KemenPAN-RB</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Konteks nasional memberi bobot tinggi pada pencapaian ini</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-k">K</div>
+          <div class="star-block-title">Kendala yang Dihadapi</div>
+          <span class="star-quality-chip chip-good">Kuat</span>
+        </div>
+        <div class="star-answer">Waktu yang terbatas (deadline penyelesaian yang semakin dekat) sementara kegiatan rutin di tiap tim kerja sedang padat-padatnya, dan saat di penghujung deadline saya harus mengikuti kegiatan workshop change management di Jakarta</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Multi-tasking pressure yang nyata: deadline ZI + workshop di Jakarta</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Tekanan ganda pada waktu paling kritis diungkap dengan baik</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: sebutkan berapa banyak satker yang harus dikoordinasi</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-p">P</div>
+          <div class="star-block-title">Peran Saya</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Peran saya saat itu sebagai ketua Tim Pembangunan ZI dan Reformasi Birokrasi. Saya bertanggung jawab agar pekerjaan ini dapat selesai dengan tepat, cermat dan optimal. Untuk dapat menyelesaikan pekerjaan ini dengan baik saya membentuk tim sekretariat dan tim inti di tiap pilar. Dalam setiap pilar saya menempatkan orang-orang yang kompeten dan berpengalaman dalam pembangunan ZI.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Struktur tim yang rinci: sekretariat + tim inti per pilar</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Pemilihan orang kompeten menunjukkan strategic deployment of talent</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Monitoring rutin + turun langsung = kepemimpinan yang turun ke lapangan</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-h">H</div>
+          <div class="star-block-title">Hasil</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">4 satker yaitu BPS Provinsi Babel diusulkan WBBM dan 3 satker BPS Kab/Kota diusulkan ke WBK Kemenpan RB. Hal ini melampai target yang ditetapkan dimana target awal 3 satker yang akan diusulkan, realisasinya 4 satker. Selain itu BPS Prov. Babel juga mendapat penghargaan dari BPS RI sebagai terbaik pertama satker dengan proporsi terbesar pengulusan WBK/WBBM ke Kemenpan RB.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Melampaui target dengan angka jelas: 3→4 satker (133% dari target)</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Penghargaan terbaik pertama nasional dari BPS RI — evidence L5</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Dua level pencapaian: kuantitas (4 satker) + kualitas (penghargaan)</div></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div><div class="pe-question-card">
+      <div class="pe-q-header" onclick="toggleCard(this)">
+        <div class="pe-q-num">5</div>
+        <div class="pe-q-komp">Pelayanan Publik</div>
+        <div class="pe-q-score">
+          <span class="pe-q-badge">Level 4 – Mendorong Perubahan Sistemik Layanan</span>
+          <span class="pe-q-badge" style="background:rgba(255,255,255,.3)">Skor 4/5</span>
+        </div>
+        <div class="pe-q-chevron">▾</div>
+      </div>
+      <div class="pe-q-body">
+        <div class="q-text-box">Ceritakan pengalaman Anda ketika berhasil memberikan pelayanan yang berhubungan dengan tugas Anda sehari-hari.</div>
+        <div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-s">S</div>
+          <div class="star-block-title">Situasi</div>
+          <span class="star-quality-chip chip-ok">Cukup</span>
+        </div>
+        <div class="star-answer">Indeks pelayanan publik BPS Prov. Babel belum berkategori pelayanan prima. Proses pelayanan di PST belum terdigitalisasi secara menyeluruh.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Situasi berbasis gap yang jelas: belum kategori prima</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: tambahkan konteks skor indeks awal vs target yang ingin dicapai</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: sebutkan tahun baseline dan tahun target</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-k">K</div>
+          <div class="star-block-title">Kendala yang Dihadapi</div>
+          <span class="star-quality-chip chip-ok">Cukup</span>
+        </div>
+        <div class="star-answer">Belum optimalnya pengelolaan pelayanan statistik terpadu baik dari sisi SDM maupun infrastruktur.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Kendala valid tapi agak umum</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: jelaskan lebih spesifik hambatan SDM-nya apa, infrastruktur-nya apa</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: berapa banyak pengunjung yang tidak terlayani optimal?</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-p">P</div>
+          <div class="star-block-title">Peran Saya</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Sebagai change champion dan ketua tim manajemen perubahan, saya menginisiasi program manajemen perubahan PST Make Over dengan tujuan mengoptimalkan nilai indeks pelayanan publik BPS Babel menjadi kategori pelayanan prima. Sasaran dari PST Make Over adalah optimalisasi SOP service excellence, transformasi ruang PST (PST digital), dan penyediaan aplikasi chat bot PST Mobile.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Program bernama resmi: 'PST Make Over' — dapat diverifikasi</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Tiga sasaran terstruktur: SOP + ruang PST digital + aplikasi chatbot</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Inisiatif sistemik: mengubah sistem, bukan hanya perilaku individu</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-h">H</div>
+          <div class="star-block-title">Hasil</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Indeks pelayanan publik BPS Prov. Babel meningkat signifikan menjadi berkategori pelayanan prima. BPS Babel selanjutnya berhasil meraih sertifikasi ISO 9001:2015 untuk pelayanan publik standar internasional.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Dua pencapaian terverifikasi: kategori prima + ISO 9001:2015</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">ISO 9001:2015 adalah sertifikasi standar internasional yang sangat kuat</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: tambahkan angka indeks sebelum vs sesudah untuk dampak lebih terukur</div></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div><div class="pe-question-card">
+      <div class="pe-q-header" onclick="toggleCard(this)">
+        <div class="pe-q-num">6</div>
+        <div class="pe-q-komp">Pengembangan Diri dan Orang Lain</div>
+        <div class="pe-q-score">
+          <span class="pe-q-badge">Level 4 – Mentor dan Kaderisasi Efektif</span>
+          <span class="pe-q-badge" style="background:rgba(255,255,255,.3)">Skor 4/5</span>
+        </div>
+        <div class="pe-q-chevron">▾</div>
+      </div>
+      <div class="pe-q-body">
+        <div class="q-text-box">Ceritakan pengalaman Anda ketika berhasil melakukan pengembangan diri dan juga orang lain yang terkait dengan pekerjaan Anda.</div>
+        <div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-s">S</div>
+          <div class="star-block-title">Situasi</div>
+          <span class="star-quality-chip chip-good">Kuat</span>
+        </div>
+        <div class="star-answer">Awal tahun 2023 saya dipercaya menjadi change champion dan ketua tim manajemen perubahan. Ada 3 program intervensi nasional dan 7 program intervensi khusus yang harus dijalankan dengan baik dan optimal.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Peran ganda yang kompleks disebutkan: CC + ketua tim RB</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">10 program = beban kerja yang signifikan, konteks yang bagus</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: sebutkan satu atau dua program yang paling strategis sebagai fokus</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-k">K</div>
+          <div class="star-block-title">Kendala yang Dihadapi</div>
+          <span class="star-quality-chip chip-good">Kuat</span>
+        </div>
+        <div class="star-answer">Di tahun yang sama, saya dipercaya menjadi ketua tim reformasi birokrasi dan pembangunan zona integritas, selain itu juga masih menjadi kontributor utama dalam tim pengolahan dan pengembangan aplikasi. Sehingga dibutuhkan efektivitas dan pembagian kerja yang baik agar seluruh tanggung jawab pekerjaan dapat diselesaikan dengan baik.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Konflik sumber daya personal: tiga tanggung jawab besar sekaligus</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">'Kontributor utama' menunjukkan bukan peran pinggiran</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: jelaskan mana yang paling berat dan bagaimana dampaknya</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-p">P</div>
+          <div class="star-block-title">Peran Saya</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Saya sebagai change champion (CC) bertanggung jawab terhadap semua program manajemen perubahan berjalan baik, lancar dan optimal. Langkah awal yang saya lakukan dengan merekrut 8 orang pegawai lainnya untuk menjadi change ambassador (CA) yang tergabung dalam tim pengelola manajemen perubahan. Melalui pendekatan persuasif saya berupaya mengoptimalkan peran masing-masing CA sebagai PJ dari program manajemen perubahan. Bersama-sama para CA, dilakukan rapat untuk merancang detail kegiatan dari masing-masing program. Saya melakukan monitoring dan evaluasi berkala termasuk mengumpulkan feedback dari program yang sudah berjalan. Saya juga terus melakukan pengembangan diri dengan banyak membaca buku softskills dan leadership serta mengikuti pelatihan-pelatihan yang ada di warkop pusdiklat maupun di luar kantor. Selanjutnya pengetahuan-pengetahuan tersebut saya bagikan kepada para CA secara informal maupun formal dalam rapat atau kegiatan pembinaan. Melalui knowledge sharing dan coaching saya berupaya melakukan kaderisasi agar salah satu CA dapat menjadi CC selanjutnya.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Kaderisasi eksplisit: 'agar salah satu CA dapat menjadi CC selanjutnya' — tanda L4+</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Knowledge sharing formal + informal = pendekatan mentor yang menyeluruh</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Pengembangan diri sendiri: membaca buku, pelatihan, lalu disebarkan ke CA</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-h">H</div>
+          <div class="star-block-title">Hasil</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Alhamdulillah semua program manajemen perubahan dapat terlaksana dengan baik dan lancar. BPS Babel berhasil meraih penghargaan sebagai satker Terbaik 3 dalam pengelolaan program manajemen perubahan. Saya berhasil menjadi CC terbaik 3 nasional dan salah satu CA dapat menjadi CC di tahun berikutnya.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Tiga lapisan hasil: organisasi (terbaik 3) + diri (CC terbaik 3) + orang lain (CA jadi CC)</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Kaderisasi berhasil terbukti: CA menjadi CC — dampak pengembangan orang lain terverifikasi</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Ini adalah evidence terkuat kompetensi Pengembangan Diri dan Orang Lain L4</div></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div><div class="pe-question-card">
+      <div class="pe-q-header" onclick="toggleCard(this)">
+        <div class="pe-q-num">7</div>
+        <div class="pe-q-komp">Mengelola Perubahan</div>
+        <div class="pe-q-score">
+          <span class="pe-q-badge">Level 4 – Memimpin Transformasi Digital pada Unit Kerja</span>
+          <span class="pe-q-badge" style="background:rgba(255,255,255,.3)">Skor 4/5</span>
+        </div>
+        <div class="pe-q-chevron">▾</div>
+      </div>
+      <div class="pe-q-body">
+        <div class="q-text-box">Ceritakan pengalaman keberhasilan Anda ketika dihadapkan pada situasi yang menuntut Anda untuk berubah dengan cepat.</div>
+        <div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-s">S</div>
+          <div class="star-block-title">Situasi</div>
+          <span class="star-quality-chip chip-good">Kuat</span>
+        </div>
+        <div class="star-answer">Dalam pengelolaan keuangan dan kinerja, BPS Prov. Babel belum terdigitalisasi sepenuhnya. Masih terdapat proses yang dilakukan secara konvensional dan paper base. Sehingga masih ditemukan kesalahan dalam format tercetak seperti penjumlahan, tanggal, tahun dan judul. BPS RI merilis aplikasi backoffice untuk pengelolaan anggaran dan aplikasi keepAp untuk pengelolaan kinerja.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Gap yang jelas: proses konvensional vs tuntutan digitalisasi</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Contoh konkret masalah paper-based: kesalahan penjumlahan, tanggal, tahun</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Inisiasi dari BPS RI memberikan konteks kebijakan yang mengikat</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-k">K</div>
+          <div class="star-block-title">Kendala yang Dihadapi</div>
+          <span class="star-quality-chip chip-good">Kuat</span>
+        </div>
+        <div class="star-answer">Aplikasi ini merupakan aplikasi baru sehingga mayoritas pegawai belum familiar. Pada saat implementasinya, terjadi resistensi dikalangan pegawai karena merasa sudah nyaman dengan metode lama. Pegawai merasa terbebani dan mempersulit pekerjaan berkaitan dengan keuangan dan kinerja.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Resistensi dikuantifikasikan: 'mayoritas pegawai' belum familiar</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Psikologi resistensi digambarkan dengan baik: nyaman dengan yang lama</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: sebutkan berapa persen pegawai yang awalnya menolak</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-p">P</div>
+          <div class="star-block-title">Peran Saya</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Sebagai admin SPBE di BPS Provinsi, saya bertanggung jawab agar proses transformasi digital dalam pengelolaan keuangan dan kinerja dapat berjalan baik dan tepat. Sebagai langkah awal, saya mengadakan sosialisasi terkait manfaat jangka pendek, menengah dan panjang dari implementasi backoffice dan kippAp. Setelah seluruh pegawai terinfokan dengan baik, saya membuat knowledge sharing dan briefing penggunaan aplikasi. Selanjutnya, melakukan asistensi kepada pegawai yang masih menemukan kendala dalam penggunaannya. Saya tak sungkan untuk turun langsung mengajari penggunaan aplikasi bagi pegawai yang melapor mengalami kesulitan.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Strategi tiga tahap: sosialisasi manfaat → knowledge sharing → asistensi langsung</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Manfaat jangka pendek-menengah-panjang: menunjukkan komunikasi perubahan yang matang</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Turun langsung: menghilangkan jarak pemimpin-staf dalam transformasi</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-h">H</div>
+          <div class="star-block-title">Hasil</div>
+          <span class="star-quality-chip chip-ok">Cukup</span>
+        </div>
+        <div class="star-answer">Implementasi backoffice dan kipApp berjalan baik sesuai jadwal, diterima oleh semua pegawai, dan pegawai dapat merasakan manfaat signifikan dari penerapan aplikasi-aplikasi tersebut.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Hasil positif namun bisa lebih terukur</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: sebutkan berapa % efisiensi, atau berapa error yang berkurang</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: ada pengakuan dari BPS RI atau satker lain atas implementasinya?</div></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div><div class="pe-question-card">
+      <div class="pe-q-header" onclick="toggleCard(this)">
+        <div class="pe-q-num">8</div>
+        <div class="pe-q-komp">Pengambilan Keputusan</div>
+        <div class="pe-q-score">
+          <span class="pe-q-badge">Level 4 – Keputusan Berisiko Tinggi dalam Tekanan Waktu</span>
+          <span class="pe-q-badge" style="background:rgba(255,255,255,.3)">Skor 4/5</span>
+        </div>
+        <div class="pe-q-chevron">▾</div>
+      </div>
+      <div class="pe-q-body">
+        <div class="q-text-box">Ceritakan pengalaman keberhasilan Anda ketika menghadapi situasi yang menyebabkan Anda harus mengambil keputusan diantara banyak pilihan situasi yang sulit.</div>
+        <div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-s">S</div>
+          <div class="star-block-title">Situasi</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Akhir tahun 2022 BPS dihadapkan dengan tantangan pekerjaan baru yaitu kegiatan pendataan registrasi sosial ekonomi (regsosek). Kegiatan ini merupakan pemutakhiran rumah tangga untuk mengetahui strata rumah tangga dari tingkat kemiskinannya. Kegiatan ini mendata seluruh rumah tangga sehingga persis dengan kegiatan sensus penduduk. Proses pendataan menggunakan kertas sehingga pengolahan data menggunakan data entri. Durasi pengolahannya hanya 1 bulan.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Konteks nasional besar: Regsosek skala sensus, akhir tahun 2022</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Kompleksitas teknis dijelaskan: paper-based, data entri, 1 bulan saja</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Bandingkan dengan sensus untuk memberikan gambaran skala tantangan</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-k">K</div>
+          <div class="star-block-title">Kendala yang Dihadapi</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Proses pengolahan data dengan data entri memerlukan kesiapan baik infrastruktur dan ketersediaan operator entri yang mumpuni. Kegiatan yang baru muncul di akhir tahun dengan skala seperti sensus tentu menjadi tantangan tersendiri. Banyak PC olah di BPS Kab/Kota yang sudah rusak. Perekrutan mitra entri dengan waktu yang singkat sulit dipenuhi khususnya di wilayah jauh dari perkotaan.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Multi-dimensi kendala: infrastruktur rusak + SDM mitra + waktu singkat + geografi</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Masalah konkret disebutkan: PC rusak, mitra entri langka di daerah terpencil</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Konteks akhir tahun menambah tekanan: anggaran tahunan akan habis</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-p">P</div>
+          <div class="star-block-title">Peran Saya</div>
+          <span class="star-quality-chip chip-excellent">Sangat Kuat</span>
+        </div>
+        <div class="star-answer">Saya sebagai PJ teknis pengolahan yang juga Innas Pengolahan Regsosek harus bertindak cepat dan tepat karena durasi pengolahan yang cukup singkat. Saya langsung menginventarisir kebutuhan infrastruktur, infrastruktur existing, ketersediaan mitra entri dan mitigasi risiko pengolahan guna sebagai bahan strategi pengolahan. Dari inventarisir dan mitigasi risiko tersebut, beberapa kab/kota tidak memungkinkan untuk dilakukan pengolahan di kab/kota masing-masing secara tepat waktu. Oleh karena itu dari beberapa alternatif solusi yang telah didiskusikan bersama tim pengolahan provinsi, saya mengambil keputusan beban pengolahan dipindahkan sebagian ke BPS Provinsi.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Analisis berbasis data: inventarisir infrastruktur + mitigasi risiko sebelum memutuskan</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Keputusan berani: sentralisasi sebagian pengolahan ke provinsi — solusi non-konvensional</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">'Didiskusikan bersama tim' tapi 'saya mengambil keputusan' — kepemimpinan yang akuntabel</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-h">H</div>
+          <div class="star-block-title">Hasil</div>
+          <span class="star-quality-chip chip-good">Kuat</span>
+        </div>
+        <div class="star-answer">Kegiatan pengolahan regsosek dapat diselesaikan sebelum deadline yang telah ditetapkan sehingga masih bisa dilakukan pengecekan kewajaran isian hasil entri untuk meningkatkan kualitas hasil pengolahan.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Selesai sebelum deadline — ini adalah baseline keberhasilan</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Tambahan nilai: ada quality control pasca-entri yang meningkatkan kualitas data</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: sebutkan berapa satker yang dipindahkan dan seberapa signifikan dampaknya</div></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div><div class="pe-question-card">
+      <div class="pe-q-header" onclick="toggleCard(this)">
+        <div class="pe-q-num">9</div>
+        <div class="pe-q-komp">Perekat Bangsa</div>
+        <div class="pe-q-score">
+          <span class="pe-q-badge">Level 3–4 – Adaptasi Lintas Budaya dengan Dampak Kerja</span>
+          <span class="pe-q-badge" style="background:rgba(255,255,255,.3)">Skor 3.5/5</span>
+        </div>
+        <div class="pe-q-chevron">▾</div>
+      </div>
+      <div class="pe-q-body">
+        <div class="q-text-box">Ceritakan pengalaman keberhasilan Anda dalam membina hubungan yang harmonis ketika bekerja dengan kolega dengan keberagaman tersebut!</div>
+        <div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-s">S</div>
+          <div class="star-block-title">Situasi</div>
+          <span class="star-quality-chip chip-good">Kuat</span>
+        </div>
+        <div class="star-answer">Penempatan tugas pertama saya setelah lulus kuliah di BPS Kabupaten Maluku Tengah, Provinsi Maluku. Tidak pernah terbayang akan dapat penempatan langsung di daerah wilayah timur Indonesia, dengan keragaman etnis, suku dan agama.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Konteks keberagaman nyata: Maluku pasca-kerusuhan SARA</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Latar belakang lintas budaya ekstrem: Jawa ke Maluku Timur</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: sebutkan tahun masuk lebih spesifik dan kondisi pasca-konflik yang relevan</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-k">K</div>
+          <div class="star-block-title">Kendala yang Dihadapi</div>
+          <span class="star-quality-chip chip-good">Kuat</span>
+        </div>
+        <div class="star-answer">Salah satu kendala yang saya hadapi saat pertama kali tiba di Kabupaten Maluku Tengah pada Februari 2010 adalah kendala bahasa, kemudian kultur masyarakatnya yang terkotak-kotak sebagai dampak sisa-sisa kerusuhan umat beragama. Selain itu kondisi daerah yang sepi, sangat jarang angkutan umum, angkutan umum kebanyakan ojek motor dan becak kayuh.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Tahun spesifik: Februari 2010 — dapat diverifikasi</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Hambatan multi-dimensional: bahasa + budaya terkotak + isolasi geografis</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Konteks sisa kerusuhan memberi bobot kompetensi Perekat Bangsa yang tinggi</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-p">P</div>
+          <div class="star-block-title">Peran Saya</div>
+          <span class="star-quality-chip chip-good">Kuat</span>
+        </div>
+        <div class="star-answer">Saya sebagai pendatang baru tentunya harus mampu menempatkan diri dan melakukan adaptasi cepat kepada rekan-rekan kantor dan lingkungan sekitar. Strategi yang saya lakukan adalah sering mengajak berkomunikasi baik rekan-rekan maupun tetangga rumah agar proses pembelajaran bahasa daerah lebih cepat saya kuasai. Mendengarkan, memerhatikan, dan mempraktekkan bahasa daerah Maluku serta tidak segan bertanya kepada lawan bicara bila ada kata yang tidak saya mengerti sehingga semakin menambah kosakata yang saya hapal.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Strategi aktif: sering mengajak komunikasi, tidak segan bertanya</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Pendekatan empatik dan rendah hati terhadap perbedaan budaya</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: tambahkan tindakan yang lebih strategis untuk membangun jembatan antar kelompok</div></div>
+          </div>
+        </div>
+      </div><div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter sl-h">H</div>
+          <div class="star-block-title">Hasil</div>
+          <span class="star-quality-chip chip-ok">Cukup</span>
+        </div>
+        <div class="star-answer">Dengan semakin lancarnya saya berbahasa daerah Maluku semakin menambah keakraban dan keharmonisan dengan sesama rekan kantor dan tetangga sekitar rumah. Komunikasi yang lancar ini berkorelasi pada peningkatan kerja sama diantara kami. Saya berhasil membina hubungan yang baik dengan semua rekan kerja baik pegawai organik maupun mitra sehingga memudahkan saya dalam mengemban tugas di sana.</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            <div class="analysis-item"><div class="aitem-dot dot-green"></div><div class="aitem-text">Hasil personal cukup baik: hubungan harmonis, kerja sama meningkat</div></div><div class="analysis-item"><div class="aitem-dot dot-blue"></div><div class="aitem-text">Namun kurang dampak sistemik atau pencapaian terverifikasi</div></div><div class="analysis-item"><div class="aitem-dot dot-amber"></div><div class="aitem-text">Saran: sebutkan pencapaian tugas konkret yang dimungkinkan oleh harmoni ini (misalnya coverage survei, penerimaan masyarakat)</div></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div></div>
+</div>
+
+<!-- ══════════════════ SECTION: COMPARE ══════════════════ -->
+<div id="section-compare" class="section">
+  <div class="sec-title">Jawaban Kuat vs Lemah — Contoh Perbandingan</div>
+  <div class="sec-sub">Perbandingan ini menunjukkan secara konkret perbedaan kualitas jawaban yang menghasilkan skor berbeda.</div>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Komponen</th>
+        <th class="th-strong">✅ Jawaban Kuat (skor ini)</th>
+        <th class="th-weak">⚠️ Jawaban Umum/Lemah</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Situasi</td>
+        <td class="td-strong"><span class="td-tag tag-g">Spesifik</span><br>
+          "Kegiatan SKJHI, terpilih 10 Mei 2024 melalui jalur prestasi sebagai Insan Statistik Teladan Nasional, tim 6 orang, berangkat 10 hari lebih lambat dari jadwal"
+        </td>
+        <td class="td-weak"><span class="td-tag tag-r">Generik</span><br>
+          "Saya pernah bertugas dalam kegiatan survei yang memerlukan kerja sama tim yang solid"
+        </td>
+      </tr>
+      <tr>
+        <td>Kendala</td>
+        <td class="td-strong"><span class="td-tag tag-g">Tekanan nyata</span><br>
+          "Waktu persiapan hanya 8 hari, tim baru belum saling kenal, jadwal sudah mundur 10 hari"
+        </td>
+        <td class="td-weak"><span class="td-tag tag-r">Terlalu umum</span><br>
+          "Hambatannya adalah koordinasi dan komunikasi yang kurang baik antar anggota tim"
+        </td>
+      </tr>
+      <tr>
+        <td>Peran</td>
+        <td class="td-strong"><span class="td-tag tag-g">Tindakan konkret</span><br>
+          "Saya langsung berinisiatif membangun sinergi internal dan eksternal, dipercaya sebagai public relationship, memfasilitasi mobil antar-jemput <em>(terobosan baru yang belum pernah ada)</em>, memotivasi tim"
+        </td>
+        <td class="td-weak"><span class="td-tag tag-r">Pasif/umum</span><br>
+          "Saya berusaha berkomunikasi dengan baik dan mendukung rekan-rekan tim agar bisa bekerja sama"
+        </td>
+      </tr>
+      <tr>
+        <td>Hasil</td>
+        <td class="td-strong"><span class="td-tag tag-g">Terukur + dampak</span><br>
+          "Pelaksanaan SKJHI berjalan lancar, rilis publikasi 1 bulan pasca kedatangan — <strong>tercepat sejak 2010</strong>"
+        </td>
+        <td class="td-weak"><span class="td-tag tag-r">Tidak terukur</span><br>
+          "Kegiatan berjalan dengan lancar dan semua anggota tim merasa puas dengan hasilnya"
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr class="divider">
+  <div class="sec-title" style="font-size:15px">Contoh Komponen Kendala: Integritas</div>
+  <table class="compare-table" style="margin-top:1rem">
+    <thead>
+      <tr>
+        <th>Elemen</th>
+        <th class="th-strong">✅ Versi Kuat</th>
+        <th class="th-weak">⚠️ Versi Lemah</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Tekanan</td>
+        <td class="td-strong">"Kepala BPS Babar marah dan <strong>menginstruksikan saya</strong> untuk tidak menyerahkan angka IKG" — tekanan dari atasan langsung yang spesifik</td>
+        <td class="td-weak">"Ada perbedaan pendapat terkait pemenuhan kewajiban yang membuat situasi menjadi tidak nyaman"</td>
+      </tr>
+      <tr>
+        <td>Dilemma</td>
+        <td class="td-strong">Konflik antara loyalitas kepada pimpinan vs kewajiban kontrak yang harus dipenuhi — dilemma etis yang jelas</td>
+        <td class="td-weak">Tidak ada dilemma yang dinarasikan — tampak seperti situasi biasa</td>
+      </tr>
+      <tr>
+        <td>Konsekuensi</td>
+        <td class="td-strong">Mengabaikan instruksi pimpinan — ada risiko personal yang diambil demi integritas</td>
+        <td class="td-weak">Tidak ada risiko yang disebutkan</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════ SECTION: RUBRIC ══════════════════ -->
+<div id="section-rubric" class="section">
+  <div class="sec-title">Rubrik Penilaian Level Kompetensi</div>
+  <div class="sec-sub">Panduan asesor dalam menentukan level kompetensi berdasarkan kualitas evidence yang teridentifikasi dari jawaban STAR. Tuntutan jabatan Administrator/Madya adalah <strong>Level 4</strong>.</div>
+
+  <div id="rubric-container"><div class="rubric-wrap"><table class="rubric-table">
+    <thead><tr>
+      <th>Kompetensi</th>
+      <th style="background:#FAECE7;color:#7A1F1F">Level 1–2</th>
+      <th style="background:#FDF0E4;color:#7A3B00">Level 3</th>
+      <th style="background:#EEF2FB;color:#1F3A8C">Level 4 ← Target</th>
+      <th style="background:#E4F1EC;color:#0B5E3E">Level 5</th>
+    </tr></thead>
+    <tbody><tr>
+      <td>Integritas</td>
+      <td class="rl-1">Menjalankan tugas sesuai aturan dasar, tidak ada pelanggaran prosedur.</td>
+      <td class="rl-3">Mengingatkan tim, menegakkan nilai, mengambil tindakan terhadap pelanggaran prosedur.</td>
+      <td class="rl-4"><strong>Membangun sistem pencegahan, berani menghadapi tekanan eksternal, melaporkan melalui jalur formal.</strong></td>
+      <td class="rl-5">Role model integritas nasional, membangun kultur etika yang mengakar di organisasi.</td>
+    </tr><tr>
+      <td>Kerjasama</td>
+      <td class="rl-1">Berpartisipasi aktif, membantu rekan.</td>
+      <td class="rl-3">Membangun tim efektif, menghargai perbedaan.</td>
+      <td class="rl-4"><strong>Membangun sinergi lintas instansi, mekanisme kolaborasi yang adil dan berkelanjutan.</strong></td>
+      <td class="rl-5">Sinergi strategis lintas organisasi, katalis kolaborasi tingkat nasional.</td>
+    </tr><tr>
+      <td>Komunikasi</td>
+      <td class="rl-1">Menyampaikan informasi dengan jelas.</td>
+      <td class="rl-3">Komunikasi asertif, umpan balik efektif.</td>
+      <td class="rl-4"><strong>Menggalang pandangan dari berbagai pihak berkepentingan berbeda, komunikasi strategis.</strong></td>
+      <td class="rl-5">Komunikasi visioner dan inspiratif, mempengaruhi kebijakan tingkat nasional.</td>
+    </tr><tr>
+      <td>Orientasi pada Hasil</td>
+      <td class="rl-1">Memenuhi standar kerja dasar.</td>
+      <td class="rl-3">Menetapkan target menantang bagi unit, memotivasi tim.</td>
+      <td class="rl-4"><strong>Inovasi strategis untuk melampaui target pemerintah, redesain sistem pencapaian.</strong></td>
+      <td class="rl-5">Menciptakan lingkungan yang mendorong orang berprestasi melampaui target.</td>
+    </tr><tr>
+      <td>Pelayanan Publik</td>
+      <td class="rl-1">Mengikuti standar pelayanan.</td>
+      <td class="rl-3">Mendukung orang lain dalam pelayanan prima.</td>
+      <td class="rl-4"><strong>Mendorong perubahan sistemik, inklusivitas dan aksesibilitas layanan.</strong></td>
+      <td class="rl-5">Membangun sistem kolaborasi dengan mitra pelayanan lintas sektor.</td>
+    </tr><tr>
+      <td>Pengembangan Diri &amp; Orang Lain</td>
+      <td class="rl-1">Mengikuti pelatihan wajib.</td>
+      <td class="rl-3">Membimbing bawahan, umpan balik konstruktif.</td>
+      <td class="rl-4"><strong>Mentor efektif, IDP terpersonalisasi, kaderisasi, membangun bench strength.</strong></td>
+      <td class="rl-5">Menciptakan ekosistem belajar bersama seluruh pemangku kepentingan.</td>
+    </tr><tr>
+      <td>Mengelola Perubahan</td>
+      <td class="rl-1">Mengikuti perubahan dengan arahan.</td>
+      <td class="rl-3">Membantu orang lain mengikuti perubahan.</td>
+      <td class="rl-4"><strong>Memimpin perubahan unit, koalisi perubahan, ubah resistensi jadi energi positif.</strong></td>
+      <td class="rl-5">Memimpin dan menggalang perubahan di tingkat instansi/lintas instansi.</td>
+    </tr><tr>
+      <td>Pengambilan Keputusan</td>
+      <td class="rl-1">Mengidentifikasi masalah, mengumpulkan informasi dasar.</td>
+      <td class="rl-3">Membandingkan alternatif, menyeimbangkan risiko.</td>
+      <td class="rl-4"><strong>Keputusan berisiko tinggi, antisipasi dampak, dokumentasi asumsi secara transparan.</strong></td>
+      <td class="rl-5">Keputusan strategis jangka panjang, mengatasi permasalahan lintas organisasi.</td>
+    </tr><tr>
+      <td>Perekat Bangsa</td>
+      <td class="rl-1">Menghargai perbedaan, tidak diskriminasi.</td>
+      <td class="rl-3">Hubungan harmonis lintas perbedaan, memfasilitasi dialog.</td>
+      <td class="rl-4"><strong>Mendayagunakan perbedaan secara konstruktif, membangun kepercayaan lintas kelompok.</strong></td>
+      <td class="rl-5">Keberagaman sebagai keunggulan strategis, mediator konflik lintas identitas.</td>
+    </tr>
+    </tbody>
+  </table></div>
+  <div class="highlight-box hb-blue" style="margin-top:.5rem">
+    <div class="hb-icon">💡</div>
+    <div class="hb-text">
+      <div class="hb-title">Cara Membaca Rubrik Ini</div>
+      Asesor mencari <strong>bukti perilaku tertinggi</strong> yang teridentifikasi dari jawaban STAR. Jika jawaban Anda mengandung elemen Level 4 meski campuran dengan Level 3, skor yang diberikan adalah Level 4. Sebaliknya, satu indikator Level 5 tidak cukup jika keseluruhan narasi masih Level 3.
+    </div>
+  </div></div>
+</div>
+
+<!-- ══════════════════ SECTION: TIPS ══════════════════ -->
+<div id="section-tips" class="section">
+  <div class="sec-title">Panduan Menulis Jawaban PE Berkualitas Tinggi</div>
+  <div class="sec-sub">Strategi praktis untuk menghasilkan jawaban STAR yang mencerminkan kompetensi level 4.</div>
+
+  <div class="highlight-box hb-blue">
+    <div class="hb-icon">🎯</div>
+    <div class="hb-text">
+      <div class="hb-title">Prinsip Inti: "Konkret, Spesifik, Terukur"</div>
+      Asesor menilai <strong>bukti perilaku</strong>, bukan narasi umum. Setiap kalimat harus menjawab pertanyaan: "Apa yang <em>saya secara spesifik</em> lakukan, kapan, di mana, dan apa dampaknya yang bisa diverifikasi?"
+    </div>
+  </div>
+
+  <div class="tips-grid">
+    <div class="tip-card">
+      <div class="tip-header"><div class="tip-icon">🔵</div><div class="tip-title">S — Situasi</div></div>
+      <div class="tip-list">
+        <div class="tip-item"><div class="tip-bullet">1</div><div class="tip-text">Sebutkan <strong>nama kegiatan resmi</strong> (bukan "suatu kegiatan")</div></div>
+        <div class="tip-item"><div class="tip-bullet">2</div><div class="tip-text">Cantumkan <strong>tahun, waktu, atau periode</strong> yang spesifik</div></div>
+        <div class="tip-item"><div class="tip-bullet">3</div><div class="tip-text">Jelaskan <strong>konteks strategisnya</strong> — mengapa situasi ini penting?</div></div>
+        <div class="tip-item"><div class="tip-bullet">4</div><div class="tip-text">Tunjukkan <strong>kompleksitas atau tantangan bawaan</strong> situasi tersebut</div></div>
+        <div class="tip-item"><div class="tip-bullet">5</div><div class="tip-text">Hindari narasi yang terlalu panjang — 3–5 kalimat sudah cukup untuk situasi</div></div>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-header"><div class="tip-icon">🟠</div><div class="tip-title">K — Kendala</div></div>
+      <div class="tip-list">
+        <div class="tip-item"><div class="tip-bullet">1</div><div class="tip-text">Gambarkan kendala sebagai <strong>tekanan nyata pada diri Anda</strong>, bukan hanya deskripsi situasi</div></div>
+        <div class="tip-item"><div class="tip-bullet">2</div><div class="tip-text">Sebutkan <strong>dilemma atau konflik</strong> yang harus Anda hadapi (orang, aturan, waktu, sumber daya)</div></div>
+        <div class="tip-item"><div class="tip-bullet">3</div><div class="tip-text">Kuantifikasikan hambatan jika memungkinkan: "hanya 8 hari", "80% PC rusak"</div></div>
+        <div class="tip-item"><div class="tip-bullet">4</div><div class="tip-text">Tunjukkan bahwa kendala itu <strong>signifikan</strong> — bukan hambatan rutin yang mudah diatasi</div></div>
+        <div class="tip-item"><div class="tip-bullet">5</div><div class="tip-text">Hindari menyalahkan pihak lain — fokus pada hambatan objektif yang harus dihadapi</div></div>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-header"><div class="tip-icon">🟢</div><div class="tip-title">P — Peran Saya</div></div>
+      <div class="tip-list">
+        <div class="tip-item"><div class="tip-bullet">1</div><div class="tip-text">Mulai dengan <strong>peran/jabatan formal</strong> Anda dalam situasi tersebut</div></div>
+        <div class="tip-item"><div class="tip-bullet">2</div><div class="tip-text">Gunakan kata kerja aktif: "Saya menginisiasi...", "Saya memutuskan...", "Saya memfasilitasi..."</div></div>
+        <div class="tip-item"><div class="tip-bullet">3</div><div class="tip-text">Tunjukkan <strong>inisiatif dan kepemimpinan</strong> — jangan hanya narasi "mengikuti instruksi"</div></div>
+        <div class="tip-item"><div class="tip-bullet">4</div><div class="tip-text">Sebutkan <strong>inovasi atau terobosan</strong> yang berbeda dari cara biasa</div></div>
+        <div class="tip-item"><div class="tip-bullet">5</div><div class="tip-text">Gambarkan bagaimana Anda <strong>menggerakkan orang lain</strong> — bukan hanya mengerjakan sendiri</div></div>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-header"><div class="tip-icon">🔴</div><div class="tip-title">H — Hasil</div></div>
+      <div class="tip-list">
+        <div class="tip-item"><div class="tip-bullet">1</div><div class="tip-text">Cantumkan <strong>angka, peringkat, atau persentase</strong> yang konkret</div></div>
+        <div class="tip-item"><div class="tip-bullet">2</div><div class="tip-text">Sebutkan <strong>penghargaan, sertifikasi, atau pengakuan resmi</strong> jika ada</div></div>
+        <div class="tip-item"><div class="tip-bullet">3</div><div class="tip-text">Bandingkan dengan <strong>baseline atau target</strong>: "melampaui target 3 menjadi 4", "tercepat sejak 2010"</div></div>
+        <div class="tip-item"><div class="tip-bullet">4</div><div class="tip-text">Tunjukkan <strong>dampak jangka panjang atau sistemik</strong> dari tindakan Anda</div></div>
+        <div class="tip-item"><div class="tip-bullet">5</div><div class="tip-text">Akhiri dengan <strong>pelajaran atau legacy</strong> yang ditinggalkan (opsional tapi menambah bobot)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight-box hb-green">
+    <div class="hb-icon">🏆</div>
+    <div class="hb-text">
+      <div class="hb-title">Formula Hasil yang Berkesan</div>
+      <strong>[Pencapaian kuantitatif]</strong> + <strong>[dibandingkan dengan baseline/target]</strong> + <strong>[dampak sistemik yang bertahan]</strong><br><br>
+      Contoh: "4 satker berhasil diusulkan WBBM/WBK — <em>melampaui target 3</em> yang ditetapkan — dan BPS Babel meraih terbaik pertama nasional dalam proporsi pengusulan ke KemenPAN-RB."
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="sec-title" style="font-size:15px">Kesalahan Fatal yang Harus Dihindari</div>
+  <div style="margin-top:1rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+    <div class="highlight-box hb-amber" style="margin-bottom:0">
+      <div class="hb-icon">❌</div>
+      <div class="hb-text">
+        <div class="hb-title">Menjawab dengan "Kami" bukan "Saya"</div>
+        Asesor menilai peran <em>individual</em>. "Kami berhasil menyelesaikan..." tidak memberikan evidence tentang kontribusi Anda secara spesifik. Gunakan "Saya" dan jelaskan tindakan personal.
+      </div>
+    </div>
+    <div class="highlight-box hb-amber" style="margin-bottom:0">
+      <div class="hb-icon">❌</div>
+      <div class="hb-text">
+        <div class="hb-title">Hasil yang tidak terukur</div>
+        "Kegiatan berjalan lancar dan semua pihak merasa puas" tidak dapat diverifikasi asesor. Selalu lampirkan bukti: penghargaan, sertifikasi, angka, peringkat, atau dokumen yang bisa dirujuk.
+      </div>
+    </div>
+    <div class="highlight-box hb-amber" style="margin-bottom:0">
+      <div class="hb-icon">❌</div>
+      <div class="hb-text">
+        <div class="hb-title">Jawaban yang tidak relevan dengan kompetensi</div>
+        Soal Integritas harus menunjukkan dilemma etis, bukan sekadar kerja keras. Pastikan pengalaman yang dipilih memang mengandung behavioral evidence yang sesuai kompetensi yang ditanyakan.
+      </div>
+    </div>
+    <div class="highlight-box hb-amber" style="margin-bottom:0">
+      <div class="hb-icon">❌</div>
+      <div class="hb-text">
+        <div class="hb-title">Situasi terlalu lama/terlalu baru</div>
+        Pengalaman lebih dari 10 tahun lalu atau sangat baru (&lt; 3 bulan) dinilai kurang representatif. Pilih pengalaman 2–7 tahun terakhir yang relevan dengan jabatan yang dilamar.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ SECTION: CHECKLIST ══════════════════ -->
+<div id="section-checklist" class="section active">
+  <div class="sec-title">Self-Checklist Sebelum Submit</div>
+  <div class="sec-sub">Gunakan checklist ini untuk mengevaluasi kualitas jawaban PE Anda sebelum diserahkan. Centang setiap item yang sudah terpenuhi.</div>
+
+  <div class="checklist-grid" id="checklist-container"><div class="checklist-card">
+      <div class="checklist-title">
+        <span>🔵</span> Situasi
+      </div>
+      
+      <label class="check-item">
+        <input type="checkbox" id="chk-0-0" onchange="updateReadiness()">
+        <span class="check-text">Nama kegiatan/program disebutkan secara resmi dan spesifik</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-0-1" onchange="updateReadiness()">
+        <span class="check-text">Tahun atau periode waktu dicantumkan secara jelas</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-0-2" onchange="updateReadiness()">
+        <span class="check-text">Konteks strategis atau implikasi kegiatan dijelaskan</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-0-3" onchange="updateReadiness()">
+        <span class="check-text">Kompleksitas atau tantangan bawaan situasi tergambar</span>
+      </label>
+    </div><div class="checklist-card">
+      <div class="checklist-title">
+        <span>🟠</span> Kendala
+      </div>
+      
+      <label class="check-item">
+        <input type="checkbox" id="chk-1-0" onchange="updateReadiness()">
+        <span class="check-text">Kendala bersifat personal (tekanan pada saya), bukan hanya deskripsi situasi</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-1-1" onchange="updateReadiness()">
+        <span class="check-text">Ada dilemma, konflik nilai, atau pilihan sulit yang harus dihadapi</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-1-2" onchange="updateReadiness()">
+        <span class="check-text">Hambatan dikuantifikasi (waktu, SDM, anggaran, skala)</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-1-3" onchange="updateReadiness()">
+        <span class="check-text">Konsekuensi jika kendala tidak diatasi disebutkan</span>
+      </label>
+    </div><div class="checklist-card">
+      <div class="checklist-title">
+        <span>🟢</span> Peran Saya
+      </div>
+      
+      <label class="check-item">
+        <input type="checkbox" id="chk-2-0" onchange="updateReadiness()">
+        <span class="check-text">Peran/jabatan formal disebutkan di awal</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-2-1" onchange="updateReadiness()">
+        <span class="check-text">Tindakan menggunakan kata kerja aktif ('Saya menginisiasi...', 'Saya memutuskan...')</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-2-2" onchange="updateReadiness()">
+        <span class="check-text">Ada inovasi atau pendekatan yang berbeda dari cara biasa</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-2-3" onchange="updateReadiness()">
+        <span class="check-text">Menunjukkan bagaimana saya menggerakkan orang lain, bukan hanya bekerja sendiri</span>
+      </label>
+    </div><div class="checklist-card">
+      <div class="checklist-title">
+        <span>🔴</span> Hasil
+      </div>
+      
+      <label class="check-item">
+        <input type="checkbox" id="chk-3-0" onchange="updateReadiness()">
+        <span class="check-text">Ada angka, peringkat, persentase, atau indikator yang terukur</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-3-1" onchange="updateReadiness()">
+        <span class="check-text">Ada perbandingan dengan target atau baseline ('melampaui target', 'tercepat sejak...')</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-3-2" onchange="updateReadiness()">
+        <span class="check-text">Ada penghargaan, sertifikasi, atau pengakuan formal jika ada</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-3-3" onchange="updateReadiness()">
+        <span class="check-text">Dampak jangka panjang atau sistemik disebutkan</span>
+      </label>
+    </div><div class="checklist-card">
+      <div class="checklist-title">
+        <span>⭐</span> Relevansi Kompetensi
+      </div>
+      
+      <label class="check-item">
+        <input type="checkbox" id="chk-4-0" onchange="updateReadiness()">
+        <span class="check-text">Pengalaman yang dipilih memang mengandung evidence kompetensi yang ditanyakan</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-4-1" onchange="updateReadiness()">
+        <span class="check-text">Tidak mencampurkan terlalu banyak kompetensi dalam satu cerita</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-4-2" onchange="updateReadiness()">
+        <span class="check-text">Situasi tidak lebih dari 7 tahun lalu</span>
+      </label>
+      <label class="check-item">
+        <input type="checkbox" id="chk-4-3" onchange="updateReadiness()">
+        <span class="check-text">Situasi relevan dengan jenjang/jabatan yang dilamar</span>
+      </label>
+    </div></div>
+
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-top:.5rem">
+    <div style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:.75rem">📊 Skor Kesiapan Anda</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="flex:1;background:#e8ecf8;border-radius:6px;height:12px;overflow:hidden">
+        <div id="readiness-bar" style="height: 12px; border-radius: 6px; background: rgb(224, 108, 108); width: 0%; transition: width 0.5s;"></div>
+      </div>
+      <div id="readiness-pct" style="font-size: 18px; font-weight: 800; color: rgb(224, 108, 108); min-width: 50px;">0%</div>
+    </div>
+    <div id="readiness-label" style="font-size:12px;color:var(--text3);margin-top:.5rem">Centang item yang sudah terpenuhi untuk melihat kesiapan Anda</div>
+  </div>
+</div>
+
+</div><!-- end container -->
+
+<script>
+// ── DATA ────────────────────────────────────────────────
+const KOMPETENSI_SCORES = [
+  {k:"Integritas", skor:4, tuntutan:4, match:100, color:"#4caf7d"},
+  {k:"Kerjasama", skor:3.5, tuntutan:4, match:88, color:"#7fa8ff"},
+  {k:"Komunikasi", skor:4, tuntutan:4, match:100, color:"#4caf7d"},
+  {k:"Orientasi pada Hasil", skor:5, tuntutan:4, match:100, color:"#4caf7d"},
+  {k:"Pelayanan Publik", skor:4, tuntutan:4, match:100, color:"#4caf7d"},
+  {k:"Pengembangan Diri dan Orang Lain", skor:4, tuntutan:4, match:100, color:"#4caf7d"},
+  {k:"Mengelola Perubahan", skor:4, tuntutan:4, match:100, color:"#4caf7d"},
+  {k:"Pengambilan Keputusan", skor:4, tuntutan:4, match:100, color:"#4caf7d"},
+  {k:"Perekat Bangsa", skor:3.5, tuntutan:4, match:88, color:"#7fa8ff"}
+];
+
+const PE_DATA = [
+  {
+    no:1, kompetensi:"Integritas", skor:4, levelLabel:"Level 4 – Mengatasi Pelanggaran Etika Secara Sistemik",
+    qtxt:"Dalam Anda melaksanakan tugas pasti pernah mengalami situasi yang bertentangan dengan nilai, norma, dan etika organisasi. Ceritakan pengalaman terbaik Anda ketika berhasil menghadapi situasi tersebut!",
+    star:{
+      situasi:{text:"Ketika kegiatan penyusunan indeks kesulitan geografis (IKG) dimana BPS Kab. Bangka Barat melakukan kerja sama swakelola tipe 2 dengan Diskominfo Kab. Bangka Barat. Di kesepakatan awal akan diadakan konsultasi bersama ke BPS RI sebanyak 2 kali kegiatan yaitu di awal pelaksanaan kegiatan dan di akhir saat finalisasi angka IKG.",quality:"good",
+        analysis:["Kegiatan disebutkan spesifik: IKG, swakelola tipe 2 dengan Diskominfo","Konteks perjanjian/kesepakatan yang mengikat dijelaskan dengan baik","Saran: tambahkan tahun pelaksanaan untuk lebih terverifikasi"]},
+      kendala:{text:"Proses pengelolaan anggaran oleh Diskominfo Kab. Bangka Barat kurang terbuka. Tatkala Kepala BPS Kab. Bangka Barat mengetahui bahwa anggaran konsultasi kedua telah digunakan oleh Diskominfo Kab. Babar beliau marah dan menginstruksikan saya untuk tidak menyerahkan angka IKG hasil perhitungan. Tentu hal ini bertentangan dengan kesepakatan di perjanjian bahwa BPS Babar bertanggung jawab menyerahkan hasil perhitungan angka IKG.",quality:"excellent",
+        analysis:["Tekanan dari atasan langsung disebutkan eksplisit ('beliau marah dan menginstruksikan saya')","Dilemma etis sangat jelas: loyalitas kepada pimpinan vs kewajiban perjanjian","Ini adalah kendala integritas yang sesungguhnya — bukan hambatan teknis biasa"]},
+      peran:{text:"Peran saya sangat penting, saya dipercaya pimpinan menjadi ketua pelaksana kegiatan, sehingga tindakan yang saya lakukan adalah melakukan pendekatan persuasif ke Kepala BPS Babar dan tim Diskominfo Babar agar mematuhi kesepakatan yang telah dibuat. Kepada Kepala BPS Babar saya mengingatkan bahwa tanggung jawab BPS adalah menyerahkan data IKG, sehingga bila tidak diserahkan berarti telah melalaikan tanggung jawabnya. Kepada tim Diskominfo saya menyampaikan bahwa kesepatakan berupa kebijakan harusnya dijalankan dan bila tidak dapat dipenuhi harus ada komunikasi terbuka sehingga kejadian ini tidak berulang di waktu yang akan datang.",quality:"excellent",
+        analysis:["Tindakan dua arah: kepada pimpinan DAN kepada mitra eksternal","Argumen berbasis nilai dan kewajiban — bukan sekadar negosiasi","Menyertakan langkah preventif agar tidak terulang — indikator L4"]},
+      hasil:{text:"Alhamdulillah situasi konflik yang sempat membuat hubungan BPS dan Diskominfo merenggang dapat diselesaikan dan hubungan kembali menjadi baik dan harmonis.",quality:"ok",
+        analysis:["Hasil positif namun kurang terukur — tidak ada indikator konkret","Saran: tambahkan 'angka IKG akhirnya berhasil diserahkan dan menjadi dasar kebijakan [nama kebijakan]'","Perlu ada dampak yang bisa diverifikasi secara formal"]}
+    }
+  },
+  {
+    no:2, kompetensi:"Kerjasama", skor:3.5, levelLabel:"Level 3–4 – Sinergi Tim Lintas Instansi",
+    qtxt:"Sepanjang perjalanan karir Anda pasti pernah bekerja sama dalam sebuah tim. Ceritakan pengalaman terbaik Anda ketika berhasil bekerja sama dalam tim untuk menyelesaikan suatu tugas pekerjaan!",
+    star:{
+      situasi:{text:"Tanggal 10 Mei 2024 saya dihubungi oleh Biro Humas BPS RI menginformasikan bahwa saya terpilih sebagai salah satu petugas Survei Kepuasan Jamaah Haji Indonesia (SKJHI). Saya terpilih melalui jalur prestasi. Tim SKJHI terdiri dari 6 orang, dimana 5 orang lainnya berasal dari BPS RI.",quality:"excellent",
+        analysis:["Tanggal spesifik (10 Mei 2024) — dapat diverifikasi","Jalur seleksi disebutkan: prestasi sebagai Insan Statistik Teladan Nasional","Komposisi tim jelas: 6 orang, 5 dari BPS RI — konteks lintas hierarki"]},
+      kendala:{text:"Waktu persiapan pemberangkatan dan pendalaman materi SKJHI sangat singkat, tersisa hanya 8 hari, dimana perlu persiapan tim dan individu. Selain itu jadwal keberangkatan sudah lewat 10 hari dari jadwal pelaksanaan survei dari tahun-tahun sebelumnya. Komposisi tim baru terbentuk dan belum mengenal satu dengan yang lain.",quality:"good",
+        analysis:["Tekanan waktu dikuantifikasi: '8 hari', 'mundur 10 hari dari jadwal normal'","Tim baru = tantangan interpersonal yang nyata","Saran: tambahkan tekanan dari ekspektasi BPS RI sebagai instansi yang mengirim"]},
+      peran:{text:"Saya terpilih sebagai petugas SKJHI dari jalur prestasi sebagai Insan Statistik Teladan Nasional dan Change Champion terbaik 3 Nasional. Saya langsung berinisiatif untuk membangun sinergi di internal (antar anggota tim dan petugas senior) dan eksternal (tim kemenag). Selanjutnya saya dipercaya menjadi public relationship oleh ketua tim, untuk semakin memantapkan sinergi dengan stakeholder eksternal seperti Tim Kemenag, Jurnalis, TNI dan Polri. Terobosan yang saya lakukan yang belum pernah ada dalam pelaksanaan SKJHI sebelum-sebelumnya yaitu memfasilitasi mobil antar-jemput untuk petugas SKJHI yang berada di Madinah dan penyediaan konsumsi makan siang di kantor sektor-sektor Madinah.",quality:"excellent",
+        analysis:["Inovasi yang belum pernah ada disebutkan eksplisit — sangat kuat","Peran dipercaya oleh ketua tim sebagai PR menunjukkan kepercayaan kelompok","Jangkauan sinergi luas: internal, Kemenag, jurnalis, TNI/Polri"]},
+      hasil:{text:"Alhamdulillah pelaksanaan SKJHI berjalan lancar dan sukses, rilis publikasi dapat diselesaikan 1 bulan pasca kedatangan di tanah air. Hal ini menjadi rilis tercepat dalam pelaksanaak SKJHI yang telah berlangsung sejak tahun 2010.",quality:"excellent",
+        analysis:["'Rilis tercepat sejak 2010' — benchmark historis yang sangat kuat","Timeline spesifik: 1 bulan pasca kedatangan","Dapat diverifikasi oleh asesor melalui arsip BPS"]}
+    }
+  },
+  {
+    no:3, kompetensi:"Komunikasi", skor:4, levelLabel:"Level 4 – Menggalang Pandangan Positif dari Berbagai Pihak",
+    qtxt:"Ceritakan pengalaman terbaik Anda ketika berhasil dalam tugas pekerjaan yang menuntut kemampuan untuk berkomunikasi dengan orang lain!",
+    star:{
+      situasi:{text:"Kegiatan pemantauan dan evaluasi kegiatan penyelenggaraan pelayanan publik (PEKPPP) tahun 2023 yang dilaksanakan pada bulan Februari-Mei.",quality:"good",
+        analysis:["Nama kegiatan resmi disebutkan: PEKPPP","Periode waktu spesifik: Februari-Mei 2023","Saran: jelaskan sedikit lebih lanjut bobot/implikasi penilaian PEKPPP ini"]},
+      kendala:{text:"Selama ini pelaksanaan PEKPPP di BPS Provinsi Kep. Babel dibebankan pada penanggung jawab PST dan tim IPDS. Terbatasnya sumber daya manusia dan infrastruktur dimana PEKPPP ini aspek yang dinilai tidak hanya dalam ruang lingkup PST namun mencakup seluruh perkantoran.",quality:"ok",
+        analysis:["Kendala SDM dan infrastruktur tergambar tapi masih bisa lebih spesifik","Saran: berapa banyak staf yang tersedia vs yang dibutuhkan?","Saran: sebutkan konsekuensi jika PEKPPP tidak berhasil"]},
+      peran:{text:"Sebagai anggota tim IPDS dan ketua tim RB, saya mengusulkan gagasan ke pimpinan agar dibentuk tim adhoc yang bertugas khusus melengkapi bukti dukung pada LKE PEKPPP. Pimpinan setuju dan memercayakan saya sebagai ketua tim pelaksana. Saya bertanggung jawab agar kegiatan ini diselesaikan dengan baik, tepat dan cepat. Untuk dapat menyelesaikan pekerjaan ini saya merancang strategi dengan mengintegrasikan informasi-informasi dari berbagai pihak ke dalam konsep yang dibuat dalam paparan. Langkah berikutnya saya membentuk tim yang disesuaikan dengan aspek-aspek dalam LKE. Saya memilih orang-orang yang kompeten dan mengutamakan yang beririsan pekerjaan rutin dengan aspek dalam LKE.",quality:"excellent",
+        analysis:["Inisiatif tinggi: mengusulkan gagasan pembentukan tim adhoc","Kepercayaan diberikan dari atas: 'pimpinan setuju dan memercayakan saya'","Strategi integrasi informasi menunjukkan kompetensi komunikasi L4"]},
+      hasil:{text:"Hasil penilaian mandiri PEKPPP oleh BPS RI, BPS Babel berhasil masuk 10 besar dengan kategori indeks pelayanan publik berkategori sangat baik, dan berkesampatan tahun berikutnya ikut sertifikasi ISO 9001:2015.",quality:"excellent",
+        analysis:["Masuk 10 besar nasional — terukur dan terverifikasi","Dampak jangka panjang: diikutsertakan sertifikasi ISO 9001:2015","Kausalitas antara tindakan dan hasil sangat jelas"]}
+    }
+  },
+  {
+    no:4, kompetensi:"Orientasi pada Hasil", skor:5, levelLabel:"Level 5 – Mendorong Melampaui Target, Penghargaan Nasional",
+    qtxt:"Ceritakan pengalaman Anda ketika berhasil menyelesaikan tugas dalam situasi yang sulit dengan tetap berpegang pada kualitas hasil dan target kerja!",
+    star:{
+      situasi:{text:"Pengumpulan bukti dukung lembar kerja pembangunan (LKE) pembangunan zona integritas (ZI) BPS se-Provinsi Kepulauan Babel.",quality:"good",
+        analysis:["Kegiatan ZI skala provinsi — cakupan lebih luas dari unit sendiri","LKE ZI adalah dokumen formal yang hasilnya diverifikasi KemenPAN-RB","Konteks nasional memberi bobot tinggi pada pencapaian ini"]},
+      kendala:{text:"Waktu yang terbatas (deadline penyelesaian yang semakin dekat) sementara kegiatan rutin di tiap tim kerja sedang padat-padatnya, dan saat di penghujung deadline saya harus mengikuti kegiatan workshop change management di Jakarta",quality:"good",
+        analysis:["Multi-tasking pressure yang nyata: deadline ZI + workshop di Jakarta","Tekanan ganda pada waktu paling kritis diungkap dengan baik","Saran: sebutkan berapa banyak satker yang harus dikoordinasi"]},
+      peran:{text:"Peran saya saat itu sebagai ketua Tim Pembangunan ZI dan Reformasi Birokrasi. Saya bertanggung jawab agar pekerjaan ini dapat selesai dengan tepat, cermat dan optimal. Untuk dapat menyelesaikan pekerjaan ini dengan baik saya membentuk tim sekretariat dan tim inti di tiap pilar. Dalam setiap pilar saya menempatkan orang-orang yang kompeten dan berpengalaman dalam pembangunan ZI.",quality:"excellent",
+        analysis:["Struktur tim yang rinci: sekretariat + tim inti per pilar","Pemilihan orang kompeten menunjukkan strategic deployment of talent","Monitoring rutin + turun langsung = kepemimpinan yang turun ke lapangan"]},
+      hasil:{text:"4 satker yaitu BPS Provinsi Babel diusulkan WBBM dan 3 satker BPS Kab/Kota diusulkan ke WBK Kemenpan RB. Hal ini melampai target yang ditetapkan dimana target awal 3 satker yang akan diusulkan, realisasinya 4 satker. Selain itu BPS Prov. Babel juga mendapat penghargaan dari BPS RI sebagai terbaik pertama satker dengan proporsi terbesar pengulusan WBK/WBBM ke Kemenpan RB.",quality:"excellent",
+        analysis:["Melampaui target dengan angka jelas: 3→4 satker (133% dari target)","Penghargaan terbaik pertama nasional dari BPS RI — evidence L5","Dua level pencapaian: kuantitas (4 satker) + kualitas (penghargaan)"]}
+    }
+  },
+  {
+    no:5, kompetensi:"Pelayanan Publik", skor:4, levelLabel:"Level 4 – Mendorong Perubahan Sistemik Layanan",
+    qtxt:"Ceritakan pengalaman Anda ketika berhasil memberikan pelayanan yang berhubungan dengan tugas Anda sehari-hari.",
+    star:{
+      situasi:{text:"Indeks pelayanan publik BPS Prov. Babel belum berkategori pelayanan prima. Proses pelayanan di PST belum terdigitalisasi secara menyeluruh.",quality:"ok",
+        analysis:["Situasi berbasis gap yang jelas: belum kategori prima","Saran: tambahkan konteks skor indeks awal vs target yang ingin dicapai","Saran: sebutkan tahun baseline dan tahun target"]},
+      kendala:{text:"Belum optimalnya pengelolaan pelayanan statistik terpadu baik dari sisi SDM maupun infrastruktur.",quality:"ok",
+        analysis:["Kendala valid tapi agak umum","Saran: jelaskan lebih spesifik hambatan SDM-nya apa, infrastruktur-nya apa","Saran: berapa banyak pengunjung yang tidak terlayani optimal?"]},
+      peran:{text:"Sebagai change champion dan ketua tim manajemen perubahan, saya menginisiasi program manajemen perubahan PST Make Over dengan tujuan mengoptimalkan nilai indeks pelayanan publik BPS Babel menjadi kategori pelayanan prima. Sasaran dari PST Make Over adalah optimalisasi SOP service excellence, transformasi ruang PST (PST digital), dan penyediaan aplikasi chat bot PST Mobile.",quality:"excellent",
+        analysis:["Program bernama resmi: 'PST Make Over' — dapat diverifikasi","Tiga sasaran terstruktur: SOP + ruang PST digital + aplikasi chatbot","Inisiatif sistemik: mengubah sistem, bukan hanya perilaku individu"]},
+      hasil:{text:"Indeks pelayanan publik BPS Prov. Babel meningkat signifikan menjadi berkategori pelayanan prima. BPS Babel selanjutnya berhasil meraih sertifikasi ISO 9001:2015 untuk pelayanan publik standar internasional.",quality:"excellent",
+        analysis:["Dua pencapaian terverifikasi: kategori prima + ISO 9001:2015","ISO 9001:2015 adalah sertifikasi standar internasional yang sangat kuat","Saran: tambahkan angka indeks sebelum vs sesudah untuk dampak lebih terukur"]}
+    }
+  },
+  {
+    no:6, kompetensi:"Pengembangan Diri dan Orang Lain", skor:4, levelLabel:"Level 4 – Mentor dan Kaderisasi Efektif",
+    qtxt:"Ceritakan pengalaman Anda ketika berhasil melakukan pengembangan diri dan juga orang lain yang terkait dengan pekerjaan Anda.",
+    star:{
+      situasi:{text:"Awal tahun 2023 saya dipercaya menjadi change champion dan ketua tim manajemen perubahan. Ada 3 program intervensi nasional dan 7 program intervensi khusus yang harus dijalankan dengan baik dan optimal.",quality:"good",
+        analysis:["Peran ganda yang kompleks disebutkan: CC + ketua tim RB","10 program = beban kerja yang signifikan, konteks yang bagus","Saran: sebutkan satu atau dua program yang paling strategis sebagai fokus"]},
+      kendala:{text:"Di tahun yang sama, saya dipercaya menjadi ketua tim reformasi birokrasi dan pembangunan zona integritas, selain itu juga masih menjadi kontributor utama dalam tim pengolahan dan pengembangan aplikasi. Sehingga dibutuhkan efektivitas dan pembagian kerja yang baik agar seluruh tanggung jawab pekerjaan dapat diselesaikan dengan baik.",quality:"good",
+        analysis:["Konflik sumber daya personal: tiga tanggung jawab besar sekaligus","'Kontributor utama' menunjukkan bukan peran pinggiran","Saran: jelaskan mana yang paling berat dan bagaimana dampaknya"]},
+      peran:{text:"Saya sebagai change champion (CC) bertanggung jawab terhadap semua program manajemen perubahan berjalan baik, lancar dan optimal. Langkah awal yang saya lakukan dengan merekrut 8 orang pegawai lainnya untuk menjadi change ambassador (CA) yang tergabung dalam tim pengelola manajemen perubahan. Melalui pendekatan persuasif saya berupaya mengoptimalkan peran masing-masing CA sebagai PJ dari program manajemen perubahan. Bersama-sama para CA, dilakukan rapat untuk merancang detail kegiatan dari masing-masing program. Saya melakukan monitoring dan evaluasi berkala termasuk mengumpulkan feedback dari program yang sudah berjalan. Saya juga terus melakukan pengembangan diri dengan banyak membaca buku softskills dan leadership serta mengikuti pelatihan-pelatihan yang ada di warkop pusdiklat maupun di luar kantor. Selanjutnya pengetahuan-pengetahuan tersebut saya bagikan kepada para CA secara informal maupun formal dalam rapat atau kegiatan pembinaan. Melalui knowledge sharing dan coaching saya berupaya melakukan kaderisasi agar salah satu CA dapat menjadi CC selanjutnya.",quality:"excellent",
+        analysis:["Kaderisasi eksplisit: 'agar salah satu CA dapat menjadi CC selanjutnya' — tanda L4+","Knowledge sharing formal + informal = pendekatan mentor yang menyeluruh","Pengembangan diri sendiri: membaca buku, pelatihan, lalu disebarkan ke CA"]},
+      hasil:{text:"Alhamdulillah semua program manajemen perubahan dapat terlaksana dengan baik dan lancar. BPS Babel berhasil meraih penghargaan sebagai satker Terbaik 3 dalam pengelolaan program manajemen perubahan. Saya berhasil menjadi CC terbaik 3 nasional dan salah satu CA dapat menjadi CC di tahun berikutnya.",quality:"excellent",
+        analysis:["Tiga lapisan hasil: organisasi (terbaik 3) + diri (CC terbaik 3) + orang lain (CA jadi CC)","Kaderisasi berhasil terbukti: CA menjadi CC — dampak pengembangan orang lain terverifikasi","Ini adalah evidence terkuat kompetensi Pengembangan Diri dan Orang Lain L4"]}
+    }
+  },
+  {
+    no:7, kompetensi:"Mengelola Perubahan", skor:4, levelLabel:"Level 4 – Memimpin Transformasi Digital pada Unit Kerja",
+    qtxt:"Ceritakan pengalaman keberhasilan Anda ketika dihadapkan pada situasi yang menuntut Anda untuk berubah dengan cepat.",
+    star:{
+      situasi:{text:"Dalam pengelolaan keuangan dan kinerja, BPS Prov. Babel belum terdigitalisasi sepenuhnya. Masih terdapat proses yang dilakukan secara konvensional dan paper base. Sehingga masih ditemukan kesalahan dalam format tercetak seperti penjumlahan, tanggal, tahun dan judul. BPS RI merilis aplikasi backoffice untuk pengelolaan anggaran dan aplikasi keepAp untuk pengelolaan kinerja.",quality:"good",
+        analysis:["Gap yang jelas: proses konvensional vs tuntutan digitalisasi","Contoh konkret masalah paper-based: kesalahan penjumlahan, tanggal, tahun","Inisiasi dari BPS RI memberikan konteks kebijakan yang mengikat"]},
+      kendala:{text:"Aplikasi ini merupakan aplikasi baru sehingga mayoritas pegawai belum familiar. Pada saat implementasinya, terjadi resistensi dikalangan pegawai karena merasa sudah nyaman dengan metode lama. Pegawai merasa terbebani dan mempersulit pekerjaan berkaitan dengan keuangan dan kinerja.",quality:"good",
+        analysis:["Resistensi dikuantifikasikan: 'mayoritas pegawai' belum familiar","Psikologi resistensi digambarkan dengan baik: nyaman dengan yang lama","Saran: sebutkan berapa persen pegawai yang awalnya menolak"]},
+      peran:{text:"Sebagai admin SPBE di BPS Provinsi, saya bertanggung jawab agar proses transformasi digital dalam pengelolaan keuangan dan kinerja dapat berjalan baik dan tepat. Sebagai langkah awal, saya mengadakan sosialisasi terkait manfaat jangka pendek, menengah dan panjang dari implementasi backoffice dan kippAp. Setelah seluruh pegawai terinfokan dengan baik, saya membuat knowledge sharing dan briefing penggunaan aplikasi. Selanjutnya, melakukan asistensi kepada pegawai yang masih menemukan kendala dalam penggunaannya. Saya tak sungkan untuk turun langsung mengajari penggunaan aplikasi bagi pegawai yang melapor mengalami kesulitan.",quality:"excellent",
+        analysis:["Strategi tiga tahap: sosialisasi manfaat → knowledge sharing → asistensi langsung","Manfaat jangka pendek-menengah-panjang: menunjukkan komunikasi perubahan yang matang","Turun langsung: menghilangkan jarak pemimpin-staf dalam transformasi"]},
+      hasil:{text:"Implementasi backoffice dan kipApp berjalan baik sesuai jadwal, diterima oleh semua pegawai, dan pegawai dapat merasakan manfaat signifikan dari penerapan aplikasi-aplikasi tersebut.",quality:"ok",
+        analysis:["Hasil positif namun bisa lebih terukur","Saran: sebutkan berapa % efisiensi, atau berapa error yang berkurang","Saran: ada pengakuan dari BPS RI atau satker lain atas implementasinya?"]}
+    }
+  },
+  {
+    no:8, kompetensi:"Pengambilan Keputusan", skor:4, levelLabel:"Level 4 – Keputusan Berisiko Tinggi dalam Tekanan Waktu",
+    qtxt:"Ceritakan pengalaman keberhasilan Anda ketika menghadapi situasi yang menyebabkan Anda harus mengambil keputusan diantara banyak pilihan situasi yang sulit.",
+    star:{
+      situasi:{text:"Akhir tahun 2022 BPS dihadapkan dengan tantangan pekerjaan baru yaitu kegiatan pendataan registrasi sosial ekonomi (regsosek). Kegiatan ini merupakan pemutakhiran rumah tangga untuk mengetahui strata rumah tangga dari tingkat kemiskinannya. Kegiatan ini mendata seluruh rumah tangga sehingga persis dengan kegiatan sensus penduduk. Proses pendataan menggunakan kertas sehingga pengolahan data menggunakan data entri. Durasi pengolahannya hanya 1 bulan.",quality:"excellent",
+        analysis:["Konteks nasional besar: Regsosek skala sensus, akhir tahun 2022","Kompleksitas teknis dijelaskan: paper-based, data entri, 1 bulan saja","Bandingkan dengan sensus untuk memberikan gambaran skala tantangan"]},
+      kendala:{text:"Proses pengolahan data dengan data entri memerlukan kesiapan baik infrastruktur dan ketersediaan operator entri yang mumpuni. Kegiatan yang baru muncul di akhir tahun dengan skala seperti sensus tentu menjadi tantangan tersendiri. Banyak PC olah di BPS Kab/Kota yang sudah rusak. Perekrutan mitra entri dengan waktu yang singkat sulit dipenuhi khususnya di wilayah jauh dari perkotaan.",quality:"excellent",
+        analysis:["Multi-dimensi kendala: infrastruktur rusak + SDM mitra + waktu singkat + geografi","Masalah konkret disebutkan: PC rusak, mitra entri langka di daerah terpencil","Konteks akhir tahun menambah tekanan: anggaran tahunan akan habis"]},
+      peran:{text:"Saya sebagai PJ teknis pengolahan yang juga Innas Pengolahan Regsosek harus bertindak cepat dan tepat karena durasi pengolahan yang cukup singkat. Saya langsung menginventarisir kebutuhan infrastruktur, infrastruktur existing, ketersediaan mitra entri dan mitigasi risiko pengolahan guna sebagai bahan strategi pengolahan. Dari inventarisir dan mitigasi risiko tersebut, beberapa kab/kota tidak memungkinkan untuk dilakukan pengolahan di kab/kota masing-masing secara tepat waktu. Oleh karena itu dari beberapa alternatif solusi yang telah didiskusikan bersama tim pengolahan provinsi, saya mengambil keputusan beban pengolahan dipindahkan sebagian ke BPS Provinsi.",quality:"excellent",
+        analysis:["Analisis berbasis data: inventarisir infrastruktur + mitigasi risiko sebelum memutuskan","Keputusan berani: sentralisasi sebagian pengolahan ke provinsi — solusi non-konvensional","'Didiskusikan bersama tim' tapi 'saya mengambil keputusan' — kepemimpinan yang akuntabel"]},
+      hasil:{text:"Kegiatan pengolahan regsosek dapat diselesaikan sebelum deadline yang telah ditetapkan sehingga masih bisa dilakukan pengecekan kewajaran isian hasil entri untuk meningkatkan kualitas hasil pengolahan.",quality:"good",
+        analysis:["Selesai sebelum deadline — ini adalah baseline keberhasilan","Tambahan nilai: ada quality control pasca-entri yang meningkatkan kualitas data","Saran: sebutkan berapa satker yang dipindahkan dan seberapa signifikan dampaknya"]}
+    }
+  },
+  {
+    no:9, kompetensi:"Perekat Bangsa", skor:3.5, levelLabel:"Level 3–4 – Adaptasi Lintas Budaya dengan Dampak Kerja",
+    qtxt:"Ceritakan pengalaman keberhasilan Anda dalam membina hubungan yang harmonis ketika bekerja dengan kolega dengan keberagaman tersebut!",
+    star:{
+      situasi:{text:"Penempatan tugas pertama saya setelah lulus kuliah di BPS Kabupaten Maluku Tengah, Provinsi Maluku. Tidak pernah terbayang akan dapat penempatan langsung di daerah wilayah timur Indonesia, dengan keragaman etnis, suku dan agama.",quality:"good",
+        analysis:["Konteks keberagaman nyata: Maluku pasca-kerusuhan SARA","Latar belakang lintas budaya ekstrem: Jawa ke Maluku Timur","Saran: sebutkan tahun masuk lebih spesifik dan kondisi pasca-konflik yang relevan"]},
+      kendala:{text:"Salah satu kendala yang saya hadapi saat pertama kali tiba di Kabupaten Maluku Tengah pada Februari 2010 adalah kendala bahasa, kemudian kultur masyarakatnya yang terkotak-kotak sebagai dampak sisa-sisa kerusuhan umat beragama. Selain itu kondisi daerah yang sepi, sangat jarang angkutan umum, angkutan umum kebanyakan ojek motor dan becak kayuh.",quality:"good",
+        analysis:["Tahun spesifik: Februari 2010 — dapat diverifikasi","Hambatan multi-dimensional: bahasa + budaya terkotak + isolasi geografis","Konteks sisa kerusuhan memberi bobot kompetensi Perekat Bangsa yang tinggi"]},
+      peran:{text:"Saya sebagai pendatang baru tentunya harus mampu menempatkan diri dan melakukan adaptasi cepat kepada rekan-rekan kantor dan lingkungan sekitar. Strategi yang saya lakukan adalah sering mengajak berkomunikasi baik rekan-rekan maupun tetangga rumah agar proses pembelajaran bahasa daerah lebih cepat saya kuasai. Mendengarkan, memerhatikan, dan mempraktekkan bahasa daerah Maluku serta tidak segan bertanya kepada lawan bicara bila ada kata yang tidak saya mengerti sehingga semakin menambah kosakata yang saya hapal.",quality:"good",
+        analysis:["Strategi aktif: sering mengajak komunikasi, tidak segan bertanya","Pendekatan empatik dan rendah hati terhadap perbedaan budaya","Saran: tambahkan tindakan yang lebih strategis untuk membangun jembatan antar kelompok"]},
+      hasil:{text:"Dengan semakin lancarnya saya berbahasa daerah Maluku semakin menambah keakraban dan keharmonisan dengan sesama rekan kantor dan tetangga sekitar rumah. Komunikasi yang lancar ini berkorelasi pada peningkatan kerja sama diantara kami. Saya berhasil membina hubungan yang baik dengan semua rekan kerja baik pegawai organik maupun mitra sehingga memudahkan saya dalam mengemban tugas di sana.",quality:"ok",
+        analysis:["Hasil personal cukup baik: hubungan harmonis, kerja sama meningkat","Namun kurang dampak sistemik atau pencapaian terverifikasi","Saran: sebutkan pencapaian tugas konkret yang dimungkinkan oleh harmoni ini (misalnya coverage survei, penerimaan masyarakat)"]}
+    }
+  }
+];
+
+const RUBRIC_DATA = [
+  {komp:"Integritas", l1:"Menjalankan tugas sesuai aturan dasar, tidak ada pelanggaran prosedur.", l3:"Mengingatkan tim, menegakkan nilai, mengambil tindakan terhadap pelanggaran prosedur.", l4:"Membangun sistem pencegahan, berani menghadapi tekanan eksternal, melaporkan melalui jalur formal.", l5:"Role model integritas nasional, membangun kultur etika yang mengakar di organisasi."},
+  {komp:"Kerjasama", l1:"Berpartisipasi aktif, membantu rekan.", l3:"Membangun tim efektif, menghargai perbedaan.", l4:"Membangun sinergi lintas instansi, mekanisme kolaborasi yang adil dan berkelanjutan.", l5:"Sinergi strategis lintas organisasi, katalis kolaborasi tingkat nasional."},
+  {komp:"Komunikasi", l1:"Menyampaikan informasi dengan jelas.", l3:"Komunikasi asertif, umpan balik efektif.", l4:"Menggalang pandangan dari berbagai pihak berkepentingan berbeda, komunikasi strategis.", l5:"Komunikasi visioner dan inspiratif, mempengaruhi kebijakan tingkat nasional."},
+  {komp:"Orientasi pada Hasil", l1:"Memenuhi standar kerja dasar.", l3:"Menetapkan target menantang bagi unit, memotivasi tim.", l4:"Inovasi strategis untuk melampaui target pemerintah, redesain sistem pencapaian.", l5:"Menciptakan lingkungan yang mendorong orang berprestasi melampaui target."},
+  {komp:"Pelayanan Publik", l1:"Mengikuti standar pelayanan.", l3:"Mendukung orang lain dalam pelayanan prima.", l4:"Mendorong perubahan sistemik, inklusivitas dan aksesibilitas layanan.", l5:"Membangun sistem kolaborasi dengan mitra pelayanan lintas sektor."},
+  {komp:"Pengembangan Diri & Orang Lain", l1:"Mengikuti pelatihan wajib.", l3:"Membimbing bawahan, umpan balik konstruktif.", l4:"Mentor efektif, IDP terpersonalisasi, kaderisasi, membangun bench strength.", l5:"Menciptakan ekosistem belajar bersama seluruh pemangku kepentingan."},
+  {komp:"Mengelola Perubahan", l1:"Mengikuti perubahan dengan arahan.", l3:"Membantu orang lain mengikuti perubahan.", l4:"Memimpin perubahan unit, koalisi perubahan, ubah resistensi jadi energi positif.", l5:"Memimpin dan menggalang perubahan di tingkat instansi/lintas instansi."},
+  {komp:"Pengambilan Keputusan", l1:"Mengidentifikasi masalah, mengumpulkan informasi dasar.", l3:"Membandingkan alternatif, menyeimbangkan risiko.", l4:"Keputusan berisiko tinggi, antisipasi dampak, dokumentasi asumsi secara transparan.", l5:"Keputusan strategis jangka panjang, mengatasi permasalahan lintas organisasi."},
+  {komp:"Perekat Bangsa", l1:"Menghargai perbedaan, tidak diskriminasi.", l3:"Hubungan harmonis lintas perbedaan, memfasilitasi dialog.", l4:"Mendayagunakan perbedaan secara konstruktif, membangun kepercayaan lintas kelompok.", l5:"Keberagaman sebagai keunggulan strategis, mediator konflik lintas identitas."}
+];
+
+const CHECKLIST_DATA = [
+  {section:"Situasi", items:[
+    "Nama kegiatan/program disebutkan secara resmi dan spesifik",
+    "Tahun atau periode waktu dicantumkan secara jelas",
+    "Konteks strategis atau implikasi kegiatan dijelaskan",
+    "Kompleksitas atau tantangan bawaan situasi tergambar"
+  ]},
+  {section:"Kendala", items:[
+    "Kendala bersifat personal (tekanan pada saya), bukan hanya deskripsi situasi",
+    "Ada dilemma, konflik nilai, atau pilihan sulit yang harus dihadapi",
+    "Hambatan dikuantifikasi (waktu, SDM, anggaran, skala)",
+    "Konsekuensi jika kendala tidak diatasi disebutkan"
+  ]},
+  {section:"Peran Saya", items:[
+    "Peran/jabatan formal disebutkan di awal",
+    "Tindakan menggunakan kata kerja aktif ('Saya menginisiasi...', 'Saya memutuskan...')",
+    "Ada inovasi atau pendekatan yang berbeda dari cara biasa",
+    "Menunjukkan bagaimana saya menggerakkan orang lain, bukan hanya bekerja sendiri"
+  ]},
+  {section:"Hasil", items:[
+    "Ada angka, peringkat, persentase, atau indikator yang terukur",
+    "Ada perbandingan dengan target atau baseline ('melampaui target', 'tercepat sejak...')",
+    "Ada penghargaan, sertifikasi, atau pengakuan formal jika ada",
+    "Dampak jangka panjang atau sistemik disebutkan"
+  ]},
+  {section:"Relevansi Kompetensi", items:[
+    "Pengalaman yang dipilih memang mengandung evidence kompetensi yang ditanyakan",
+    "Tidak mencampurkan terlalu banyak kompetensi dalam satu cerita",
+    "Situasi tidak lebih dari 7 tahun lalu",
+    "Situasi relevan dengan jenjang/jabatan yang dilamar"
+  ]}
+];
+
+// ── RENDER ───────────────────────────────────────────────
+function renderKompBars(){
+  const c = document.getElementById('komp-bars-container');
+  c.innerHTML = KOMPETENSI_SCORES.map(d => {
+    const pct = d.match;
+    const w = pct;
+    const color = pct >= 100 ? '#4caf7d' : pct >= 80 ? '#7fa8ff' : '#f0a04b';
+    const tuntLabel = `L${d.tuntutan} tuntutan`;
+    const skorLabel = `L${d.skor} aktual`;
+    return `<div class="komp-row">
+      <span class="komp-name">${d.k}</span>
+      <div class="komp-bar-outer"><div class="komp-bar-inner" style="width:0%;background:${color}" data-w="${w}"></div></div>
+      <span class="komp-score" style="color:${color}">${d.skor}/5</span>
+      <span class="level-label">${tuntLabel} · ${skorLabel}</span>
+    </div>`;
+  }).join('');
+  setTimeout(() => {
+    document.querySelectorAll('.komp-bar-inner').forEach(el => {
+      el.style.width = el.dataset.w + '%';
+    });
+  }, 200);
+}
+
+const QUALITY_MAP = {
+  excellent:{label:'Sangat Kuat', cls:'chip-excellent'},
+  good:{label:'Kuat', cls:'chip-good'},
+  ok:{label:'Cukup', cls:'chip-ok'},
+  weak:{label:'Lemah', cls:'chip-weak'}
+};
+
+function renderAccordion(){
+  const c = document.getElementById('pe-accordion-container');
+  c.innerHTML = PE_DATA.map(q => {
+    const starKeys = [
+      {k:'situasi', badge:'S', title:'Situasi', cls:'sl-s'},
+      {k:'kendala', badge:'K', title:'Kendala yang Dihadapi', cls:'sl-k'},
+      {k:'peran',   badge:'P', title:'Peran Saya', cls:'sl-p'},
+      {k:'hasil',   badge:'H', title:'Hasil', cls:'sl-h'}
+    ];
+    const starHtml = starKeys.map(({k,badge,title,cls}) => {
+      const d = q.star[k];
+      const qm = QUALITY_MAP[d.quality];
+      return `<div class="star-block">
+        <div class="star-block-header">
+          <div class="star-letter ${cls}">${badge}</div>
+          <div class="star-block-title">${title}</div>
+          <span class="star-quality-chip ${qm.cls}">${qm.label}</span>
+        </div>
+        <div class="star-answer">${esc(d.text)}</div>
+        <div class="star-analysis">
+          <div class="analysis-label">Analisis Asesor</div>
+          <div class="analysis-items">
+            ${d.analysis.map((a,i) => {
+              const dot = a.startsWith('Saran') ? 'dot-amber' : i === 0 ? 'dot-green' : 'dot-blue';
+              return `<div class="analysis-item"><div class="aitem-dot ${dot}"></div><div class="aitem-text">${esc(a)}</div></div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const color = q.skor >= 4 ? '#4caf7d' : q.skor >= 3.5 ? '#7fa8ff' : '#f0a04b';
+    return `<div class="pe-question-card">
+      <div class="pe-q-header" onclick="toggleCard(this)">
+        <div class="pe-q-num">${q.no}</div>
+        <div class="pe-q-komp">${q.kompetensi}</div>
+        <div class="pe-q-score">
+          <span class="pe-q-badge">${q.levelLabel}</span>
+          <span class="pe-q-badge" style="background:rgba(255,255,255,.3)">Skor ${q.skor}/5</span>
+        </div>
+        <div class="pe-q-chevron">▾</div>
+      </div>
+      <div class="pe-q-body">
+        <div class="q-text-box">${esc(q.qtxt)}</div>
+        ${starHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderRubric(){
+  const c = document.getElementById('rubric-container');
+  c.innerHTML = `<div class="rubric-wrap"><table class="rubric-table">
+    <thead><tr>
+      <th>Kompetensi</th>
+      <th style="background:#FAECE7;color:#7A1F1F">Level 1–2</th>
+      <th style="background:#FDF0E4;color:#7A3B00">Level 3</th>
+      <th style="background:#EEF2FB;color:#1F3A8C">Level 4 ← Target</th>
+      <th style="background:#E4F1EC;color:#0B5E3E">Level 5</th>
+    </tr></thead>
+    <tbody>${RUBRIC_DATA.map(r => `<tr>
+      <td>${r.komp}</td>
+      <td class="rl-1">${r.l1}</td>
+      <td class="rl-3">${r.l3}</td>
+      <td class="rl-4"><strong>${r.l4}</strong></td>
+      <td class="rl-5">${r.l5}</td>
+    </tr>`).join('')}
+    </tbody>
+  </table></div>
+  <div class="highlight-box hb-blue" style="margin-top:.5rem">
+    <div class="hb-icon">💡</div>
+    <div class="hb-text">
+      <div class="hb-title">Cara Membaca Rubrik Ini</div>
+      Asesor mencari <strong>bukti perilaku tertinggi</strong> yang teridentifikasi dari jawaban STAR. Jika jawaban Anda mengandung elemen Level 4 meski campuran dengan Level 3, skor yang diberikan adalah Level 4. Sebaliknya, satu indikator Level 5 tidak cukup jika keseluruhan narasi masih Level 3.
+    </div>
+  </div>`;
+}
+
+function renderChecklist(){
+  const c = document.getElementById('checklist-container');
+  let totalItems = 0;
+  c.innerHTML = CHECKLIST_DATA.map((section, si) => {
+    totalItems += section.items.length;
+    const itemsHtml = section.items.map((item, ii) => `
+      <label class="check-item">
+        <input type="checkbox" id="chk-${si}-${ii}" onchange="updateReadiness()">
+        <span class="check-text">${item}</span>
+      </label>`).join('');
+    return `<div class="checklist-card">
+      <div class="checklist-title">
+        <span>${['🔵','🟠','🟢','🔴','⭐'][si]}</span> ${section.section}
+      </div>
+      ${itemsHtml}
+    </div>`;
+  }).join('');
+  window._totalCheckItems = totalItems;
+}
+
+function updateReadiness(){
+  const total = window._totalCheckItems || 20;
+  const checked = document.querySelectorAll('#checklist-container input:checked').length;
+  const pct = Math.round((checked / total) * 100);
+  document.getElementById('readiness-bar').style.width = pct + '%';
+  document.getElementById('readiness-pct').textContent = pct + '%';
+  const color = pct >= 80 ? '#4caf7d' : pct >= 60 ? '#7fa8ff' : pct >= 40 ? '#f0a04b' : '#e06c6c';
+  document.getElementById('readiness-bar').style.background = color;
+  document.getElementById('readiness-pct').style.color = color;
+  const labels = {
+    0:'Centang item yang sudah terpenuhi untuk melihat kesiapan Anda',
+    20:'Masih banyak yang perlu diperkuat sebelum asesmen',
+    40:'Sudah ada fondasi, tapi perlu penguatan signifikan',
+    60:'Jawaban cukup baik, perkuat bagian yang belum tercentang',
+    80:'Jawaban kuat! Tinggal sempurnakan beberapa detail',
+    100:'Siap untuk asesmen. Tinjau ulang sekali lagi dan percaya diri!'
+  };
+  const lk = Object.keys(labels).map(Number).filter(k => pct >= k).pop();
+  document.getElementById('readiness-label').textContent = labels[lk];
+}
+
+function toggleCard(hdr){
+  const body = hdr.nextElementSibling;
+  const chev = hdr.querySelector('.pe-q-chevron');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('section-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  window.scrollTo(0, 120);
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ── INIT ─────────────────────────────────────────────────
+renderKompBars();
+renderAccordion();
+renderRubric();
+renderChecklist();
+</script>
+
+
+</body></html>
