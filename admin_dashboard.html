@@ -953,7 +953,9 @@ function renderKompetensi(){
 // ═══════════════════════════════════════════════════════
 //  DETAIL PANEL
 // ═══════════════════════════════════════════════════════
+let currentDetailDocId = null;
 function openDetail(docId){
+  currentDetailDocId = docId;
   const doc = allDocs.find(d => d.id === docId);
   if(!doc) return;
   const p = getPeserta(doc);
@@ -1043,7 +1045,7 @@ function openDetail(docId){
     // Check if JPM already cached
     const cachedJPM = jpmCache[doc.id];
     const jpmResultHTML = cachedJPM
-      ? renderJPMResult(cachedJPM, getPeserta(doc).jenjang)
+      ? renderJPMResult(cachedJPM, getPeserta(doc).jenjang, doc.id)
       : `<div id="jpm-result-area-${doc.id}">
           <button class="btn-jpm" onclick="runJPM('${doc.id}')">
             🎯 Jalankan Analisis Job-Person Match
@@ -1398,7 +1400,7 @@ async function runJPM(docId){
     jpmCache[docId] = result;
 
     // Render result
-    areaEl.innerHTML = renderJPMResult(result, p.jenjang);
+    areaEl.innerHTML = renderJPMResult(result, p.jenjang, docId);
 
     // Save to Firebase
     try {
@@ -1424,7 +1426,7 @@ async function runJPM(docId){
 }
 
 // Render JPM result HTML
-function renderJPMResult(result, jenjang){
+function renderJPMResult(result, jenjang, docId){
   const overall = result.jpm_overall || 0;
   const cat = result.jpm_kategori || '';
   const reqLevel = REQUIRED_LEVEL[jenjang] || 4;
@@ -1561,7 +1563,7 @@ function renderJPMResult(result, jenjang){
     </div>
 
     <div style="text-align:right;margin-top:.75rem">
-      <button class="td-btn" onclick="runJPM('${currentDetailDocId}')">↻ Analisis Ulang</button>
+      <button class="td-btn" onclick="runJPM('${docId}')">↻ Analisis Ulang</button>
     </div>`;
 }
 
@@ -1572,14 +1574,7 @@ function toggleJPMKomp(id){
   if(chev){ chev.classList.toggle('open'); }
 }
 
-// Track current open detail
-let currentDetailDocId = null;
-const _origOpenDetail = openDetail;
-// Override openDetail to track current doc
-function openDetail(docId){
-  currentDetailDocId = docId;
-  _origOpenDetail(docId);
-}
+// currentDetailDocId is set inside openDetail directly (see function above)
 
 // ── JPM AGGREGATE PAGE ──────────────────────────────────
 function renderJPMAggregate(){
