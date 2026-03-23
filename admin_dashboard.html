@@ -191,6 +191,10 @@ td{padding:.75rem 1rem;font-size:13px;color:#c8d0e8}
 .modal-btn-success{background:rgba(76,175,125,.15);color:#4caf7d;border:1px solid rgba(76,175,125,.3)}.modal-btn-success:hover{background:#0F6E56;color:#fff}
 .modal-input{width:100%;padding:9px 12px;background:#0f1523;border:1px solid #2e3d66;border-radius:8px;color:#e8ecf8;font-size:13px;outline:none;margin-top:.75rem;font-family:inherit}
 .modal-input:focus{border-color:#4b6fcc}
+.modal-form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-top:.75rem}
+.modal-form-group label{font-size:11px;font-weight:600;color:#4a5470;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px}
+.edit-info-btn{display:inline-flex;align-items:center;gap:6px;margin-top:.75rem;padding:7px 14px;background:transparent;border:1px solid #2e3d66;border-radius:8px;color:#7a88aa;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.edit-info-btn:hover{border-color:#7fa8ff;color:#7fa8ff;background:rgba(127,168,255,.08)}
 
 /* ── JPM ANALYSIS ── */
 .btn-jpm{width:100%;padding:11px;background:linear-gradient(135deg,#1F3A8C,#2a6fff);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.03em;margin-top:.5rem}
@@ -973,6 +977,7 @@ function openDetail(docId){
       <div class="info-item"><div class="info-item-label">Session ID</div><div class="info-item-val" style="font-size:11px;font-family:monospace;color:#7a88aa">${doc.id}</div></div>
       <div class="info-item"><div class="info-item-label">Waktu Submit</div><div class="info-item-val">${fmtDate(getTimestamp(doc))}</div></div>
     </div>
+    <button class="edit-info-btn" onclick="editPeserta('${doc.id}')">✏️ Edit Data Peserta</button>
   </div>`;
 
   // ── SJT ──
@@ -1685,6 +1690,73 @@ function showToast(msg, isErr){
   t.style.color = isErr ? '#e06c6c' : '#4caf7d';
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════════════════
+//  EDIT DATA PESERTA
+// ═══════════════════════════════════════════════════════
+function editPeserta(docId){
+  const doc = allDocs.find(d => d.id === docId);
+  if(!doc) return;
+  const p = getPeserta(doc);
+  showModal({
+    icon: '✏️',
+    title: 'Edit Data Peserta',
+    body: `
+      <div class="modal-form-row">
+        <div class="modal-form-group">
+          <label>Nama Lengkap</label>
+          <input class="modal-input" id="edit-nama" type="text" value="${esc(p.nama||'')}" placeholder="Nama lengkap">
+        </div>
+        <div class="modal-form-group">
+          <label>NIP</label>
+          <input class="modal-input" id="edit-nip" type="text" value="${esc(p.nip||'')}" placeholder="NIP">
+        </div>
+      </div>
+      <div class="modal-form-group" style="margin-top:.75rem">
+        <label>Unit Kerja</label>
+        <input class="modal-input" id="edit-unit" type="text" value="${esc(p.unit||'')}" placeholder="BPS Provinsi / Kab / Kota">
+      </div>
+      <div class="modal-form-group" style="margin-top:.75rem">
+        <label>Jenjang yang Dilamar</label>
+        <select class="modal-input" id="edit-jenjang">
+          <option value="Pengawas" ${p.jenjang==='Pengawas'?'selected':''}>Pengawas (Eselon IV)</option>
+          <option value="Administrator" ${p.jenjang==='Administrator'?'selected':''}>Administrator / Madya (Eselon III)</option>
+          <option value="Pratama" ${p.jenjang==='Pratama'?'selected':''}>Pratama (Eselon II)</option>
+        </select>
+      </div>`,
+    buttons: [
+      { label: 'Batal', type: 'cancel', action: null },
+      { label: 'Simpan Perubahan', type: 'success', action: () => saveEditPeserta(docId) }
+    ]
+  });
+}
+
+async function saveEditPeserta(docId){
+  const nama    = document.getElementById('edit-nama')?.value?.trim();
+  const nip     = document.getElementById('edit-nip')?.value?.trim();
+  const unit    = document.getElementById('edit-unit')?.value?.trim();
+  const jenjang = document.getElementById('edit-jenjang')?.value;
+  if(!nama || !nip || !unit){ showToast('Nama, NIP, dan Unit Kerja wajib diisi', true); return; }
+  try {
+    const newPeserta = { nama, nip, unit, jenjang };
+    await db.collection('asesmen_mansoskul').doc(docId).update({ peserta: newPeserta });
+    const idx = allDocs.findIndex(d => d.id === docId);
+    if(idx >= 0){
+      allDocs[idx].peserta = newPeserta;
+      if(allDocs[idx].pe)  allDocs[idx].pe.peserta  = newPeserta;
+      if(allDocs[idx].sjt) allDocs[idx].sjt.peserta = newPeserta;
+    }
+    renderTable(); renderTable2();
+    openDetail(docId);
+    showToast(`✓ Data "${nama}" berhasil diperbarui`);
+  } catch(e){
+    showModal({
+      icon: '❌', title: 'Gagal Menyimpan',
+      body: `Terjadi kesalahan: <span style="color:#e06c6c;font-size:12px">${e.message}</span>`,
+      buttons: [{ label: 'Tutup', type: 'cancel', action: null }]
+    });
+  }
 }
 </script>
 </body>
